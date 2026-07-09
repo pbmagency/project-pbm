@@ -46,17 +46,22 @@ export function Faq() {
     return (
         <section
             ref={ref}
-            className="border-b border-lp-border-soft bg-lp-bg-elevated"
+            className="relative overflow-hidden border-b border-lp-border-soft bg-lp-bg-elevated"
         >
-            <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:py-28">
+            <div className="pointer-events-none absolute inset-0 bg-lp-grid opacity-30" />
+
+            <div className="relative mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:py-28">
                 <div className="text-center">
                     <Eyebrow className="mx-auto">Sebelum Kamu Daftar</Eyebrow>
-                    <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-lp-text sm:text-4xl">
-                        Pertanyaan yang Sering Muncul
+                    <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-lp-text sm:text-4xl lg:text-5xl">
+                        Pertanyaan yang{' '}
+                        <span className="bg-gradient-to-r from-lp-primary to-lp-primary-2 bg-clip-text text-transparent">
+                            Sering Muncul
+                        </span>
                     </h2>
                 </div>
 
-                <div className="mt-9 flex flex-col gap-2.5">
+                <div className="mt-10 flex flex-col gap-2.5">
                     {FAQS.map((faq, index) => {
                         const isOpen = openIndex === index;
 
@@ -68,17 +73,34 @@ export function Faq() {
                                     setOpenIndex(isOpen ? null : index)
                                 }
                             >
-                                <div className="overflow-hidden rounded-2xl border border-lp-border bg-lp-bg">
+                                <div
+                                    className={cn(
+                                        'lp-gradient-border lp-gradient-border-inner overflow-hidden rounded-2xl bg-lp-bg/70 backdrop-blur-sm transition-all',
+                                        isOpen && 'lp-glow',
+                                    )}
+                                >
                                     <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 px-5.5 py-4.5 text-left">
                                         <span className="text-[15.5px] font-semibold text-lp-text">
                                             {faq.question}
                                         </span>
-                                        <ChevronDown
+                                        <span
                                             className={cn(
-                                                'h-5 w-5 shrink-0 text-lp-primary-ink transition-transform',
-                                                isOpen && 'rotate-180',
+                                                'flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all',
+                                                isOpen
+                                                    ? 'bg-gradient-to-br from-lp-primary to-lp-primary-2'
+                                                    : 'bg-lp-bg-elevated-2',
                                             )}
-                                        />
+                                        >
+                                            <ChevronDown
+                                                className={cn(
+                                                    'h-4 w-4 shrink-0 transition-transform',
+                                                    isOpen
+                                                        ? 'rotate-180 text-white'
+                                                        : 'text-lp-primary-ink',
+                                                )}
+                                                strokeWidth={2.5}
+                                            />
+                                        </span>
                                     </CollapsibleTrigger>
                                     <CollapsibleContent className="px-5.5 pb-5 text-[15px] text-lp-text-muted">
                                         {faq.answer}
@@ -89,7 +111,7 @@ export function Faq() {
                     })}
                 </div>
 
-                <div className="mt-10 flex flex-col items-center gap-4">
+                <div className="mt-11 flex flex-col items-center gap-4">
                     <CtaButton location="faq_primary">
                         Masih Ragu? Daftar Sekarang
                     </CtaButton>
