@@ -81,23 +81,173 @@
 }
 
 :root {
-    --lp-bg: oklch(0.15 0.02 230);
-    --lp-bg-elevated: oklch(0.195 0.022 230);
-    --lp-bg-elevated-2: oklch(0.24 0.024 230);
-    --lp-border: oklch(0.32 0.028 230);
-    --lp-border-soft: oklch(0.27 0.024 230);
-    --lp-text: oklch(0.97 0.008 230);
-    --lp-text-muted: oklch(0.74 0.016 230);
-    --lp-text-dim: oklch(0.56 0.016 230);
-    --lp-primary: oklch(0.62 0.2 224);
-    --lp-primary-2: oklch(0.46 0.2 230);
-    --lp-primary-soft: oklch(0.27 0.07 224);
-    --lp-primary-ink: oklch(0.8 0.1 224);
-    --lp-danger: oklch(0.63 0.19 25);
-    --lp-danger-soft: oklch(0.27 0.07 25);
-    --lp-amber: oklch(0.78 0.15 75);
-    --lp-amber-soft: oklch(0.3 0.07 75);
-    --lp-amber-ink: oklch(0.82 0.13 75);
+    --lp-bg: oklch(0.14 0.022 245);
+    --lp-bg-elevated: oklch(0.185 0.026 240);
+    --lp-bg-elevated-2: oklch(0.23 0.03 235);
+    --lp-border: oklch(0.32 0.032 232);
+    --lp-border-soft: oklch(0.26 0.028 235);
+    --lp-text: oklch(0.98 0.008 230);
+    --lp-text-muted: oklch(0.75 0.02 232);
+    --lp-text-dim: oklch(0.58 0.024 235);
+    --lp-primary: oklch(0.68 0.19 232);
+    --lp-primary-2: oklch(0.5 0.22 268);
+    --lp-primary-soft: oklch(0.29 0.09 232);
+    --lp-primary-ink: oklch(0.82 0.12 228);
+    --lp-danger: oklch(0.66 0.2 22);
+    --lp-danger-soft: oklch(0.28 0.08 22);
+    --lp-amber: oklch(0.8 0.16 78);
+    --lp-amber-soft: oklch(0.32 0.08 78);
+    --lp-amber-ink: oklch(0.85 0.14 78);
+}
+
+/* ================== Landing page atmospheric utilities ================== */
+
+/* Subtle grid backdrop, drawn as two gradient stripes */
+@utility bg-lp-grid {
+    background-image:
+        linear-gradient(to right, oklch(0.7 0.15 232 / 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, oklch(0.7 0.15 232 / 0.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+
+/* Fine grain noise using layered radial dots */
+@utility bg-lp-dots {
+    background-image: radial-gradient(oklch(0.8 0.15 232 / 0.08) 1px, transparent 1px);
+    background-size: 22px 22px;
+}
+
+/* Ambient primary glow shadow */
+@utility lp-glow {
+    box-shadow:
+        0 0 0 1px oklch(0.68 0.19 232 / 0.15),
+        0 20px 60px -20px oklch(0.5 0.22 250 / 0.55),
+        0 0 80px -30px oklch(0.68 0.19 232 / 0.45);
+}
+
+@utility lp-glow-amber {
+    box-shadow:
+        0 0 0 1px oklch(0.8 0.16 78 / 0.2),
+        0 20px 60px -20px oklch(0.75 0.16 78 / 0.35),
+        0 0 60px -25px oklch(0.8 0.16 78 / 0.4);
+}
+
+/* Glass surface */
+@utility lp-glass {
+    background: linear-gradient(
+        135deg,
+        oklch(0.24 0.03 235 / 0.7),
+        oklch(0.18 0.026 240 / 0.55)
+    );
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+
+/* Gradient border via padding trick */
+@utility lp-gradient-border {
+    position: relative;
+    background-clip: padding-box;
+    border: 1px solid transparent;
+}
+@utility lp-gradient-border-inner {
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        padding: 1px;
+        border-radius: inherit;
+        background: linear-gradient(
+            135deg,
+            oklch(0.68 0.19 232 / 0.55),
+            oklch(0.5 0.22 268 / 0.15) 40%,
+            oklch(0.68 0.19 232 / 0.05) 60%,
+            oklch(0.5 0.22 268 / 0.5)
+        );
+        -webkit-mask:
+            linear-gradient(#000 0 0) content-box,
+            linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+}
+
+/* Aurora blobs animation */
+@keyframes lp-aurora {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.55; }
+    50% { transform: translate3d(30px, -20px, 0) scale(1.15); opacity: 0.8; }
+}
+@utility animate-lp-aurora {
+    animation: lp-aurora 14s ease-in-out infinite;
+}
+
+@keyframes lp-aurora-alt {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); opacity: 0.6; }
+    50% { transform: translate3d(-30px, 25px, 0) scale(0.9); opacity: 0.85; }
+}
+@utility animate-lp-aurora-alt {
+    animation: lp-aurora-alt 18s ease-in-out infinite;
+}
+
+/* Slow float for decorative badges */
+@keyframes lp-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+@utility animate-lp-float {
+    animation: lp-float 5s ease-in-out infinite;
+}
+@utility animate-lp-float-alt {
+    animation: lp-float 6.5s ease-in-out infinite 0.8s;
+}
+
+/* Shimmer sweep for CTAs */
+@keyframes lp-shimmer {
+    0% { transform: translateX(-120%); }
+    100% { transform: translateX(220%); }
+}
+@utility animate-lp-shimmer {
+    animation: lp-shimmer 2.8s ease-in-out infinite;
+}
+
+/* Slow pulse ring */
+@keyframes lp-pulse-ring {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+@utility animate-lp-pulse-ring {
+    animation: lp-pulse-ring 2.2s ease-out infinite;
+}
+
+/* Bar grow for hero mini chart */
+@keyframes lp-bar-grow {
+    from { transform: scaleY(0.1); }
+    to { transform: scaleY(1); }
+}
+@utility animate-lp-bar {
+    transform-origin: bottom;
+    animation: lp-bar-grow 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Section divider — subtle radial glow */
+@utility lp-divider-glow {
+    position: relative;
+    &::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 0;
+        width: 60%;
+        height: 1px;
+        transform: translateX(-50%);
+        background: linear-gradient(
+            to right,
+            transparent,
+            oklch(0.68 0.19 232 / 0.5),
+            transparent
+        );
+    }
 }
 
 :root {
