@@ -35,7 +35,13 @@ export default function Landing() {
                 />
             </Head>
 
-            <div className="min-h-screen bg-lp-bg font-sans">
+            <div className="relative min-h-screen overflow-hidden bg-lp-bg font-sans text-lp-text">
+                {/* Global atmospheric layer */}
+                <div className="pointer-events-none fixed inset-0 -z-10">
+                    <div className="absolute top-[20%] -left-40 h-[500px] w-[500px] rounded-full bg-lp-primary/10 blur-[160px]" />
+                    <div className="absolute top-[60%] -right-40 h-[500px] w-[500px] rounded-full bg-lp-primary-2/12 blur-[160px]" />
+                </div>
+
                 <Navbar />
                 <main>
                     <Hero />
