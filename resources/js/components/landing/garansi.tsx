@@ -1,5 +1,4 @@
 import { ShieldCheck } from 'lucide-react';
-import { Eyebrow } from '@/components/landing/eyebrow';
 import { useSectionView } from '@/hooks/use-section-view';
 
 export function Garansi() {
@@ -8,35 +7,45 @@ export function Garansi() {
     return (
         <section
             ref={ref}
-            className="relative overflow-hidden border-b border-lp-border-soft bg-lp-bg-elevated"
+            className="relative overflow-hidden border-b border-lp-border-soft bg-lp-bg pb-16 sm:pb-24"
         >
-            <div className="pointer-events-none absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-lp-primary/15 blur-[120px]" />
+            {/* Ambient glow — sama dengan pricing */}
+            <div className="pointer-events-none absolute inset-0">
+                <div className="absolute top-1/3 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-lp-primary-2/25 blur-[150px]" />
+                <div className="absolute inset-0 bg-lp-grid opacity-40" />
+            </div>
 
-            <div className="relative mx-auto max-w-xl px-4 py-14 text-center sm:px-6 sm:py-20">
-                <Eyebrow className="mx-auto">Komitmen Kami</Eyebrow>
+            <div className="relative mx-auto max-w-lg px-4 sm:px-6">
+                {/* Card garansi — layout horizontal seperti referensi */}
+                <div className="lp-gradient-border-inner lp-gradient-border rounded-[24px] bg-lp-bg-elevated/80 p-6 backdrop-blur-sm sm:p-7">
+                    <div className="flex gap-5">
+                        {/* Icon kiri */}
+                        <div className="shrink-0">
+                            <div className="relative flex h-12 w-12 items-center justify-center">
+                                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-lp-primary to-lp-primary-2 opacity-25 blur-md" />
+                                <div className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-lp-primary/20 to-lp-primary-2/15 ring-1 ring-lp-primary/30">
+                                    <ShieldCheck className="h-6 w-6 text-lp-primary-ink" />
+                                </div>
+                            </div>
+                        </div>
 
-                <div className="lp-gradient-border lp-gradient-border-inner mt-8 rounded-[24px] bg-lp-bg/70 p-7 backdrop-blur-sm sm:p-10">
-                    <div className="relative mx-auto flex h-16 w-16 items-center justify-center">
-                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-lp-primary to-lp-primary-2 opacity-40 blur-lg" />
-                        <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-lp-primary/30 to-lp-primary-2/20 ring-1 ring-lp-primary/40">
-                            <ShieldCheck className="h-7 w-7 text-lp-primary-ink" />
+                        {/* Konten kanan */}
+                        <div className="min-w-0">
+                            <h2 className="font-display text-lg font-extrabold tracking-tight text-lp-text">
+                                Garansi Kepuasan
+                            </h2>
+                            <p className="mt-0.5 font-mono text-[11px] tracking-[0.12em] text-lp-primary-ink uppercase">
+                                100% Uang Kembali
+                            </p>
+                            <p className="mt-3 text-[14px] leading-relaxed text-lp-text-muted">
+                                Jika lo ikut full, tapi masih ngerasa webinar
+                                tidak bermanfaat?{' '}
+                                <span className="font-semibold text-lp-text">
+                                    Kami refund 100% tanpa syarat ribet.
+                                </span>{' '}
+                            </p>
                         </div>
                     </div>
-
-                    <h2 className="mt-6 text-2xl font-extrabold tracking-tight text-lp-text sm:text-[30px]">
-                        Bukan Garansi Uang Kembali.{' '}
-                        <span className="bg-gradient-to-r from-lp-primary to-lp-primary-2 bg-clip-text text-transparent">
-                            Ini Lebih dari Itu.
-                        </span>
-                    </h2>
-
-                    <p className="mx-auto mt-5 max-w-[52ch] text-base text-lp-text-muted">
-                        Kalau kamu ikut penuh sesi live ini dan ngerasa belum
-                        dapat kejelasan yang dijanjikan, kamu berhak dapat sesi
-                        tambahan atau kelas pengganti. Kami percaya diri sama
-                        isi webinar ini, dan itu yang bikin kami berani kasih
-                        komitmen ini.
-                    </p>
                 </div>
             </div>
         </section>

@@ -267,6 +267,7 @@ class AbTestingService
     {
         $labels = [
             'hero' => 'Hero',
+            'trust' => 'Quick Proof',
             'problem' => 'Problem',
             'solution' => 'Solution',
             'benefit' => 'Benefit',

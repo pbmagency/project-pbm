@@ -6,9 +6,9 @@ import { useSectionView } from '@/hooks/use-section-view';
 
 const INCLUDES = [
     'Live Session & Rekaman Webinar "The Silent Conversion Leak"',
-    'Ebook "Iklan Sudah Jalan, Tapi Kok Tetap Boncos?"',
-    'Kesempatan Tanya Jawab Langsung dengan Justin Wijaya',
-    'Personal Funnel Audit Gratis Setelah Webinar',
+    'Bonus: Ebook "Iklan Sudah Jalan, Tapi Kok Tetap Boncos?"',
+    'Bonus: Akses Tanya Jawab Langsung Dengan Mentor',
+    'Bonus: Kesempatan Funnel Audit Gratis',
 ];
 
 export function Pricing() {
@@ -25,16 +25,16 @@ export function Pricing() {
                 <div className="absolute inset-0 bg-lp-grid opacity-40" />
             </div>
 
-            <div className="relative mx-auto max-w-lg px-4 py-16 sm:px-6 sm:py-24 lg:py-28">
+            <div className="relative mx-auto max-w-lg px-4 pt-16 pb-10 sm:px-6 sm:pt-24 sm:pb-12 lg:pt-28">
                 <div className="text-center">
                     <Eyebrow className="mx-auto" tone="amber">
                         Early Bird
                     </Eyebrow>
 
-                    <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-lp-text sm:text-[38px]">
+                    <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-lp-text sm:text-[38px]">
                         Investasi Terbaik buat{' '}
                         <span className="bg-gradient-to-r from-lp-primary to-lp-primary-2 bg-clip-text text-transparent">
-                            Funnel Kamu
+                            Funnel Lo
                         </span>
                     </h2>
                 </div>
@@ -42,10 +42,10 @@ export function Pricing() {
                 <div className="relative mt-10">
                     <div className="absolute -inset-3 rounded-[28px] bg-gradient-to-br from-lp-primary via-lp-primary-2 to-lp-amber opacity-40 blur-2xl" />
 
-                    <div className="lp-gradient-border lp-gradient-border-inner relative overflow-hidden rounded-[24px] bg-lp-bg-elevated shadow-[0_40px_80px_-20px_rgba(0,0,0,0.7)]">
+                    <div className="lp-gradient-border-inner lp-gradient-border relative overflow-hidden rounded-[24px] bg-lp-bg-elevated shadow-[0_40px_80px_-20px_rgba(0,0,0,0.7)]">
                         <div className="p-7 sm:p-9">
                             <p className="font-mono text-[11px] tracking-[0.16em] text-lp-text-dim uppercase">
-                                Yang Kamu Dapatkan
+                                Yang Lo Dapatkan
                             </p>
                             <ul className="mt-5 flex flex-col gap-1">
                                 {INCLUDES.map((item) => (
@@ -76,19 +76,18 @@ export function Pricing() {
 
                             <div className="relative">
                                 <p className="text-[13px] text-white/80 line-through">
-                                    Harga Normal Rp399.000
+                                    Harga Normal Rp299.000
                                 </p>
                                 <p className="mt-1.5 font-mono text-[11px] tracking-[0.18em] text-white/90 uppercase">
                                     Harga Early Bird
                                 </p>
-                                <p className="mt-2 text-6xl font-extrabold tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
+                                <p className="mt-2 font-display text-6xl font-extrabold tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
                                     Rp129.000
                                 </p>
 
                                 <div className="mt-6 border-t border-white/25 pt-5">
                                     <p className="font-mono text-[10.5px] tracking-[0.14em] text-white/80 uppercase">
-                                        Harga early bird ini terasa lebih
-                                        mendesak dalam
+                                        Harga early bird berakhir dalam
                                     </p>
                                     <div className="mt-3">
                                         <CountdownTimer />
@@ -102,7 +101,7 @@ export function Pricing() {
                                         variant="white"
                                         className="w-full"
                                     >
-                                        Amankan Harga Early Bird, Rp129.000
+                                        Amankan Seat Saya
                                     </CtaButton>
                                 </div>
                                 <p className="mt-3.5 text-xs text-white/80">
@@ -113,11 +112,6 @@ export function Pricing() {
                         </div>
                     </div>
                 </div>
-
-                <p className="mt-6 text-center text-[13.5px] text-lp-text-dim">
-                    Audit personal ini juga bisa jadi langkah awal kalau kamu
-                    butuh bantuan lebih lanjut menggarap funnel kamu.
-                </p>
             </div>
         </section>
     );

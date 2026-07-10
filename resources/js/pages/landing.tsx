@@ -11,6 +11,8 @@ import { Navbar } from '@/components/landing/navbar';
 import { Pricing } from '@/components/landing/pricing';
 import { Problem } from '@/components/landing/problem';
 import { Proof } from '@/components/landing/proof';
+import { QuickProof } from '@/components/landing/quick-proof';
+import { SocialProofBar } from '@/components/landing/social-proof-bar';
 import { Solution } from '@/components/landing/solution';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { useDwellTime } from '@/hooks/use-dwell-time';
@@ -35,7 +37,7 @@ export default function Landing() {
                 />
             </Head>
 
-            <div className="relative min-h-screen overflow-hidden bg-lp-bg font-sans text-lp-text">
+            <div className="relative min-h-screen overflow-clip bg-lp-bg font-sans text-lp-text">
                 {/* Global atmospheric layer */}
                 <div className="pointer-events-none fixed inset-0 -z-10">
                     <div className="absolute top-[20%] -left-40 h-[500px] w-[500px] rounded-full bg-lp-primary/10 blur-[160px]" />
@@ -45,6 +47,8 @@ export default function Landing() {
                 <Navbar />
                 <main>
                     <Hero />
+                    <SocialProofBar />
+                    {/* <QuickProof /> */}
                     <Problem />
                     <Solution />
                     <Benefit />

@@ -14,11 +14,11 @@ const FAQS = [
     {
         question:
             'Iklan saya udah jalan bagus, CTR tinggi, CPC rendah, ini relevan buat saya?',
-        answer: 'Justru itu targetnya. Webinar ini dibuat khusus untuk kamu yang iklannya sudah jalan dengan baik, tapi closingnya masih tertahan. Kalau kamu ngerasa masalahnya ada di iklan itu sendiri, ini mungkin bukan tempat yang tepat dulu.',
+        answer: 'Justru itu targetnya. Webinar ini dibuat khusus untuk lo yang iklannya sudah jalan dengan baik, tapi closingnya masih tertahan. Kalau lo ngerasa masalahnya ada di iklan itu sendiri, ini mungkin bukan tempat yang tepat dulu.',
     },
     {
         question: 'Traffic saya udah ramai, kenapa closing masih rendah?',
-        answer: 'Karena ramai dan closing itu dua hal berbeda. Traffic ramai cuma menunjukkan iklan kamu berhasil menarik perhatian. Yang menentukan closing ada di lapisan lapisan setelahnya, dari halaman sampai penawaran, yang kita bedah tuntas di webinar ini.',
+        answer: 'Karena ramai dan closing itu dua hal berbeda. Traffic ramai cuma menunjukkan iklan lo berhasil menarik perhatian. Yang menentukan closing ada di lapisan lapisan setelahnya, dari halaman sampai penawaran, yang kita bedah tuntas di webinar ini.',
     },
     {
         question: 'Apa saja yang saya dapat kalau daftar?',
@@ -26,16 +26,16 @@ const FAQS = [
     },
     {
         question: 'Webinarnya kapan, dan platformnya apa?',
-        answer: 'Jadwal lengkap dan link platform dikirim lewat email setelah kamu daftar. Pastikan email yang kamu masukkan aktif.',
+        answer: 'Jadwal lengkap dan link platform dikirim lewat email setelah lo daftar. Pastikan email yang lo masukkan aktif.',
     },
     {
         question: 'Audit personal setelah webinar itu ngapain aja?',
-        answer: 'Funnel kamu ditinjau langsung, dicari titik titik yang berpotensi bocor. Ini juga jadi kesempatan buat kami mengenal bisnis kamu lebih jauh, kalau ke depannya kamu butuh bantuan lebih lanjut.',
+        answer: 'Funnel lo ditinjau langsung, dicari titik titik yang berpotensi bocor. Ini juga jadi kesempatan buat kami mengenal bisnis lo lebih jauh, kalau ke depannya lo butuh bantuan lebih lanjut.',
     },
     {
         question:
             'Saya baru mulai jalanin iklan dan belum yakin iklannya sendiri bagus, cocok gak?',
-        answer: 'Belum tentu. Webinar ini fokus untuk kamu yang iklannya sudah menunjukkan hasil baik, CTR dan CPC sehat, tapi closingnya belum ikut naik. Kalau iklan kamu sendiri yang masih dicari formulanya, ini bukan prioritas pertamamu.',
+        answer: 'Belum tentu. Webinar ini fokus untuk lo yang iklannya sudah menunjukkan hasil baik, CTR dan CPC sehat, tapi closingnya belum ikut naik. Kalau iklan lo sendiri yang masih dicari formulanya, ini bukan prioritas pertama lo.',
     },
 ];
 
@@ -52,8 +52,8 @@ export function Faq() {
 
             <div className="relative mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:py-28">
                 <div className="text-center">
-                    <Eyebrow className="mx-auto">Sebelum Kamu Daftar</Eyebrow>
-                    <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-lp-text sm:text-4xl lg:text-5xl">
+                    <Eyebrow className="mx-auto">Sebelum Lo Daftar</Eyebrow>
+                    <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-lp-text sm:text-4xl lg:text-5xl">
                         Pertanyaan yang{' '}
                         <span className="bg-gradient-to-r from-lp-primary to-lp-primary-2 bg-clip-text text-transparent">
                             Sering Muncul
@@ -75,7 +75,7 @@ export function Faq() {
                             >
                                 <div
                                     className={cn(
-                                        'lp-gradient-border lp-gradient-border-inner overflow-hidden rounded-2xl bg-lp-bg/70 backdrop-blur-sm transition-all',
+                                        'lp-gradient-border-inner lp-gradient-border overflow-hidden rounded-2xl bg-lp-bg/70 backdrop-blur-sm transition-all',
                                         isOpen && 'lp-glow',
                                     )}
                                 >
@@ -112,19 +112,9 @@ export function Faq() {
                 </div>
 
                 <div className="mt-11 flex flex-col items-center gap-4">
-                    <CtaButton location="faq_primary">
-                        Masih Ragu? Daftar Sekarang
+                    <CtaButton location="faq_primary" showTrustBadges>
+                        Amankan Seat Sekarang
                     </CtaButton>
-
-                    <a
-                        href="https://wa.me/6281385059742"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm text-lp-text-dim transition-colors hover:text-lp-text"
-                    >
-                        <MessageCircle className="h-4 w-4" />
-                        Tanya dulu lewat WhatsApp
-                    </a>
                 </div>
             </div>
         </section>

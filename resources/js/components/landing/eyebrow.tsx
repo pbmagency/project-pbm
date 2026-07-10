@@ -22,7 +22,7 @@ export function Eyebrow({
                 className,
             )}
         >
-            <span
+            {/* <span
                 className={cn(
                     'relative flex h-1.5 w-1.5 shrink-0 rounded-full',
                     tone === 'primary' && 'bg-lp-primary-ink',
@@ -36,7 +36,7 @@ export function Eyebrow({
                         tone === 'amber' && 'bg-lp-amber-ink',
                     )}
                 />
-            </span>
+            </span> */}
             {children}
         </div>
     );

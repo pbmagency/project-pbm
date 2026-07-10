@@ -4,8 +4,8 @@ import { useSectionView } from '@/hooks/use-section-view';
 
 const PAIN_POINTS = [
     {
-        lead: 'Udah coba ganti banyak hal.',
-        detail: 'Ganti kreatif, ganti angle, ganti landing page, CPAnya tetap di angka yang sama.',
+        lead: 'Lo udah punya landing page sendiri,',
+        detail: 'Udah coba ganti semuanya, Ganti kreatif, ganti angle, ganti landing page, CPAnya tetap di angka yang sama.',
     },
     {
         lead: 'Closing seret, budget jalan terus.',
@@ -24,7 +24,7 @@ const CAUSES = [
     },
     {
         title: 'Landing page menahan, bukan mendorong',
-        detail: 'Halaman kamu bisa jadi titik orang ragu buat lanjut, bukan titik mereka yakin buat beli.',
+        detail: 'Halaman lo bisa jadi titik orang ragu buat lanjut, bukan titik mereka yakin buat beli.',
     },
     {
         title: 'Penawaran belum pas',
@@ -49,7 +49,7 @@ export function Problem() {
             <div className="relative mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-24 lg:py-28">
                 <Eyebrow>Pernah Ngerasain Ini?</Eyebrow>
 
-                <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-lp-text sm:text-4xl lg:text-5xl">
+                <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-lp-text sm:text-4xl lg:text-5xl">
                     Iklan Udah Oke,
                     <br />
                     <span className="bg-gradient-to-r from-lp-primary via-lp-primary-ink to-lp-primary-2 bg-clip-text text-transparent">
@@ -58,7 +58,7 @@ export function Problem() {
                 </h2>
 
                 <p className="mt-6 text-lg text-lp-text-muted">
-                    Kamu udah ngerasa iklannya jalan dengan baik, CTR sehat, CPC
+                    Lo udah ngerasa iklannya jalan dengan baik, CTR sehat, CPC
                     wajar. Tapi setiap kali cek CPA, angkanya bikin mikir dua
                     kali. Ini yang bikin makin pusing.
                 </p>
@@ -70,16 +70,16 @@ export function Problem() {
                             className="group relative overflow-hidden rounded-2xl border border-lp-danger/25 bg-lp-danger-soft/60 p-5 backdrop-blur-sm transition-all hover:border-lp-danger/50"
                         >
                             <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-lp-danger to-transparent opacity-70" />
-                            <span className="mr-1 inline-flex h-5.5 w-5.5 items-center justify-center rounded-full bg-lp-danger/25 align-middle ring-1 ring-lp-danger/40">
+                            <span className="mr-2 inline-flex h-5.5 w-5.5 items-center justify-center rounded-full bg-lp-danger/25 align-middle ring-1 ring-lp-danger/40">
                                 <X
                                     className="h-2.5 w-2.5 text-lp-danger"
                                     strokeWidth={3}
                                 />
                             </span>
-                            <strong className="text-[15.5px] text-lp-text">
+                            <strong className="text-[15.5px] font-medium">
                                 {point.lead}
                             </strong>{' '}
-                            <span className="text-[15.5px] text-lp-text-muted">
+                            <span className="text-[15.5px] font-medium">
                                 {point.detail}
                             </span>
                         </div>
@@ -87,12 +87,12 @@ export function Problem() {
                 </div>
 
                 <p className="mt-8 text-base font-bold text-lp-text">
-                    Titik bocornya emang gak kelihatan, sampai kamu tahu persis
+                    Titik bocornya emang gak kelihatan, sampai lo tahu persis
                     harus cek di mana.
                 </p>
 
                 <div className="lp-divider-glow mt-14 pt-11">
-                    <h3 className="text-center text-2xl font-extrabold tracking-tight text-lp-text sm:text-3xl">
+                    <h3 className="text-center font-display text-2xl font-extrabold tracking-tight text-lp-text sm:text-3xl">
                         Faktanya, Ada 4 Penyebab yang Bikin Closing Jadi Mahal
                     </h3>
 
@@ -100,7 +100,7 @@ export function Problem() {
                         {CAUSES.map((cause, index) => (
                             <div
                                 key={cause.title}
-                                className="lp-gradient-border lp-gradient-border-inner group relative overflow-hidden rounded-2xl bg-lp-bg/40 p-5 backdrop-blur-sm transition-all hover:-translate-y-0.5"
+                                className="group lp-gradient-border-inner lp-gradient-border relative overflow-hidden rounded-2xl bg-lp-bg/40 p-5 backdrop-blur-sm transition-all hover:-translate-y-0.5"
                             >
                                 <div className="flex items-center gap-3">
                                     <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-lp-primary to-lp-primary-2 font-mono text-[13px] font-bold text-white shadow-[0_8px_20px_-6px_oklch(0.62_0.20_224/0.6)]">
@@ -118,10 +118,14 @@ export function Problem() {
                     </div>
 
                     <p className="mt-9 text-center text-base font-bold text-lp-text">
-                        Begitu kamu tahu penyebab mana yang terjadi di bisnismu,
-                        kamu bisa mulai benerin di titik yang tepat,{' '}
+                        Empat hal ini ketauannya dari data yang ada di landing
+                        page lo
+                    </p>
+                    <p className="mt-9 text-center text-base font-bold text-lp-text">
+                        Begitu lo tahu penyebab mana yang terjadi di bisnis lo,
+                        lo bisa mulai benerin di titik yang tepat,{' '}
                         <span className="bg-gradient-to-r from-lp-primary to-lp-primary-2 bg-clip-text text-transparent">
-                            dan itu yang webinar ini bantu kamu temukan.
+                            dan itu yang webinar ini bantu lo temukan.
                         </span>
                     </p>
                 </div>

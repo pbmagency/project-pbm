@@ -1,62 +1,33 @@
-import { Eye, MousePointerClick, Radar } from 'lucide-react';
+import { Eye, Wrench, FileText } from 'lucide-react';
 import { Eyebrow } from '@/components/landing/eyebrow';
 import { useSectionView } from '@/hooks/use-section-view';
 import { cn } from '@/lib/utils';
+import { CtaButton } from '@/components/landing/cta-button';
 
 const MODULES = [
     {
-        icon: Radar,
-        title: 'Modul 1',
-        subtitle: 'Lapisan Akuisisi',
-        metric: 'Bounce Rate',
-        description:
-            'Momen pertama begitu orang mendarat di halaman kamu. Kalau bermasalah di sini, biasanya karena janji di iklan gak nyambung dengan yang mereka lihat pertama kali, atau soal teknis, seperti loading yang lambat.',
-        amber: false,
-    },
-    {
         icon: Eye,
-        title: 'Modul 2',
-        subtitle: 'Lapisan Engagement',
-        metric: 'Scroll Depth & Dwell Time',
+        title: 'Modul 1',
+        subtitle: 'Cara Membaca Letak Masalah',
         description:
-            'Apakah orang sungguh membaca, dicek lewat checkpoint scroll depth di 25, 50, 75, dan 90 persen. Kalau bermasalah, biasanya ada satu bagian tertentu di halaman yang bikin orang berhenti, dan perbaikannya ada di bagian itu, bukan di tempat lain.',
+            'Temukan di mana letak traffic lo terbuang sia sia selama ini',
         amber: false,
     },
     {
-        icon: MousePointerClick,
-        title: 'Modul 3',
-        subtitle: 'Lapisan Intent',
-        metric: 'Lead Rate',
+        icon: Wrench,
+        title: 'Modul 2',
+        subtitle: 'Cara Efektif Perbaiki Kebocoran',
         description:
-            'Apakah orang mengambil langkah, klik harga, klik WhatsApp. Kalau bermasalah, biasanya karena salah satu dari tiga hal: penawaran kurang jelas, kepercayaan belum cukup, atau tombol aksinya kurang kelihatan.',
+            'Pelajari framework praktis untuk memperbaiki kebocoran funnel lo',
+        amber: false,
+    },
+    {
+        icon: FileText,
+        title: 'Modul 3',
+        subtitle: 'Studi Kasus & Tools Diagnosis',
+        description:
+            'Kita bedah tuntas studi kasus cara diagnosis & perbaiki conversion layer',
         amber: true,
-    },
-];
-
-const CYCLES = [
-    {
-        label: 'Cycle 1 · Uji Hero (Akuisisi)',
-        bounce: '74,7% → 68,5%',
-        lead: '2,5% → 2,61%',
-        running: false,
-    },
-    {
-        label: 'Cycle 2 · Uji Problem (Engagement)',
-        bounce: '69,2% → 68,6%',
-        lead: '2,35% → 2,84%',
-        running: false,
-    },
-    {
-        label: 'Cycle 3 · Iterasi Lanjutan (Engagement)',
-        bounce: '63,6% → 61,2%',
-        lead: '2,75% → 3,63%',
-        running: false,
-    },
-    {
-        label: 'Cycle 4 · Masih Berjalan',
-        bounce: null,
-        lead: null,
-        running: true,
     },
 ];
 
@@ -74,10 +45,10 @@ export function Module() {
             <div className="relative mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-24 lg:py-28">
                 <Eyebrow>Di Dalam Webinar</Eyebrow>
 
-                <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-lp-text sm:text-4xl lg:text-5xl">
-                    Apa yang Sebenarnya{' '}
+                <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-lp-text sm:text-4xl lg:text-5xl">
+                    Apa yang Akan{' '}
                     <span className="bg-gradient-to-r from-lp-primary to-lp-primary-2 bg-clip-text text-transparent">
-                        Dibedah
+                        Dipelajari
                     </span>
                 </h2>
 
@@ -91,7 +62,7 @@ export function Module() {
                         <div
                             key={mod.title}
                             className={cn(
-                                'lp-gradient-border lp-gradient-border-inner group relative overflow-hidden rounded-[20px] p-6 backdrop-blur-sm transition-all hover:-translate-y-1',
+                                'group lp-gradient-border-inner lp-gradient-border relative overflow-hidden rounded-[20px] p-6 backdrop-blur-sm transition-all hover:-translate-y-1',
                                 mod.amber
                                     ? 'bg-gradient-to-br from-lp-amber-soft/80 to-lp-amber-soft/40 hover:lp-glow-amber'
                                     : 'bg-lp-bg-elevated/70 hover:lp-glow',
@@ -114,11 +85,11 @@ export function Module() {
                                     )}
                                 />
                             </div>
-                            <h3 className="mt-5 text-lg font-bold text-lp-text">
-                                {mod.title}
+                            <h3 className="mt-5 font-display text-lg font-bold text-lp-text">
+                                {/* {mod.title}
                                 <span className="mx-1.5 text-lp-text-dim">
                                     &middot;
-                                </span>
+                                </span> */}
                                 {mod.subtitle}
                             </h3>
                             <p
@@ -129,7 +100,7 @@ export function Module() {
                                         : 'text-lp-primary-ink',
                                 )}
                             >
-                                {mod.metric}
+                                {mod.title}
                             </p>
                             <p className="mt-3 text-sm text-lp-text-muted">
                                 {mod.description}
@@ -138,7 +109,7 @@ export function Module() {
                     ))}
                 </div>
 
-                <div className="lp-gradient-border lp-gradient-border-inner mt-10 rounded-[22px] bg-lp-bg-elevated/70 p-6 backdrop-blur-sm sm:p-8">
+                {/* <div className="lp-gradient-border-inner lp-gradient-border mt-10 rounded-[22px] bg-lp-bg-elevated/70 p-6 backdrop-blur-sm sm:p-8">
                     <p className="font-mono text-[11px] tracking-[0.15em] text-lp-text-dim uppercase">
                         Data dari Studi Kasus, per Siklus Uji
                     </p>
@@ -159,7 +130,7 @@ export function Module() {
                                 {cycle.running ? (
                                     <span className="flex items-center gap-2 rounded-full border border-lp-primary/60 bg-lp-primary-soft/60 px-3 py-1 font-mono text-[11px] tracking-[0.14em] text-lp-primary-ink uppercase">
                                         <span className="relative flex h-1.5 w-1.5">
-                                            <span className="animate-lp-pulse-ring absolute inline-flex h-full w-full rounded-full bg-lp-primary-ink" />
+                                            <span className="absolute inline-flex h-full w-full animate-lp-pulse-ring rounded-full bg-lp-primary-ink" />
                                             <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-lp-primary-ink" />
                                         </span>
                                         Sedang Berlangsung
@@ -190,7 +161,7 @@ export function Module() {
                         dari studi kasus kami sejauh ini, bukan jaminan hasil
                         untuk setiap bisnis.
                     </p>
-                </div>
+                </div> */}
             </div>
         </section>
     );
