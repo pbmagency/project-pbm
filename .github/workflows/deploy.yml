@@ -1,0 +1,107 @@
+name: Deploy Split Structure (Laravel & Public)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SERVER_IP: '72.61.142.238'
+      SERVER_USER: 'root'
+      TARGET_DIR_LARAVEL: '/home/pbmagency.id/laravel-sub3'
+      TARGET_DIR_PUBLIC: '/home/pbmagency.id/sub3'
+      DOMAIN_USERNAME: 'pbmag2242'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: Install Composer Dependencies
+        run: |
+          composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install NPM & Build Inertia React
+        run: |
+          npm install
+          npm run build
+
+      - name: Setup SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY_VPS2 }}
+
+      - name: Add Server to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          for attempt in 1 2 3; do
+            keyscan_error_file="$(mktemp)"
+            if ssh-keyscan -T 30 -H ${{ env.SERVER_IP }} >> ~/.ssh/known_hosts 2>"$keyscan_error_file"; then
+              rm -f "$keyscan_error_file"
+              break
+            fi
+            echo "ssh-keyscan attempt $attempt failed:"
+            cat "$keyscan_error_file"
+            rm -f "$keyscan_error_file"
+            if [ "$attempt" -eq 3 ]; then
+              echo "Failed to fetch SSH host key for ${{ env.SERVER_IP }} after 3 attempts."
+              exit 1
+            else
+              sleep 5
+            fi
+          done
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Sync Core Laravel to Server
+        run: |
+          rsync -avz --delete \
+          --exclude='.env' \
+          --exclude='/storage/' \
+          --exclude='/bootstrap/cache/' \
+          --exclude='/.git/' \
+          --exclude='/node_modules/' \
+          --exclude='/public/' \
+          ./ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_LARAVEL }}
+
+      - name: Sync Public Assets to public_html
+        run: |
+          rsync -avz --delete \
+          --exclude='index.php' \
+          --exclude='.htaccess' \
+          ./public/ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_PUBLIC }}
+
+      - name: Run Artisan & Move Manifest
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.SERVER_IP }}
+          username: ${{ env.SERVER_USER }}
+          key: ${{ secrets.DEPLOY_KEY_VPS2 }}
+          script: |
+            mkdir -p ${{ env.TARGET_DIR_LARAVEL }}/public/build
+            cp ${{ env.TARGET_DIR_PUBLIC }}/build/manifest.json ${{ env.TARGET_DIR_LARAVEL }}/public/build/manifest.json
+
+            cd ${{ env.TARGET_DIR_PUBLIC }}
+            ln -sfn ${{ env.TARGET_DIR_LARAVEL }}/storage/app/public storage
+
+            cd ${{ env.TARGET_DIR_LARAVEL }}
+            php artisan optimize:clear
+            php artisan migrate --force
+
+            chown -R ${{ env.DOMAIN_USERNAME }}:${{ env.DOMAIN_USERNAME }} ${{ env.TARGET_DIR_LARAVEL }}
+            chown -R ${{ env.DOMAIN_USERNAME }}:${{ env.DOMAIN_USERNAME }} ${{ env.TARGET_DIR_PUBLIC }}
+            chown -R ${{ env.DOMAIN_USERNAME }}:${{ env.DOMAIN_USERNAME }} ${{ env.TARGET_DIR_LARAVEL }}/storage
+            chown -R ${{ env.DOMAIN_USERNAME }}:${{ env.DOMAIN_USERNAME }} ${{ env.TARGET_DIR_LARAVEL }}/bootstrap/cache
