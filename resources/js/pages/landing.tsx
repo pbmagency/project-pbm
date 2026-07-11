@@ -11,7 +11,6 @@ import { Navbar } from '@/components/landing/navbar';
 import { Pricing } from '@/components/landing/pricing';
 import { Problem } from '@/components/landing/problem';
 import { Proof } from '@/components/landing/proof';
-import { QuickProof } from '@/components/landing/quick-proof';
 import { SocialProofBar } from '@/components/landing/social-proof-bar';
 import { Solution } from '@/components/landing/solution';
 import { useAnalytics } from '@/hooks/use-analytics';
