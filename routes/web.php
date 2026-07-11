@@ -18,7 +18,7 @@ Route::post('/payment/callback', [PaymentCallbackController::class, 'handle'])->
 Route::post('/analytics/track', [AnalyticsController::class, 'track'])->name('analytics.track');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::redirect('dashboard', '/admin')->name('dashboard');
 });
 
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {

@@ -12,7 +12,12 @@ class AbTestingService
 
     public function getPerformanceMatrix(Carbon $startDate, Carbon $endDate, ?string $sourceFilter = null): array
     {
-        $counts = $this->batchEventCounts($startDate, $endDate, $sourceFilter, ['visit', 'engagement', 'cta_click', 'conversion', 'payment']);
+        $counts = $this->batchEventCounts(
+            $startDate,
+            $endDate,
+            $sourceFilter,
+            ['visit', 'engagement', 'cta_click', 'conversion', 'payment']
+        );
 
         if (empty($counts)) {
             return [];
@@ -54,7 +59,12 @@ class AbTestingService
 
     public function getSplitFunnel(Carbon $startDate, Carbon $endDate, ?string $sourceFilter = null): array
     {
-        $counts = $this->batchEventCounts($startDate, $endDate, $sourceFilter, ['visit', 'engagement', 'cta_click', 'conversion', 'payment']);
+        $counts = $this->batchEventCounts(
+            $startDate,
+            $endDate,
+            $sourceFilter,
+            ['visit', 'engagement', 'cta_click', 'conversion', 'payment']
+        );
 
         if (empty($counts)) {
             return [];
@@ -95,7 +105,7 @@ class AbTestingService
 
         $performance = [];
         foreach ($sources as $source) {
-            $src = $this->normalizeLandingSource($source);
+            $src = $this->normalizeLandingSource($source->landing_source);
             $visits = $visitData[$src] ?? collect();
             $conversions = $conversionSessions[$src] ?? collect();
 
@@ -121,11 +131,15 @@ class AbTestingService
     public function getCtaPerformance(Carbon $startDate, Carbon $endDate, ?string $sourceFilter = null): array
     {
         $query = DB::table('user_analytics')
-            ->select(['landing_source', 'session_id', DB::raw("COALESCE(cta_location, 'unknown') as cta_location")])
+            ->select([
+                DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
+                DB::raw("COALESCE(json_extract(event_data, '$.location'), 'unknown') as cta_location"),
+                'session_id',
+            ])
             ->where('event_type', 'cta_click')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereNotNull('landing_source')
-            ->where('landing_source', '!=', '');
+            ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
+            ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')");
 
         if ($sourceFilter && $sourceFilter !== 'all') {
             $query->where('referral_source', $sourceFilter);
@@ -173,7 +187,7 @@ class AbTestingService
 
         $segmentation = [];
         foreach ($sources as $source) {
-            $src = $this->normalizeLandingSource($source);
+            $src = $this->normalizeLandingSource($source->landing_source);
             $sessions = $allSessions[$src] ?? collect();
 
             if ($sessions->isEmpty()) {
@@ -221,10 +235,14 @@ class AbTestingService
         }
 
         $depthsBySource = DB::table('user_analytics')
-            ->select(['landing_source', 'session_id', DB::raw('MAX(scroll_depth) as max_depth')])
+            ->select([
+                DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
+                'session_id',
+                DB::raw("MAX(CAST(json_extract(event_data, '$.depth') AS DECIMAL(10,2))) as max_depth"),
+            ])
             ->where('event_type', 'scroll')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereNotNull('landing_source')
+            ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
             ->groupBy('landing_source', 'session_id')
             ->get()
@@ -259,10 +277,6 @@ class AbTestingService
         return $heatmap;
     }
 
-    /**
-     * Section visibility funnel: percentage of visitors who scrolled far enough to
-     * view each landing page section, ordered top to bottom by first-seen time.
-     */
     public function getSectionHeatmap(Carbon $startDate, Carbon $endDate, ?string $sourceFilter = null): array
     {
         $labels = [
@@ -281,17 +295,17 @@ class AbTestingService
 
         $rows = DB::table('user_analytics')
             ->select([
-                'landing_source',
-                'section_id',
+                DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
+                DB::raw("json_extract(event_data, '$.section') as section_name"),
                 DB::raw('COUNT(DISTINCT session_id) as views'),
                 DB::raw('MIN(created_at) as first_seen'),
             ])
             ->where('event_type', 'section_view')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereNotNull('landing_source')
-            ->where('landing_source', '!=', '')
+            ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
+            ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
-            ->groupBy('landing_source', 'section_id')
+            ->groupBy('landing_source', 'section_name')
             ->get();
 
         if ($rows->isEmpty()) {
@@ -308,8 +322,8 @@ class AbTestingService
             $prevViews = null;
 
             foreach ($sectionRows as $row) {
-                $sectionId = $row->section_id;
-                if (! $sectionId) {
+                $sectionId = trim($row->section_name, '"');
+                if ($sectionId === '') {
                     continue;
                 }
 
@@ -326,7 +340,7 @@ class AbTestingService
 
                 $sections[] = [
                     'id' => $sectionId,
-                    'name' => $labels[$sectionId] ?? ucfirst($sectionId),
+                    'name' => $labels[$sectionId] ?? ucfirst(str_replace(['-', '_'], ' ', $sectionId)),
                     'views' => $views,
                     'pct' => $pct,
                     'drop_from_prev' => max(0, $dropFromPrev),
@@ -362,7 +376,7 @@ class AbTestingService
 
         $analysis = [];
         foreach ($sources as $source) {
-            $src = $this->normalizeLandingSource($source);
+            $src = $this->normalizeLandingSource($source->landing_source);
             $sessions = $allSessions[$src] ?? collect();
             $converted = $conversionSessions[$src] ?? collect();
             $nonConverted = $sessions->diff($converted);
@@ -391,16 +405,20 @@ class AbTestingService
             ->all();
     }
 
-    // ── Batch query helpers (all filter/group on indexed generated columns) ───
+    // ── Batch query helpers ───────────────────────────────────────────────────
 
     private function batchEventCounts(Carbon $startDate, Carbon $endDate, ?string $sourceFilter, array $eventTypes): array
     {
         $rows = DB::table('user_analytics')
-            ->select(['landing_source', 'event_type', DB::raw('COUNT(DISTINCT session_id) as cnt')])
+            ->select([
+                DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
+                'event_type',
+                DB::raw('COUNT(DISTINCT session_id) as cnt'),
+            ])
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereIn('event_type', $eventTypes)
-            ->whereNotNull('landing_source')
-            ->where('landing_source', '!=', '')
+            ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
+            ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
             ->groupBy('landing_source', 'event_type')
             ->get();
@@ -416,13 +434,15 @@ class AbTestingService
 
     private function batchBouncedCounts(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
     {
-        // Bounced = visited but never sent an engagement event nor scrolled past 25%.
         $rows = DB::table('user_analytics as v')
-            ->select(['v.landing_source', DB::raw('COUNT(DISTINCT v.session_id) as bounced')])
+            ->select([
+                DB::raw("json_extract(v.event_data, '$.landing_source') as landing_source"),
+                DB::raw('COUNT(DISTINCT v.session_id) as bounced'),
+            ])
             ->where('v.event_type', 'visit')
             ->whereBetween('v.created_at', [$startDate, $endDate])
-            ->whereNotNull('v.landing_source')
-            ->where('v.landing_source', '!=', '')
+            ->whereRaw("json_extract(v.event_data, '$.landing_source') IS NOT NULL")
+            ->whereRaw("json_extract(v.event_data, '$.landing_source') NOT IN ('', 'unknown')")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('v.referral_source', $sourceFilter))
             ->where(function ($q) use ($startDate, $endDate) {
                 $q->whereNotExists(function ($sub) use ($startDate, $endDate) {
@@ -435,11 +455,11 @@ class AbTestingService
                         $sub->from('user_analytics as s')
                             ->whereColumn('s.session_id', 'v.session_id')
                             ->where('s.event_type', 'scroll')
-                            ->where('s.scroll_depth', '>=', 25)
+                            ->whereRaw("CAST(json_extract(s.event_data, '$.depth') AS DECIMAL(10,2)) >= 25")
                             ->whereBetween('s.created_at', [$startDate, $endDate]);
                     });
             })
-            ->groupBy('v.landing_source')
+            ->groupBy('landing_source')
             ->get();
 
         return $rows->mapWithKeys(fn ($row) => [
@@ -450,11 +470,14 @@ class AbTestingService
     private function batchRevenue(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
     {
         $rows = DB::table('user_analytics')
-            ->select(['landing_source', DB::raw('SUM(payment_amount) as revenue')])
+            ->select([
+                DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
+                DB::raw("SUM(CAST(json_extract(event_data, '$.amount') AS DECIMAL(20,4))) as revenue"),
+            ])
             ->where('event_type', 'payment')
-            ->where('payment_status', 'success')
+            ->whereRaw("json_extract(event_data, '$.status') = 'success'")
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereNotNull('landing_source')
+            ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
             ->groupBy('landing_source')
             ->get();
@@ -467,10 +490,13 @@ class AbTestingService
     private function batchAllSessions(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
     {
         $rows = DB::table('user_analytics')
-            ->select(['landing_source', 'session_id'])
+            ->select([
+                DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
+                'session_id',
+            ])
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereNotNull('landing_source')
-            ->where('landing_source', '!=', '')
+            ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
+            ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
             ->distinct()
             ->get();
@@ -487,10 +513,13 @@ class AbTestingService
     private function batchConversionSessionIds(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
     {
         $rows = DB::table('user_analytics')
-            ->select(['landing_source', 'session_id'])
+            ->select([
+                DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
+                'session_id',
+            ])
             ->where('event_type', 'conversion')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereNotNull('landing_source')
+            ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
             ->distinct()
             ->get();
@@ -507,11 +536,15 @@ class AbTestingService
     private function batchVisitSessionsWithUserAgent(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
     {
         $rows = DB::table('user_analytics')
-            ->select(['landing_source', 'session_id', 'user_agent'])
+            ->select([
+                DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
+                'session_id',
+                'user_agent',
+            ])
             ->where('event_type', 'visit')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereNotNull('landing_source')
-            ->where('landing_source', '!=', '')
+            ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
+            ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
             ->get();
 
@@ -527,7 +560,10 @@ class AbTestingService
     private function batchMaxScrollDepth(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
     {
         $rows = DB::table('user_analytics')
-            ->select(['session_id', DB::raw('MAX(scroll_depth) as max_depth')])
+            ->select([
+                'session_id',
+                DB::raw("MAX(CAST(json_extract(event_data, '$.depth') AS DECIMAL(10,2))) as max_depth"),
+            ])
             ->where('event_type', 'scroll')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
@@ -540,7 +576,10 @@ class AbTestingService
     private function batchTotalDwellTime(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
     {
         $rows = DB::table('user_analytics')
-            ->select(['session_id', DB::raw('SUM(engagement_duration_ms) as total_ms')])
+            ->select([
+                'session_id',
+                DB::raw("SUM(CAST(json_extract(event_data, '$.duration') AS SIGNED)) as total_ms"),
+            ])
             ->where('event_type', 'engagement')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
@@ -550,22 +589,19 @@ class AbTestingService
         return $rows->mapWithKeys(fn ($r) => [$r->session_id => (float) $r->total_ms / 1000])->all();
     }
 
-    /**
-     * @return Collection<int, string>
-     */
     private function getValidLandingSources(Carbon $startDate, Carbon $endDate, ?string $sourceFilter = null): Collection
     {
         return DB::table('user_analytics')
+            ->select(DB::raw("json_extract(event_data, '$.landing_source') as landing_source"))
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereNotNull('landing_source')
-            ->where('landing_source', '!=', '')
+            ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
+            ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
             ->groupBy('landing_source')
-            ->pluck('landing_source');
+            ->get();
     }
 
     /**
-     * @param  Collection<int, string>  $sessionIds
      * @param  array<string, float>  $scrollDepths
      * @param  array<string, float>  $dwellTimes
      * @return array{count: int, avg_scroll_depth: float, avg_dwell_time: float}
@@ -601,12 +637,12 @@ class AbTestingService
     }
 
     /**
-     * Normalize a landing_source value to a consistent clean pathname. Handles the rare
-     * case where a full URL was stored instead of a bare path.
+     * Normalize a landing_source value to a consistent clean pathname.
+     * json_extract() may return strings wrapped in double-quotes — trim them.
      */
     private function normalizeLandingSource(string $raw): string
     {
-        $clean = $raw;
+        $clean = trim($raw, '"');
 
         if (filter_var($clean, FILTER_VALIDATE_URL)) {
             $parsed = parse_url($clean);

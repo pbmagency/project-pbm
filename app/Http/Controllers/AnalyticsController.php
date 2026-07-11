@@ -138,7 +138,7 @@ class AnalyticsController extends Controller
 
         $paymentAnalytics = UserAnalytic::where('event_type', 'payment')
             ->where('created_at', '>=', $startDate)
-            ->where('event_data->status', 'success')
+            ->whereRaw("json_extract(event_data, '$.status') = 'success'")
             ->get();
 
         $payments = $paymentAnalytics->count();
@@ -193,7 +193,7 @@ class AnalyticsController extends Controller
         $engaged = UserAnalytic::where('event_type', 'engagement')->where('created_at', '>=', $startDate)->distinct('session_id')->count('session_id');
         $ctaClicks = UserAnalytic::where('event_type', 'cta_click')->where('created_at', '>=', $startDate)->distinct('session_id')->count('session_id');
         $conversions = UserAnalytic::where('event_type', 'conversion')->where('created_at', '>=', $startDate)->distinct('session_id')->count('session_id');
-        $payments = UserAnalytic::where('event_type', 'payment')->where('created_at', '>=', $startDate)->where('event_data->status', 'success')->distinct('session_id')->count('session_id');
+        $payments = UserAnalytic::where('event_type', 'payment')->where('created_at', '>=', $startDate)->whereRaw("json_extract(event_data, '$.status') = 'success'")->distinct('session_id')->count('session_id');
 
         return [
             ['stage' => 'Visits', 'count' => $visits, 'percentage' => 100],
