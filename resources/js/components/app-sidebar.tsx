@@ -5,7 +5,9 @@ import {
     FolderGit2,
     LayoutGrid,
     LineChart,
+    ShoppingCart,
 } from 'lucide-react';
+import OrderController from '@/actions/App/Http/Controllers/Admin/OrderController';
 import AnalyticsController from '@/actions/App/Http/Controllers/AnalyticsController';
 import LabsController from '@/actions/App/Http/Controllers/LabsController';
 import AppLogo from '@/components/app-logo';
@@ -58,6 +60,11 @@ export function AppSidebar() {
                       title: 'A/B Testing Labs',
                       href: LabsController.index(),
                       icon: FlaskConical,
+                  },
+                  {
+                      title: 'Orders',
+                      href: OrderController.index(),
+                      icon: ShoppingCart,
                   },
               ]
             : []),

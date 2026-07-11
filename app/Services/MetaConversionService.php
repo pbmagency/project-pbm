@@ -85,6 +85,37 @@ class MetaConversionService
     }
 
     /**
+     * Send a Purchase event after a confirmed payment callback.
+     * Fires server-side only — browser pixel fires on the success page.
+     */
+    public function sendPurchase(Request $request, string $eventId, int $amount, string $email): void
+    {
+        if (! $this->isConfigured()) {
+            return;
+        }
+
+        $userData = $this->buildUserData($request);
+        $userData->setEmail(hash('sha256', strtolower(trim($email))));
+
+        $customData = (new CustomData)
+            ->setContentName('The Silent Conversion Leak')
+            ->setContentType('product')
+            ->setValue((float) $amount)
+            ->setCurrency('IDR');
+
+        $event = (new Event)
+            ->setEventName('Purchase')
+            ->setEventTime(time())
+            ->setEventId($eventId)
+            ->setEventSourceUrl(config('app.url'))
+            ->setActionSource(ActionSource::WEBSITE)
+            ->setUserData($userData)
+            ->setCustomData($customData);
+
+        $this->sendEvents([$event]);
+    }
+
+    /**
      * Build UserData from the HTTP request with browser cookie matching.
      */
     private function buildUserData(Request $request): UserData
