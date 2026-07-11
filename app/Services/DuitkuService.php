@@ -10,15 +10,19 @@ use Illuminate\Support\Facades\Log;
 
 class DuitkuService
 {
-    private Config $config;
+    private ?Config $config = null;
 
-    public function __construct()
+    private function getConfig(): Config
     {
-        $apiKey = config('services.duitku.server_key');
-        $merchantCode = config('services.duitku.merchant_code');
-        $sandbox = (bool) config('services.duitku.sandbox', true);
+        if ($this->config === null) {
+            $apiKey = config('services.duitku.server_key');
+            $merchantCode = config('services.duitku.merchant_code');
+            $sandbox = (bool) config('services.duitku.sandbox', true);
 
-        $this->config = new Config($apiKey, $merchantCode, $sandbox, true, false);
+            $this->config = new Config($apiKey, $merchantCode, $sandbox, true, false);
+        }
+
+        return $this->config;
     }
 
     /**
@@ -37,7 +41,7 @@ class DuitkuService
 
         Log::info('Duitku create invoice', ['order_number' => $order->order_number, 'amount' => $order->amount]);
 
-        $response = Pop::createInvoice($params, $this->config);
+        $response = Pop::createInvoice($params, $this->getConfig());
         $data = json_decode($response);
 
         if (! $data || empty($data->paymentUrl)) {

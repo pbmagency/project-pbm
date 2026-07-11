@@ -3,12 +3,18 @@
 use App\Mail\OrderConfirmationMail;
 use App\Models\Order;
 use App\Models\UserAnalytic;
+use App\Services\MetaConversionService;
 use Illuminate\Support\Facades\Mail;
 
 function duitkuSignature(string $merchantCode, string $amount, string $orderId, string $serverKey): string
 {
     return md5($merchantCode . $amount . $orderId . $serverKey);
 }
+
+beforeEach(function () {
+    $this->withoutVite();
+    $this->mock(MetaConversionService::class, fn ($mock) => $mock->shouldReceive('sendPurchase')->andReturnNull());
+});
 
 it('verifies callback signature and marks order as paid', function () {
     Mail::fake();

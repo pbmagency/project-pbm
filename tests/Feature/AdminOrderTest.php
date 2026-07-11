@@ -8,6 +8,8 @@ function makeAdmin(): User
     return User::factory()->create(['role' => 'admin', 'email_verified_at' => now()]);
 }
 
+beforeEach(fn () => $this->withoutVite());
+
 it('shows admin orders index', function () {
     $admin = makeAdmin();
     Order::factory()->count(3)->create();

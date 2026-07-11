@@ -3,6 +3,8 @@
 use App\Models\Order;
 use App\Services\DuitkuService;
 
+beforeEach(fn () => $this->withoutVite());
+
 it('shows the checkout page', function () {
     $response = $this->get('/checkout');
 
