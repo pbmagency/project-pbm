@@ -7,9 +7,6 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
-     */
-    /**
      * Stored generated columns extracted from the event_data JSON blob, each backed by an
      * index, so reporting queries can filter/group without scanning and re-parsing JSON on
      * every row. Without these, AbTestingService's aggregate queries degrade badly once
@@ -17,6 +14,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (config('database.default') !== 'mysql') {
+            return;
+        }
+
         Schema::table('user_analytics', function (Blueprint $table) {
             $table->string('landing_source', 255)->nullable()
                 ->storedAs("JSON_UNQUOTE(JSON_EXTRACT(event_data, '\$.landing_source'))")->after('event_data');
@@ -48,6 +49,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (config('database.default') !== 'mysql') {
+            return;
+        }
+
         Schema::table('user_analytics', function (Blueprint $table) {
             $table->dropIndex('analytics_type_created_source_idx');
             $table->dropIndex('analytics_source_type_idx');
