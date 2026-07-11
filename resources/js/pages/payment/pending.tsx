@@ -6,7 +6,7 @@ interface PaymentPendingProps {
     order_number?: string;
 }
 
-const WA_SUPPORT = 'https://wa.me/628XXXXXXXXXX?text=' + encodeURIComponent('Halo, pembayaran saya untuk webinar The Silent Conversion Leak masih pending.');
+const WA_SUPPORT = 'https://wa.me/6285931018333?text=' + encodeURIComponent('Halo, pembayaran saya untuk webinar The Silent Conversion Leak masih pending.');
 
 export default function PaymentPending({ order_number }: PaymentPendingProps) {
     return (

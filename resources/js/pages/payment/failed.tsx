@@ -6,7 +6,7 @@ interface PaymentFailedProps {
     order_number?: string;
 }
 
-const WA_SUPPORT = 'https://wa.me/628XXXXXXXXXX?text=' + encodeURIComponent('Halo, saya mengalami masalah pembayaran untuk webinar The Silent Conversion Leak.');
+const WA_SUPPORT = 'https://wa.me/6285931018333?text=' + encodeURIComponent('Halo, saya mengalami masalah pembayaran untuk webinar The Silent Conversion Leak.');
 
 export default function PaymentFailed({ order_number }: PaymentFailedProps) {
     return (
