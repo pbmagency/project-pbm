@@ -44,10 +44,17 @@ export default function Checkout({ price, originalPrice }: CheckoutProps) {
         trackCTA('checkout_page_view', 'InitiateCheckout', '/checkout');
     }, []);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post('/checkout');
-    };
+const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    post('/checkout', {
+        onSuccess: (page) => {
+            const redirectUrl = (page.props as { redirect_url?: string }).redirect_url;
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+            }
+        },
+    });
+};
 
     const discount = originalPrice - price;
     const discountPct = Math.round((discount / originalPrice) * 100);
