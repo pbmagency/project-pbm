@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CheckoutRequest;
 use App\Models\Order;
 use App\Services\DuitkuService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -26,7 +24,7 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function store(CheckoutRequest $request, DuitkuService $duitku): JsonResponse|RedirectResponse
+    public function store(CheckoutRequest $request, DuitkuService $duitku): \Symfony\Component\HttpFoundation\Response
     {
         $price = (int) config('services.meta.course_price', 129000);
 
@@ -43,11 +41,7 @@ class CheckoutController extends Controller
 
         $paymentUrl = $duitku->createInvoice($order);
 
-        if ($request->header('X-Inertia')) {
-            return response()->json(['redirect_url' => $paymentUrl]);
-        }
-
-        return redirect()->away($paymentUrl);
+        return Inertia::location($paymentUrl);
     }
 
     public function returnPage(Request $request): Response
