@@ -20,8 +20,8 @@ const BENEFITS: Benefit[] = [
         icon: PlayCircle,
         title: 'Live Session & Rekaman Webinar',
         points: [
-            'Ikut sesi The Silent Conversion Leak secara langsung via Zoom.',
-            'Rekaman dikirim ke email lo untuk ditonton ulang kapan saja.',
+            'Sesi webinar live via zoom yang bahas strategi meningkatkan konversi landing page',
+            'Rekaman webinar yang bisa kamu tonton ulang kapan aja.',
         ],
         amber: false,
     },
@@ -29,7 +29,7 @@ const BENEFITS: Benefit[] = [
         icon: BookOpen,
         title: 'Ebook: Iklan Jalan, Tapi Kok Boncos?',
         points: [
-            'Materi pelengkap yang dikirim otomatis ke email setelah pembayaran.',
+            'Materi pelengkap: praktek memperbaiki konversi secara praktis',
         ],
         amber: false,
     },
@@ -37,7 +37,7 @@ const BENEFITS: Benefit[] = [
         icon: MessageCircleQuestion,
         title: 'Akses Tanya Jawab Langsung',
         points: [
-            'Ajukan kondisi funnel lo sendiri langsung ke mentor.',
+            'Ajukan kondisi funnel kamu sendiri langsung ke mentor.',
             'Sesi tanya jawab interaktif di akhir webinar.',
         ],
         amber: false,
@@ -46,8 +46,8 @@ const BENEFITS: Benefit[] = [
         icon: Search,
         title: 'Kesempatan Landing Page Audit Gratis',
         points: [
-            'Setelah webinar, lo bisa booking sesi audit personal ke landing page bisnis lo.',
-            'Dapatkan rekomendasi spesifik untuk bisnis lo, bukan lagi saran umum.',
+            'Setelah webinar, kamu bisa booking sesi audit personal ke landing page bisnis kamu.',
+            'Dapatkan rekomendasi spesifik untuk kasus di bisnis kamu, bukan lagi saran umum.',
         ],
         amber: true,
     },

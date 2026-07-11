@@ -38,10 +38,10 @@ export function Garansi() {
                                 100% Uang Kembali
                             </p>
                             <p className="mt-3 text-[14px] leading-relaxed text-lp-text-muted">
-                                Jika lo ikut full, tapi masih ngerasa webinar
-                                tidak bermanfaat?{' '}
+                                Udah ikut full, tapi masih ngerasa webinar tidak
+                                bermanfaat?{' '}
                                 <span className="font-semibold text-lp-text">
-                                    Kami refund 100% tanpa syarat ribet.
+                                    Saya refund 100% tanpa syarat ribet.
                                 </span>{' '}
                             </p>
                         </div>

@@ -4,16 +4,16 @@ import { useSectionView } from '@/hooks/use-section-view';
 
 const PAIN_POINTS = [
     {
-        lead: 'Lo udah punya landing page sendiri,',
-        detail: 'Udah coba ganti semuanya, Ganti kreatif, ganti angle, ganti landing page, CPAnya tetap di angka yang sama.',
+        lead: 'Kamu udah coba ganti semuanya,',
+        detail: 'ganti kreatif, ganti angle, ganti landing page, CPA nya masih tinggi juga',
     },
     {
         lead: 'Closing seret, budget jalan terus.',
-        detail: 'Makin lama iklan jalan, makin gak jelas di mana titik masalahnya.',
+        detail: 'Makin lama iklan jalan, makin gak jelas di mana titik masalahnya',
     },
     {
         lead: 'Gak tahu mulai benerin dari mana.',
-        detail: 'Tiap orang kasih saran beda beda, tapi gak ada yang nunjuk akar masalahnya.',
+        detail: 'Tiap orang kasih saran beda beda, tapi sebenarnya kamu bingung dimana akar masalahnya',
     },
 ];
 
@@ -24,7 +24,7 @@ const CAUSES = [
     },
     {
         title: 'Landing page menahan, bukan mendorong',
-        detail: 'Halaman lo bisa jadi titik orang ragu buat lanjut, bukan titik mereka yakin buat beli.',
+        detail: 'Halaman kamu bisa jadi titik orang ragu buat lanjut, bukan yakin buat beli.',
     },
     {
         title: 'Penawaran belum pas',
@@ -32,7 +32,7 @@ const CAUSES = [
     },
     {
         title: 'Kualitas traffic menurun',
-        detail: 'Yang klik makin banyak, yang benar benar butuh makin sedikit.',
+        detail: 'Yang klik makin banyak, yang benar benar merasa butuh makin sedikit.',
     },
 ];
 
@@ -58,9 +58,9 @@ export function Problem() {
                 </h2>
 
                 <p className="mt-6 text-lg text-lp-text-muted">
-                    Lo udah ngerasa iklannya jalan dengan baik, CTR sehat, CPC
+                    Kamu udah ngerasa iklannya jalan dengan baik, CTR sehat, CPC
                     wajar. Tapi setiap kali cek CPA, angkanya bikin mikir dua
-                    kali. Ini yang bikin makin pusing.
+                    kali. Ini yang bikin makin pusing :
                 </p>
 
                 <div className="mt-8 flex flex-col gap-3">
@@ -87,7 +87,7 @@ export function Problem() {
                 </div>
 
                 <p className="mt-8 text-base font-bold text-lp-text">
-                    Titik bocornya emang gak kelihatan, sampai lo tahu persis
+                    Titik bocornya emang gak kelihatan, sampai kamu tahu persis
                     harus cek di mana.
                 </p>
 
@@ -117,15 +117,18 @@ export function Problem() {
                         ))}
                     </div>
 
-                    <p className="mt-9 text-center text-base font-bold text-lp-text">
-                        Empat hal ini ketauannya dari data yang ada di landing
-                        page lo
+                    <p className="mt-9 text-center text-base font-bold text-lp-text uppercase">
+                        4 penyebab ini bisa diketahui dari data di landing page
+                        kamu
                     </p>
                     <p className="mt-9 text-center text-base font-bold text-lp-text">
-                        Begitu lo tahu penyebab mana yang terjadi di bisnis lo,
-                        lo bisa mulai benerin di titik yang tepat,{' '}
+                        Begitu kamu tahu penyebab mana yang terjadi, kamu bisa
+                        mulai benerin di titik yang tepat sehingga{' '}
                         <span className="bg-gradient-to-r from-lp-primary to-lp-primary-2 bg-clip-text text-transparent">
-                            dan itu yang webinar ini bantu lo temukan.
+                            penjualan bisnis bisa langsung naik, dan{' '}
+                            <span className="uppercase underline">
+                                itu yang webinar ini bantu temukan.
+                            </span>
                         </span>
                     </p>
                 </div>

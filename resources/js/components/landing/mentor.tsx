@@ -13,12 +13,13 @@ export function Mentor() {
             <div className="pointer-events-none absolute top-1/2 left-0 h-96 w-96 -translate-y-1/2 rounded-full bg-lp-amber/12 blur-[130px]" />
 
             <div className="relative mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24 lg:py-28">
-                <Eyebrow className="mx-auto flex w-fit sm:mx-0">Tentang Pembicara</Eyebrow>
+                <Eyebrow className="mx-auto flex w-fit sm:mx-0">
+                    Tentang Pembicara
+                </Eyebrow>
 
                 <div className="mt-8 flex flex-col items-center gap-8 sm:flex-row sm:items-start sm:gap-12">
                     {/* Photo */}
                     <div className="relative w-52 shrink-0 sm:w-56">
-                        <div className="absolute -inset-2 rounded-[28px] bg-gradient-to-br from-lp-amber via-lp-primary-2 to-lp-primary opacity-60 blur-xl" />
                         <div className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-lp-amber/50 to-lp-primary-2/30 p-[2px]">
                             <img
                                 src="/storage/mentor/justin.jpg"
@@ -71,20 +72,20 @@ export function Mentor() {
                         </div>
 
                         <p className="mt-4 max-w-[52ch] text-[15.5px] text-lp-text-muted">
-                            5 tahun terakhir gua udah jalanin digital business
-                            dan freelance bikin website. Dari situ gua sadar,
+                            5 tahun terakhir saya udah jalanin digital business
+                            dan freelance bikin website. Dari situ saya sadar,
                             bikin website yang bagus diliat sama bikin website
                             yang jualan itu dua hal yang beda jauh.
                         </p>
                         <p className="mt-3 max-w-[52ch] text-[15.5px] text-lp-text-muted">
-                            Makanya sekarang gua fokus ke conversion rate
+                            Makanya sekarang saya fokus ke conversion rate
                             optimization, yaitu gimana cara bikin website yang
-                            beneran menjual, dan dari situ konversi klien gua
+                            beneran menjual, dan dari situ konversi klien saya
                             rata rata naik 1,5 sampai 2 kali lipat.
                         </p>
                         <p className="mt-3 max-w-[52ch] text-[15.5px] text-lp-text-muted">
                             Framework keberhasilan & pengalaman ini yang bakal
-                            gua sharing lewat sesi webinar ini.
+                            saya sharing lewat sesi webinar ini.
                         </p>
                     </div>
                 </div>

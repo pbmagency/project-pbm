@@ -20,10 +20,10 @@ export function Pricing() {
             id="pricing"
             className="relative overflow-hidden bg-lp-bg"
         >
-            <div className="pointer-events-none absolute inset-0">
+            {/* <div className="pointer-events-none absolute inset-0">
                 <div className="absolute top-1/3 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-lp-primary-2/25 blur-[150px]" />
                 <div className="absolute inset-0 bg-lp-grid opacity-40" />
-            </div>
+            </div> */}
 
             <div className="relative mx-auto max-w-lg px-4 pt-16 pb-10 sm:px-6 sm:pt-24 sm:pb-12 lg:pt-28">
                 <div className="text-center">
@@ -32,9 +32,9 @@ export function Pricing() {
                     </Eyebrow>
 
                     <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-lp-text sm:text-[38px]">
-                        Investasi Terbaik buat{' '}
+                        Investasi Terbaik Untuk{' '}
                         <span className="bg-gradient-to-r from-lp-primary to-lp-primary-2 bg-clip-text text-transparent">
-                            Funnel Lo
+                            Perubahan
                         </span>
                     </h2>
                 </div>

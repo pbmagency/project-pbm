@@ -23,24 +23,27 @@ export function Hero() {
 
             <div className="relative mx-auto flex max-w-6xl flex-wrap items-center gap-10 px-4 py-14 sm:px-6 sm:py-20 lg:gap-16 lg:py-32">
                 <div className="min-w-0 flex-1 basis-[460px]">
-                    <Eyebrow>Webinar </Eyebrow>
+                    <Eyebrow>2X Your Conversion Webinar</Eyebrow>
 
-                    <h1 className="mt-6 font-display text-[42px] leading-[1.04] font-extrabold tracking-[-0.02em] text-lp-text sm:text-6xl lg:text-[68px]">
-                        Banyak yang Klik.
+                    <h1 className="mt-6 font-display text-[42px] leading-[1.04] font-extrabold tracking-[-0.02em] text-lp-text sm:text-6xl">
+                        Belajar Strategi Tingkatkan Closing{' '}
+                        <span className="bg-gradient-to-r from-lp-primary to-lp-primary-ink bg-clip-text text-transparent">
+                            Landing Page
+                        </span>
                         <br />
-                        Dikit yang{' '}
+                        Hingga{' '}
                         <span className="relative inline-block">
                             <span className="bg-gradient-to-r from-lp-primary via-lp-primary-ink to-lp-primary-2 bg-clip-text text-transparent">
-                                Beli.
+                                2X Lipat
                             </span>
                             <span className="absolute -bottom-2 left-0 h-[3px] w-full rounded-full bg-gradient-to-r from-lp-primary to-lp-primary-2 opacity-70" />
                         </span>
                     </h1>
 
                     <p className="mt-7 max-w-[46ch] text-lg font-light sm:text-xl">
-                        CTR bagus, CPC oke, tapi kenapa closing lo masih flat?
-                        Webinar ini buat lo yang iklannya sudah jalan dengan
-                        baik, bukan yang iklannya baru mau dites.
+                        Iklan udah bagus, tapi kenapa closing masih seret?
+                        Kenali blind spot pada landing page yang membuat audiens
+                        kabur sebelum checkout
                     </p>
 
                     <div className="mt-10 flex flex-col items-start gap-5">

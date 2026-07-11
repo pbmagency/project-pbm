@@ -104,8 +104,8 @@ export function Proof() {
                         </h2>
                         <p className="mx-auto mt-5 max-w-[58ch] text-lg text-lp-text-muted">
                             Studi kasus di bawah ini hasil kerja PBM Agency.
-                            Cara mikir dan cara diagnosanya sama persis dengan
-                            yang bakal lo dapetin di webinar ini.
+                            Mindset dan strategi-nya sama persis dengan yang
+                            bakal kamu dapetin di webinar ini.
                         </p>
                     </div>
 

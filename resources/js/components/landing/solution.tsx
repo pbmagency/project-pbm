@@ -8,8 +8,8 @@ const AFTER_SESSION = [
 ];
 
 const NO_MORE_WORRY = [
-    'Setiap rupiah budget iklan kerja lebih efisien, gak lagi habis buat coba coba.',
-    'Lo ambil keputusan funnel dengan tenang, bukan berdasar tebakan.',
+    'Budget iklan lebih efisien, gak lagi habis buat coba coba.',
+    'Lo bisa perbaiki dengan akurat, bukan nebak lagi. Jadi penjualan beneran naik',
 ];
 
 function ChecklistRow({
@@ -63,9 +63,12 @@ export function Solution() {
                 <p className="mt-4 font-mono text-[13px] tracking-wide text-lp-text-dim">
                     16 JULI 2026 &middot; LIVE VIA ZOOM
                 </p>
+                <p className="mt-2 font-mono text-[13px] tracking-wide text-lp-text-dim">
+                    19:00 - 20:30 WIB
+                </p>
 
-                <p className="mx-auto mt-5 max-w-[56ch] text-lg text-lp-text-muted">
-                    Sesi live 90 menit yang ngebahas kenapa landing page lo
+                <p className="mx-auto mt-5 hidden max-w-[56ch] text-lg text-lp-text-muted md:block">
+                    Sesi live 90 menit yang ngebahas kenapa landing page kamu
                     masih boncos padahal iklannya udah jalan bagus.
                 </p>
             </div>
@@ -87,6 +90,10 @@ export function Solution() {
 
                     {/* Value + CTA — desktop: kolom kanan */}
                     <div className="w-full text-left">
+                        <p className="mx-auto mb-6 block max-w-[56ch] text-lg text-lp-text-muted md:hidden">
+                            Sesi live 90 menit yang ngebahas kenapa landing page
+                            kamu masih boncos padahal iklannya udah jalan bagus.
+                        </p>
                         <div className="flex flex-col gap-3">
                             <p className="mb-0.5 text-base font-bold text-lp-text">
                                 Setelah ikut sesi ini, lo bisa:

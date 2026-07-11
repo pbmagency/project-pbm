@@ -10,7 +10,7 @@ const MODULES = [
         title: 'Modul 1',
         subtitle: 'Cara Membaca Letak Masalah',
         description:
-            'Temukan di mana letak traffic lo terbuang sia sia selama ini',
+            'Temukan di mana letak masalah yang membuat traffic kamu terbuang sia sia selama ini',
         amber: false,
     },
     {
@@ -18,7 +18,7 @@ const MODULES = [
         title: 'Modul 2',
         subtitle: 'Cara Efektif Perbaiki Kebocoran',
         description:
-            'Pelajari framework praktis untuk memperbaiki kebocoran funnel lo',
+            'Pelajari framework untuk memperbaiki kebocoran funnel kamu',
         amber: false,
     },
     {
@@ -26,7 +26,7 @@ const MODULES = [
         title: 'Modul 3',
         subtitle: 'Studi Kasus & Tools Diagnosis',
         description:
-            'Kita bedah tuntas studi kasus cara diagnosis & perbaiki conversion layer',
+            'Bedah studi kasus cara kami diagnosis & perbaiki kebocoran di landing page, serta tools diagnosa kebocoran konversi',
         amber: true,
     },
 ];
@@ -52,10 +52,10 @@ export function Module() {
                     </span>
                 </h2>
 
-                <p className="mt-5 max-w-[60ch] text-lg text-lp-text-muted">
+                {/* <p className="mt-5 max-w-[60ch] text-lg text-lp-text-muted">
                     Closing yang rendah selalu bisa dilacak ke salah satu dari
                     tiga lapisan funnel. Ini yang kita bedah, satu per satu.
-                </p>
+                </p> */}
 
                 <div className="mt-12 grid gap-5 sm:grid-cols-3">
                     {MODULES.map((mod) => (
@@ -107,6 +107,12 @@ export function Module() {
                             </p>
                         </div>
                     ))}
+                </div>
+
+                <div className="mt-12 flex justify-center">
+                    <CtaButton location="benefit_bottom" showTrustBadges>
+                        Amankan Seat Sekarang
+                    </CtaButton>
                 </div>
 
                 {/* <div className="lp-gradient-border-inner lp-gradient-border mt-10 rounded-[22px] bg-lp-bg-elevated/70 p-6 backdrop-blur-sm sm:p-8">

@@ -37,7 +37,9 @@ export function CtaButton({
     const { trackCTA, trackConversion } = useAnalytics();
 
     const handleClick = () => {
-        const destinationStr = isPricingCta ? (checkout() as any).url || checkout() : '#pricing';
+        const destinationStr = isPricingCta
+            ? (checkout() as any).url || checkout()
+            : '#pricing';
         trackCTA(
             location,
             typeof children === 'string' ? children : location,
@@ -52,7 +54,7 @@ export function CtaButton({
     const buttonClass = cn(
         'group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl px-8 py-4 text-center text-base font-bold transition-all active:translate-y-0 active:scale-[0.98]',
         variant === 'gradient' &&
-            'bg-gradient-to-br from-lp-primary via-lp-primary to-lp-primary-2 text-white shadow-[0_16px_32px_-12px_oklch(0.62_0.20_224/0.6)] hover:-translate-y-0.5 hover:shadow-[0_26px_50px_-12px_oklch(0.62_0.20_224/0.75)]',
+            'bg-gradient-to-br from-lp-primary via-lp-primary to-lp-primary-2 text-white shadow-[0_16px_32px_-12px_oklch(0.62_0.20_224/0.6)] hover:-translate-y-0.5',
         variant === 'white' &&
             'bg-white text-lp-primary-2 shadow-[0_16px_40px_-14px_rgba(255,255,255,0.55)] hover:-translate-y-0.5',
         className,
@@ -85,9 +87,9 @@ export function CtaButton({
                             key={label}
                             className="flex items-center gap-1.5 text-[12px] font-medium text-lp-text-dim"
                         >
-                            {i > 0 && (
+                            {/* {i > 0 && (
                                 <span className="h-3 w-px bg-lp-border-soft" aria-hidden="true" />
-                            )}
+                            )} */}
                             <Icon className="h-3 w-3 shrink-0 text-lp-primary-ink" />
                             {label}
                         </span>
