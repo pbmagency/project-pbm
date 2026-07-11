@@ -4,17 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Services\AbTestingService;
 use Carbon\Carbon;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class LabsController extends Controller
 {
     public function __construct(protected AbTestingService $abTestingService) {}
 
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $request->validate([
             'start_date' => 'nullable|date',
@@ -38,6 +36,7 @@ class LabsController extends Controller
         $sourceKey = $sourceFilter ?? 'all';
         $cacheKey = "ab_testing_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}";
 
+        // 30-minute cache for high-traffic tolerance
         $data = Cache::remember($cacheKey, 30 * 60, function () use ($startDate, $endDate, $sourceFilter) {
             return [
                 'matrix' => $this->abTestingService->getPerformanceMatrix($startDate, $endDate, $sourceFilter),
@@ -51,9 +50,25 @@ class LabsController extends Controller
             ];
         });
 
+        $availableSources = $this->abTestingService->getAvailableSources($startDate, $endDate);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                ...$data,
+                'available_sources' => $availableSources,
+                'meta' => [
+                    'start_date' => $startDate->toIso8601String(),
+                    'end_date' => $endDate->toIso8601String(),
+                    'range' => $range,
+                    'source' => $sourceFilter,
+                    'cached_at' => now()->toIso8601String(),
+                ],
+            ]);
+        }
+
         return Inertia::render('admin/labs/index', [
             ...$data,
-            'availableSources' => $this->abTestingService->getAvailableSources($startDate, $endDate),
+            'availableSources' => $availableSources,
             'filters' => [
                 'start_date' => $startDate->format('Y-m-d'),
                 'end_date' => $endDate->format('Y-m-d'),
@@ -63,7 +78,7 @@ class LabsController extends Controller
         ]);
     }
 
-    public function clearCache(Request $request): JsonResponse
+    public function clearCache(Request $request)
     {
         $range = $request->get('range', '7');
         $sourceFilter = $request->get('source');
