@@ -425,18 +425,24 @@ class AbTestingService
     private function batchEventCounts(Carbon $startDate, Carbon $endDate, ?string $sourceFilter, array $eventTypes): array
     {
         $rows = DB::table('user_analytics')
-            ->select([
-                DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
-                'event_type',
-                DB::raw('COUNT(DISTINCT session_id) as cnt'),
-            ])
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereIn('event_type', $eventTypes)
-            ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
-            ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
-            ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('referral_source', $sourceFilter))
-            ->groupBy('landing_source', 'event_type')
-            ->get();
+        ->selectRaw("
+            JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.landing_source')) AS landing_source,
+            event_type,
+            COUNT(DISTINCT session_id) AS cnt
+        ")
+        ->whereBetween('created_at', [$startDate, $endDate])
+        ->whereIn('event_type', $eventTypes)
+        ->whereRaw("JSON_EXTRACT(event_data, '$.landing_source') IS NOT NULL")
+        ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.landing_source')) NOT IN ('', 'unknown')")
+        ->when(
+            $sourceFilter && $sourceFilter !== 'all',
+            fn ($q) => $q->where('referral_source', $sourceFilter)
+        )
+        ->groupByRaw("
+            JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.landing_source')),
+            event_type
+        ")
+        ->get();
 
         $result = [];
         foreach ($rows as $row) {
