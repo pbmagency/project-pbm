@@ -44,15 +44,10 @@ export function AppSidebar() {
     const isAdmin = auth.user?.role === 'admin';
 
     const mainNavItems: NavItem[] = [
-        {
-            title: 'Dashboard',
-            href: dashboard(),
-            icon: LayoutGrid,
-        },
         ...(isAdmin
             ? [
                   {
-                      title: 'Analytics Dashboard',
+                      title: 'Analytics',
                       href: AnalyticsController.index(),
                       icon: LineChart,
                   },
@@ -60,11 +55,6 @@ export function AppSidebar() {
                       title: 'A/B Testing Labs',
                       href: LabsController.index(),
                       icon: FlaskConical,
-                  },
-                  {
-                      title: 'Orders',
-                      href: OrderController.index(),
-                      icon: ShoppingCart,
                   },
               ]
             : []),
