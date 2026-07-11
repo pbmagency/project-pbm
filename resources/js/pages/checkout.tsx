@@ -60,7 +60,7 @@ export default function Checkout({ price, originalPrice }: CheckoutProps) {
                 <div className="mx-auto max-w-5xl">
                     {/* Back link */}
                     <a
-                        href={home()}
+                        href={home().url}
                         className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-lp-text-dim transition-colors hover:text-lp-text"
                     >
                         <ArrowLeft className="h-4 w-4" />
