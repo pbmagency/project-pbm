@@ -41,4 +41,10 @@ return [
         'course_price' => env('VITE_COURSE_PRICE', 129000),
     ],
 
+    'duitku' => [
+        'server_key' => env('DUITKU_SERVER_KEY', ''),
+        'merchant_code' => env('DUITKU_MERCHANT_CODE', ''),
+        'sandbox' => env('DUITKU_SANDBOX', true),
+    ],
+
 ];
