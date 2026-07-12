@@ -81,7 +81,16 @@ export default function PaymentSuccess({ order }: PaymentSuccessProps) {
                             </div>
                         </div>
                     </div>
-
+                    {/* Email notice */}
+                    <div className="mt-6 rounded-2xl border border-lp-border bg-lp-bg-elevated px-5 py-4 text-center">
+                        <p className="text-base font-semibold text-lp-text">
+                            Cek email kamu sekarang!
+                        </p>
+                        <p className="mt-1 text-sm text-lp-text-muted">
+                            Info webinar & akses ebook bonus sudah dikirim ke{' '}
+                            <strong className="text-lp-text">{order.email}</strong>
+                        </p>
+                    </div>
                     {/* CTAs */}
                     <div className="mt-6 space-y-3">
                         <a
@@ -112,11 +121,6 @@ export default function PaymentSuccess({ order }: PaymentSuccessProps) {
                             Tambahkan ke Google Calendar
                         </a>
                     </div>
-
-                    <p className="mt-6 text-center text-xs text-lp-text-dim">
-                        Email konfirmasi dengan semua link di atas sudah dikirim ke{' '}
-                        <strong className="text-lp-text-muted">{order.email}</strong>
-                    </p>
                 </div>
             </div>
         </>
