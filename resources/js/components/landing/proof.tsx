@@ -15,7 +15,7 @@ const BEFORE_AFTER = [
         id: 'before',
         label: 'Sebelum',
         // TODO: ganti src dengan screenshot before yang asli
-        src: '/storage/study-case/before.webp',
+        src: '/storage/public/study-case/before.webp',
         alt: 'Data konversi sebelum optimasi',
         labelClass: 'text-lp-text-dim',
         borderClass: 'border-lp-border',
@@ -24,7 +24,7 @@ const BEFORE_AFTER = [
         id: 'after',
         label: 'Sesudah',
         // TODO: ganti src dengan screenshot after yang asli
-        src: '/storage/study-case/after.webp',
+        src: '/storage/public/study-case/after.webp',
         alt: 'Data konversi sesudah optimasi',
         labelClass: 'text-lp-primary-ink',
         borderClass: 'border-lp-primary/50',
@@ -188,7 +188,7 @@ export function Proof() {
                             type="button"
                             onClick={() =>
                                 openLightbox(
-                                    '/storage/testimonials/fullbright.jpeg',
+                                    '/storage/public/testimonials/fullbright.webp',
                                     'Screenshot testimoni WhatsApp pelanggan',
                                 )
                             }
