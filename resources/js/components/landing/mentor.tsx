@@ -22,7 +22,7 @@ export function Mentor() {
                     <div className="relative w-52 shrink-0 sm:w-56">
                         <div className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-lp-amber/50 to-lp-primary-2/30 p-[2px]">
                             <img
-                                src="/storage/public/mentor/justin.webp"
+                                src="/public/images/mentor/justin.webp"
                                 alt="Justin Wijaya — Mentor"
                                 className="aspect-[3/4] w-full rounded-[24px] object-cover object-top"
                                 loading="lazy"
