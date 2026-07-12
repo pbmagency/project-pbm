@@ -15,6 +15,7 @@ createInertiaApp({
             case name === 'welcome':
             case name === 'landing':
             case name === 'checkout':
+            case name.startsWith('payment/'):
             case name.startsWith('admin/'):
                 // Public marketing pages render with no chrome; admin pages
                 // wrap themselves in AdminLayout already.

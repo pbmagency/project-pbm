@@ -36,6 +36,11 @@ export default function PaymentPending({ order_number }: PaymentPendingProps) {
                     )}
 
                     <div className="mt-8 space-y-3">
+                        <p className="text-sm text-lp-text-dim">
+                            Sudah transfer tapi status belum berubah?{' '}
+                            <span className="font-semibold text-lp-text">Hubungi kami via WhatsApp</span>{' '}
+                            dan tim kami akan segera verifikasi pembayaranmu.
+                        </p>
                         <a
                             href={WA_SUPPORT}
                             target="_blank"
