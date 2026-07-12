@@ -22,7 +22,7 @@ const CARDS: ProofCard[] = [
         icon: MessageCircle,
         aspect: 'aspect-[3/4]',
         // TODO: ganti src dengan URL screenshot testimoni WhatsApp yang asli
-        src: '/public/images/testimonials/fullbright.webp',
+        src: '/images/testimonials/fullbright.webp',
         alt: 'Screenshot testimoni WhatsApp pelanggan',
     },
     {
@@ -32,7 +32,7 @@ const CARDS: ProofCard[] = [
         badge: '+32% Lead dalam 1 Minggu',
         aspect: 'aspect-[2/1]',
         // TODO: ganti src dengan URL screenshot dashboard A/B Labs yang asli
-        src: '/public/images/testimonials/before-after.webp',
+        src: '/images/testimonials/before-after.webp',
         alt: 'Screenshot dashboard A/B Labs sebelum dan sesudah',
     },
 ];
