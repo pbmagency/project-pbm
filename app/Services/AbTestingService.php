@@ -57,7 +57,7 @@ class AbTestingService
             ];
         }
 
-        usort($matrix, fn($a, $b) => $b['rpv'] <=> $a['rpv']);
+        usort($matrix, fn ($a, $b) => $b['rpv'] <=> $a['rpv']);
 
         return $matrix;
     }
@@ -87,12 +87,12 @@ class AbTestingService
             $funnel[] = [
                 'landing_source' => $source,
                 'steps' => [
-                    ['stage' => 'Visits',  'count' => $visits,  'percentage' => 100],
+                    ['stage' => 'Visits', 'count' => $visits, 'percentage' => 100],
                     ['stage' => 'Engaged', 'count' => $engaged, 'percentage' => round($this->safePct($engaged, $visits), 1)],
-                    ['stage' => 'Intent',  'count' => $intent,  'percentage' => round($this->safePct($intent, $visits), 1)],
+                    ['stage' => 'Intent', 'count' => $intent, 'percentage' => round($this->safePct($intent, $visits), 1)],
                     ['stage' => 'Initiate Checkout', 'count' => $initiateCheckouts, 'percentage' => round($this->safePct($initiateCheckouts, $visits), 1)],
-                    ['stage' => 'Leads',   'count' => $leads,   'percentage' => round($this->safePct($leads, $visits), 1)],
-                    ['stage' => 'Sales',   'count' => $sales,   'percentage' => round($this->safePct($sales, $visits), 1)],
+                    ['stage' => 'Leads', 'count' => $leads, 'percentage' => round($this->safePct($leads, $visits), 1)],
+                    ['stage' => 'Sales', 'count' => $sales, 'percentage' => round($this->safePct($sales, $visits), 1)],
                 ],
             ];
         }
@@ -116,8 +116,8 @@ class AbTestingService
             $visits = $visitData[$src] ?? collect();
             $leads = $leadSessions[$src] ?? collect();
 
-            $mobile = $visits->filter(fn($r) => $this->isMobileDevice($r->user_agent));
-            $desktop = $visits->reject(fn($r) => $this->isMobileDevice($r->user_agent));
+            $mobile = $visits->filter(fn ($r) => $this->isMobileDevice($r->user_agent));
+            $desktop = $visits->reject(fn ($r) => $this->isMobileDevice($r->user_agent));
 
             $mobileIds = $mobile->pluck('session_id')->unique();
             $desktopIds = $desktop->pluck('session_id')->unique();
@@ -127,7 +127,7 @@ class AbTestingService
 
             $performance[] = [
                 'landing_source' => $src,
-                'mobile' => ['visits' => $mobileIds->count(),  'leads' => $mobLeads,  'conversion_rate' => round($this->safeDiv($mobLeads, $mobileIds->count()) * 100, 2)],
+                'mobile' => ['visits' => $mobileIds->count(), 'leads' => $mobLeads, 'conversion_rate' => round($this->safeDiv($mobLeads, $mobileIds->count()) * 100, 2)],
                 'desktop' => ['visits' => $desktopIds->count(), 'leads' => $deskLeads, 'conversion_rate' => round($this->safeDiv($deskLeads, $desktopIds->count()) * 100, 2)],
             ];
         }
@@ -160,7 +160,7 @@ class AbTestingService
             ->distinct()
             ->pluck('session_id');
 
-        return $ctaClicks->groupBy(fn($row) => $this->normalizeLandingSource($row->landing_source))->map(function ($sourceClicks, $landingSource) use ($leadSessions) {
+        return $ctaClicks->groupBy(fn ($row) => $this->normalizeLandingSource($row->landing_source))->map(function ($sourceClicks, $landingSource) use ($leadSessions) {
             $locations = $sourceClicks->groupBy('cta_location')->map(function ($locationClicks, $location) use ($leadSessions) {
                 $uniqueSessions = $locationClicks->pluck('session_id')->unique();
                 $leads = $uniqueSessions->intersect($leadSessions)->count();
@@ -223,10 +223,10 @@ class AbTestingService
                 'landing_source' => $src,
                 'total_sessions' => $total,
                 'personas' => [
-                    ['name' => 'Bouncers',     'description' => 'Not engaged (<25% scroll or <15s dwell)',      'count' => $personas['bouncers'],     'percentage' => round($this->safeDiv($personas['bouncers'], $total) * 100, 1)],
-                    ['name' => 'Skimmers',     'description' => 'High scroll (>75%) but quick read (<60s)', 'count' => $personas['skimmers'],     'percentage' => round($this->safeDiv($personas['skimmers'], $total) * 100, 1)],
-                    ['name' => 'Deep Readers', 'description' => 'Extended engagement (>120s)',              'count' => $personas['deep_readers'], 'percentage' => round($this->safeDiv($personas['deep_readers'], $total) * 100, 1)],
-                    ['name' => 'Casuals',      'description' => 'Moderate engagement',                     'count' => $personas['casuals'],      'percentage' => round($this->safeDiv($personas['casuals'], $total) * 100, 1)],
+                    ['name' => 'Bouncers', 'description' => 'Not engaged (<25% scroll or <15s dwell)', 'count' => $personas['bouncers'], 'percentage' => round($this->safeDiv($personas['bouncers'], $total) * 100, 1)],
+                    ['name' => 'Skimmers', 'description' => 'High scroll (>75%) but quick read (<60s)', 'count' => $personas['skimmers'], 'percentage' => round($this->safeDiv($personas['skimmers'], $total) * 100, 1)],
+                    ['name' => 'Deep Readers', 'description' => 'Extended engagement (>120s)', 'count' => $personas['deep_readers'], 'percentage' => round($this->safeDiv($personas['deep_readers'], $total) * 100, 1)],
+                    ['name' => 'Casuals', 'description' => 'Moderate engagement', 'count' => $personas['casuals'], 'percentage' => round($this->safeDiv($personas['casuals'], $total) * 100, 1)],
                 ],
             ];
         }
@@ -250,10 +250,10 @@ class AbTestingService
             ->where('event_type', 'scroll')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
-            ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('referral_source', $sourceFilter))
-            ->groupBy('landing_source', 'session_id')
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
+            ->groupBy(DB::raw("json_extract(event_data, '$.landing_source')"), 'session_id')
             ->get()
-            ->groupBy(fn($row) => $this->normalizeLandingSource($row->landing_source));
+            ->groupBy(fn ($row) => $this->normalizeLandingSource($row->landing_source));
 
         $heatmap = [];
         foreach ($counts as $source => $typeCounts) {
@@ -266,7 +266,7 @@ class AbTestingService
             $depthData = [];
 
             foreach ([25, 50, 75, 90] as $threshold) {
-                $reaching = $sourceDepths->filter(fn($r) => (float) $r->max_depth >= $threshold)->count();
+                $reaching = $sourceDepths->filter(fn ($r) => (float) $r->max_depth >= $threshold)->count();
                 $depthData[] = [
                     'depth' => $threshold,
                     'sessions' => $reaching,
@@ -315,23 +315,20 @@ class AbTestingService
 
     public function getSectionHeatmap(Carbon $startDate, Carbon $endDate, ?string $sourceFilter = null): array
     {
-        // Human-readable labels for known sections (fallback to raw ID for unknowns)
         $labels = [
-            'hero'          => 'Hero',
+            'hero' => 'Hero',
             'success-story' => 'Success Story',
-            'solusi'        => 'Solution',
-            'problem'       => 'Problem',
-            'benefits'      => 'Benefits',
-            'testimoni'     => 'Testimonials',
-            'pengajar'      => 'Instructor',
-            'media-features'=> 'Media Features',
-            'curriculum'    => 'Curriculum',
-            'harga'         => 'Pricing',
-            'faq'           => 'FAQ',
+            'solusi' => 'Solution',
+            'problem' => 'Problem',
+            'benefits' => 'Benefits',
+            'testimoni' => 'Testimonials',
+            'pengajar' => 'Instructor',
+            'media-features' => 'Media Features',
+            'curriculum' => 'Curriculum',
+            'harga' => 'Pricing',
+            'faq' => 'FAQ',
         ];
 
-        // Query: aggregate views per section AND capture earliest first_seen
-        // so we can order sections by when they were first tracked (top → bottom of page)
         $rows = DB::table('user_analytics')
             ->select([
                 DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
@@ -343,32 +340,28 @@ class AbTestingService
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
             ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
-            ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('referral_source', $sourceFilter))
-            ->groupBy('landing_source', 'section_name')
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
+            ->groupBy(DB::raw("json_extract(event_data, '$.landing_source')"), DB::raw("json_extract(event_data, '$.section')"))
             ->get();
 
         if ($rows->isEmpty()) {
             return [];
         }
 
-        // Group by landing source
-        $grouped = $rows->groupBy('landing_source');
-
         $result = [];
-        foreach ($grouped as $source => $sourceRows) {
+        foreach ($rows->groupBy('landing_source') as $source => $sourceRows) {
             $cleanSource = $this->normalizeLandingSource($source);
-
-            // Build section data sorted by first_seen ascending
-            // (sections at top of page are seen first → naturally ordered top→bottom)
             $sectionRows = $sourceRows->sortBy('first_seen')->values();
 
             $sections = [];
             $firstViews = null;
-            $prevViews  = null;
+            $prevViews = null;
 
             foreach ($sectionRows as $row) {
                 $sectionId = trim($row->section_name, '"');
-                if ($sectionId === '') continue;
+                if ($sectionId === '') {
+                    continue;
+                }
 
                 $views = (int) $row->views;
 
@@ -382,30 +375,28 @@ class AbTestingService
                     : 0;
 
                 $sections[] = [
-                    'id'             => $sectionId,
-                    'name'           => $labels[$sectionId] ?? ucfirst(str_replace(['-', '_'], ' ', $sectionId)),
-                    'views'          => $views,
-                    'pct'            => $pct,
+                    'id' => $sectionId,
+                    'name' => $labels[$sectionId] ?? ucfirst(str_replace(['-', '_'], ' ', $sectionId)),
+                    'views' => $views,
+                    'pct' => $pct,
                     'drop_from_prev' => max(0, $dropFromPrev),
                 ];
 
                 $prevViews = $views;
             }
 
-            if (!empty($sections)) {
+            if (! empty($sections)) {
                 $result[] = [
                     'landing_source' => $cleanSource,
-                    'sections'       => $sections,
+                    'sections' => $sections,
                 ];
             }
         }
 
-        // Sort by landing_source alphabetically
-        usort($result, fn($a, $b) => strcmp($a['landing_source'], $b['landing_source']));
+        usort($result, fn ($a, $b) => strcmp($a['landing_source'], $b['landing_source']));
 
         return $result;
     }
-
 
     public function getAvailableSources(Carbon $startDate, Carbon $endDate): array
     {
@@ -425,24 +416,18 @@ class AbTestingService
     private function batchEventCounts(Carbon $startDate, Carbon $endDate, ?string $sourceFilter, array $eventTypes): array
     {
         $rows = DB::table('user_analytics')
-        ->selectRaw("
-            JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.landing_source')) AS landing_source,
-            event_type,
-            COUNT(DISTINCT session_id) AS cnt
-        ")
-        ->whereBetween('created_at', [$startDate, $endDate])
-        ->whereIn('event_type', $eventTypes)
-        ->whereRaw("JSON_EXTRACT(event_data, '$.landing_source') IS NOT NULL")
-        ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.landing_source')) NOT IN ('', 'unknown')")
-        ->when(
-            $sourceFilter && $sourceFilter !== 'all',
-            fn ($q) => $q->where('referral_source', $sourceFilter)
-        )
-        ->groupByRaw("
-            JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.landing_source')),
-            event_type
-        ")
-        ->get();
+            ->select([
+                DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
+                'event_type',
+                DB::raw('COUNT(DISTINCT session_id) as cnt'),
+            ])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereIn('event_type', $eventTypes)
+            ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
+            ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
+            ->groupBy(DB::raw("json_extract(event_data, '$.landing_source')"), 'event_type')
+            ->get();
 
         $result = [];
         foreach ($rows as $row) {
@@ -455,7 +440,6 @@ class AbTestingService
 
     private function batchBouncedCounts(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
     {
-        // Bounced = visited but NOT engaged (engagement = dwell_ping AND scroll >= 25%)
         $rows = DB::table('user_analytics as v')
             ->select([
                 DB::raw("json_extract(v.event_data, '$.landing_source') as landing_source"),
@@ -465,9 +449,8 @@ class AbTestingService
             ->whereBetween('v.created_at', [$startDate, $endDate])
             ->whereRaw("json_extract(v.event_data, '$.landing_source') IS NOT NULL")
             ->whereRaw("json_extract(v.event_data, '$.landing_source') NOT IN ('', 'unknown')")
-            ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('v.referral_source', $sourceFilter))
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('v.referral_source', $sourceFilter))
             ->where(function ($q) use ($startDate, $endDate) {
-                // NOT engaged = missing dwell_ping OR missing scroll >= 25%
                 $q->whereNotExists(function ($sub) use ($startDate, $endDate) {
                     $sub->from('user_analytics as e')
                         ->whereColumn('e.session_id', 'v.session_id')
@@ -483,10 +466,10 @@ class AbTestingService
                             ->whereBetween('s.created_at', [$startDate, $endDate]);
                     });
             })
-            ->groupBy('landing_source')
+            ->groupBy(DB::raw("json_extract(v.event_data, '$.landing_source')"))
             ->get();
 
-        return $rows->mapWithKeys(fn($row) => [
+        return $rows->mapWithKeys(fn ($row) => [
             $this->normalizeLandingSource($row->landing_source) => $row->bounced,
         ])->all();
     }
@@ -502,11 +485,11 @@ class AbTestingService
             ->whereRaw("json_extract(event_data, '$.status') = 'success'")
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
-            ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('referral_source', $sourceFilter))
-            ->groupBy('landing_source')
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
+            ->groupBy(DB::raw("json_extract(event_data, '$.landing_source')"))
             ->get();
 
-        return $rows->mapWithKeys(fn($row) => [
+        return $rows->mapWithKeys(fn ($row) => [
             $this->normalizeLandingSource($row->landing_source) => $row->revenue,
         ])->all();
     }
@@ -521,7 +504,7 @@ class AbTestingService
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
             ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
-            ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('referral_source', $sourceFilter))
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
             ->distinct()
             ->get();
 
@@ -531,7 +514,7 @@ class AbTestingService
             $result[$key][] = $row->session_id;
         }
 
-        return array_map(fn($ids) => collect(array_unique($ids)), $result);
+        return array_map(fn ($ids) => collect(array_unique($ids)), $result);
     }
 
     private function batchPaymentSessionIds(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
@@ -544,7 +527,7 @@ class AbTestingService
             ->where('event_type', 'payment')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
-            ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('referral_source', $sourceFilter))
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
             ->distinct()
             ->get();
 
@@ -554,7 +537,7 @@ class AbTestingService
             $result[$key][] = $row->session_id;
         }
 
-        return array_map(fn($ids) => collect(array_unique($ids)), $result);
+        return array_map(fn ($ids) => collect(array_unique($ids)), $result);
     }
 
     private function batchLeadSessionIds(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
@@ -567,7 +550,7 @@ class AbTestingService
             ->where('event_type', 'lead')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
-            ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('referral_source', $sourceFilter))
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
             ->distinct()
             ->get();
 
@@ -577,7 +560,7 @@ class AbTestingService
             $result[$key][] = $row->session_id;
         }
 
-        return array_map(fn($ids) => collect(array_unique($ids)), $result);
+        return array_map(fn ($ids) => collect(array_unique($ids)), $result);
     }
 
     private function batchVisitSessionsWithUserAgent(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
@@ -592,7 +575,7 @@ class AbTestingService
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
             ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
-            ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('referral_source', $sourceFilter))
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
             ->get();
 
         $result = [];
@@ -601,7 +584,7 @@ class AbTestingService
             $result[$key][] = $row;
         }
 
-        return array_map(fn($rows) => collect($rows), $result);
+        return array_map(fn ($rows) => collect($rows), $result);
     }
 
     private function batchMaxScrollDepth(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
@@ -613,7 +596,7 @@ class AbTestingService
             ])
             ->where('event_type', 'scroll')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('referral_source', $sourceFilter))
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
             ->groupBy('session_id')
             ->get();
 
@@ -629,11 +612,11 @@ class AbTestingService
             ])
             ->where('event_type', 'engagement')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('referral_source', $sourceFilter))
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
             ->groupBy('session_id')
             ->get();
 
-        return $rows->mapWithKeys(fn($r) => [$r->session_id => (float) $r->total_ms / 1000])->all();
+        return $rows->mapWithKeys(fn ($r) => [$r->session_id => (float) $r->total_ms / 1000])->all();
     }
 
     private function getValidLandingSources(Carbon $startDate, Carbon $endDate, ?string $sourceFilter = null): Collection
@@ -643,19 +626,24 @@ class AbTestingService
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
             ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
-            ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('referral_source', $sourceFilter))
-            ->groupBy('landing_source')
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
+            ->groupBy(DB::raw("json_extract(event_data, '$.landing_source')"))
             ->get();
     }
 
+    /**
+     * @param  array<string, float>  $scrollDepths
+     * @param  array<string, float>  $dwellTimes
+     * @return array{count: int, avg_scroll_depth: float, avg_dwell_time: float}
+     */
     private function calcQualityMetrics(Collection $sessionIds, array $scrollDepths, array $dwellTimes): array
     {
         if ($sessionIds->isEmpty()) {
             return ['count' => 0, 'avg_scroll_depth' => 0, 'avg_dwell_time' => 0];
         }
 
-        $depths = $sessionIds->map(fn($id) => (float) ($scrollDepths[$id] ?? 0));
-        $dwells = $sessionIds->map(fn($id) => (float) ($dwellTimes[$id] ?? 0));
+        $depths = $sessionIds->map(fn ($id) => (float) ($scrollDepths[$id] ?? 0));
+        $dwells = $sessionIds->map(fn ($id) => (float) ($dwellTimes[$id] ?? 0));
 
         return [
             'count' => $sessionIds->count(),
@@ -687,15 +675,13 @@ class AbTestingService
     {
         $clean = trim($raw, '"');
 
-        // Strip protocol + domain if someone stored a full URL
         if (filter_var($clean, FILTER_VALIDATE_URL)) {
             $parsed = parse_url($clean);
-            $clean  = $parsed['path'] ?? $clean;
+            $clean = $parsed['path'] ?? $clean;
         }
 
-        // Ensure leading slash
         if ($clean !== '' && $clean[0] !== '/') {
-            $clean = '/' . $clean;
+            $clean = '/'.$clean;
         }
 
         return $clean;
