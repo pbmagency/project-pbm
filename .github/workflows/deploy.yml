@@ -71,7 +71,16 @@ jobs:
             ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_LARAVEL }}
 
       # ---------------------------------------------------------
-      # Sync Public Folder (includes images)
+      # Sync Images to Laravel Public
+      # ---------------------------------------------------------
+      - name: Sync Images to Laravel Public
+        run: |
+          rsync -avz --delete \
+            ./public/images/ \
+            ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_LARAVEL }}/public/images/
+
+      # ---------------------------------------------------------
+      # Sync Public Folder
       # ---------------------------------------------------------
       - name: Sync Public Assets to public_html
         run: |
@@ -94,11 +103,7 @@ jobs:
             mkdir -p ${{ env.TARGET_DIR_LARAVEL }}/public/build
 
             cp ${{ env.TARGET_DIR_PUBLIC }}/build/manifest.json \
-            ${{ env.TARGET_DIR_LARAVEL }}/public/build/manifest.json
-
-            # Storage symlink (only if your app still uses Laravel storage)
-            cd ${{ env.TARGET_DIR_PUBLIC }}
-            ln -sfn ../laravel-sub3/storage/app/public storage
+              ${{ env.TARGET_DIR_LARAVEL }}/public/build/manifest.json
 
             cd ${{ env.TARGET_DIR_LARAVEL }}
 
