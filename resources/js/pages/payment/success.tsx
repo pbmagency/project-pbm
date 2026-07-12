@@ -40,7 +40,7 @@ export default function PaymentSuccess({ order }: PaymentSuccessProps) {
     }, []);
 
     const WA_GROUP_URL = 'https://chat.whatsapp.com/PLACEHOLDER';
-    const EBOOK_URL = '/ebook';
+    const EBOOK_URL = '/PBM_Ebook_Boncos.pdf';
 
     return (
         <>

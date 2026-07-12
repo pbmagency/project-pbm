@@ -2,7 +2,6 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Expand, Info, MessageCircle, TrendingUp, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Eyebrow } from '@/components/landing/eyebrow';
 import { useSectionView } from '@/hooks/use-section-view';
 
 interface ProofCard {

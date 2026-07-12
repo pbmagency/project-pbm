@@ -1,4 +1,4 @@
-import { ChevronDown, MessageCircle } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { CtaButton } from '@/components/landing/cta-button';
 import { Eyebrow } from '@/components/landing/eyebrow';
