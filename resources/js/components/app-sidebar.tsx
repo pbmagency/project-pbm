@@ -47,15 +47,20 @@ export function AppSidebar() {
         ...(isAdmin
             ? [
                   {
-                      title: 'Analytics',
-                      href: AnalyticsController.index(),
-                      icon: LineChart,
+                    title: 'Analytics',
+                    href: AnalyticsController.index(),
+                    icon: LineChart,
                   },
                   {
-                      title: 'A/B Testing Labs',
-                      href: LabsController.index(),
-                      icon: FlaskConical,
+                    title: 'A/B Testing Labs',
+                    href: LabsController.index(),
+                    icon: FlaskConical,
                   },
+                  {
+                    title: 'Orders',
+                    href: OrderController.index(),
+                    icon: ShoppingCart,
+                },
               ]
             : []),
     ];
