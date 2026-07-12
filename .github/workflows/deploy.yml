@@ -9,10 +9,12 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     env:
       SERVER_IP: "72.61.142.238"
       SERVER_USER: "root"
-      DOMAIN_USERNAME: 'pbmag2242'
+      DOMAIN_USERNAME: "pbmag2242"
+
       TARGET_DIR_LARAVEL: "/home/pbmagency.id/laravel-sub3"
       TARGET_DIR_PUBLIC: "/home/pbmagency.id/sub3"
 
@@ -27,7 +29,11 @@ jobs:
 
       - name: Install Composer Dependencies
         run: |
-          composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+          composer install \
+            --no-dev \
+            --optimize-autoloader \
+            --no-interaction \
+            --no-scripts
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -50,41 +56,35 @@ jobs:
           ssh-keyscan -H ${{ env.SERVER_IP }} >> ~/.ssh/known_hosts
 
       # ---------------------------------------------------------
-      # SYNC 1: Pindahkan Core Laravel
+      # Sync Laravel Core
       # ---------------------------------------------------------
       - name: Sync Core Laravel to Server
         run: |
           rsync -avz --delete \
-          --exclude='.env' \
-          --exclude='/storage/' \
-          --exclude='/bootstrap/cache/' \
-          --exclude='/.git/' \
-          --exclude='/node_modules/' \
-          --exclude='/public/' \
-          ./ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_LARAVEL }}
+            --exclude='.env' \
+            --exclude='/storage/' \
+            --exclude='/bootstrap/cache/' \
+            --exclude='/.git/' \
+            --exclude='/node_modules/' \
+            --exclude='/public/' \
+            ./ \
+            ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_LARAVEL }}
 
       # ---------------------------------------------------------
-      # SYNC 2: Pindahkan Aset Public
+      # Sync Public Folder (includes images)
       # ---------------------------------------------------------
       - name: Sync Public Assets to public_html
         run: |
           rsync -avz --delete \
-          --exclude='index.php' \
-          --exclude='.htaccess' \
-          ./public/ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_PUBLIC }}
+            --exclude='index.php' \
+            --exclude='.htaccess' \
+            ./public/ \
+            ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_PUBLIC }}
 
       # ---------------------------------------------------------
-      # SYNC 3: Upload storage/app/public (images, misc assets)
+      # Post Deployment
       # ---------------------------------------------------------
-      - name: Sync Storage Public Assets
-        run: |
-          rsync -avz \
-          ./storage/app/public/ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_LARAVEL }}/storage/app/public
-
-      # ---------------------------------------------------------
-      # POST-DEPLOYMENT
-      # ---------------------------------------------------------
-      - name: Run Artisan & Move Manifest
+      - name: Run Artisan & Finish Deployment
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ env.SERVER_IP }}
@@ -92,12 +92,16 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             mkdir -p ${{ env.TARGET_DIR_LARAVEL }}/public/build
-            cp ${{ env.TARGET_DIR_PUBLIC }}/build/manifest.json ${{ env.TARGET_DIR_LARAVEL }}/public/build/manifest.json
 
+            cp ${{ env.TARGET_DIR_PUBLIC }}/build/manifest.json \
+            ${{ env.TARGET_DIR_LARAVEL }}/public/build/manifest.json
+
+            # Storage symlink (only if your app still uses Laravel storage)
             cd ${{ env.TARGET_DIR_PUBLIC }}
-            ln -sfn ../laravel-sub1/storage/app/public storage
+            ln -sfn ../laravel-sub3/storage/app/public storage
 
             cd ${{ env.TARGET_DIR_LARAVEL }}
+
             php artisan optimize:clear
             php artisan migrate --force
 
