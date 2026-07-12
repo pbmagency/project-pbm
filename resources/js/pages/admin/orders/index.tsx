@@ -1,6 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import {
     ArrowUpDown,
+    CheckCircle,
     ChevronLeft,
     ChevronRight,
     Search,
@@ -57,13 +58,11 @@ function StatusBadge({ status }: { status: Order['status'] }) {
         pending: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
         failed: 'bg-red-500/15 text-red-400 border-red-500/30',
     };
-
     const labels: Record<Order['status'], string> = {
         paid: 'Paid',
         pending: 'Pending',
         failed: 'Failed',
     };
-
     return (
         <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${variants[status]}`}>
             {labels[status]}
@@ -95,6 +94,14 @@ export default function OrdersIndex({ orders, filters }: OrdersProps) {
         router.delete(`/admin/orders/${order.id}`, { preserveScroll: true });
     };
 
+    const markAsPaid = (order: Order) => {
+        if (!confirm(`Tandai ${order.order_number} sebagai PAID dan kirim email konfirmasi?`)) return;
+        router.post(`/admin/orders/${order.id}/mark-paid`, {}, {
+            preserveScroll: true,
+            onSuccess: () => router.reload(),
+        });
+    };
+
     return (
         <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title="Orders — Admin" />
@@ -120,7 +127,6 @@ export default function OrdersIndex({ orders, filters }: OrdersProps) {
                                 className="w-full rounded-lg border border-border bg-card py-2 pl-10 pr-4 text-sm text-foreground placeholder-muted-foreground outline-none focus:border-ring"
                             />
                         </div>
-
                         <select
                             value={status}
                             onChange={(e) => { setStatus(e.target.value); applyFilters({ status: e.target.value }); }}
@@ -131,7 +137,6 @@ export default function OrdersIndex({ orders, filters }: OrdersProps) {
                             <option value="paid">Paid</option>
                             <option value="failed">Failed</option>
                         </select>
-
                         <Button onClick={() => applyFilters()} size="sm">Filter</Button>
                     </div>
 
@@ -143,7 +148,6 @@ export default function OrdersIndex({ orders, filters }: OrdersProps) {
                                         { field: 'order_number', label: 'Order #' },
                                         { field: 'name', label: 'Nama' },
                                         { field: 'email', label: 'Email' },
-                                        { field: 'phone', label: 'Phone' },
                                         { field: 'amount', label: 'Amount' },
                                         { field: 'status', label: 'Status' },
                                         { field: 'created_at', label: 'Tanggal' },
@@ -161,7 +165,7 @@ export default function OrdersIndex({ orders, filters }: OrdersProps) {
                             <tbody className="divide-y divide-border/30">
                                 {orders.data.length === 0 ? (
                                     <tr>
-                                        <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
+                                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                                             Tidak ada order.
                                         </td>
                                     </tr>
@@ -169,9 +173,11 @@ export default function OrdersIndex({ orders, filters }: OrdersProps) {
                                     orders.data.map((order) => (
                                         <tr key={order.id} className="transition-colors hover:bg-muted/20">
                                             <td className="px-4 py-3 font-mono text-xs text-foreground">{order.order_number}</td>
-                                            <td className="px-4 py-3 text-foreground">{order.name}</td>
+                                            <td className="px-4 py-3 text-foreground">
+                                                <div>{order.name}</div>
+                                                <div className="text-xs text-muted-foreground">{order.phone}</div>
+                                            </td>
                                             <td className="px-4 py-3 text-muted-foreground">{order.email}</td>
-                                            <td className="px-4 py-3 text-muted-foreground">{order.phone}</td>
                                             <td className="px-4 py-3 font-medium text-foreground">{formatRupiah(order.amount)}</td>
                                             <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
                                             <td className="px-4 py-3 text-muted-foreground">
@@ -179,15 +185,29 @@ export default function OrdersIndex({ orders, filters }: OrdersProps) {
                                                     day: 'numeric', month: 'short', year: 'numeric',
                                                 })}
                                             </td>
-                                            <td className="px-4 py-3 text-right">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => deleteOrder(order)}
-                                                    className="text-muted-foreground hover:text-destructive"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center justify-end gap-1">
+                                                    {order.status !== 'paid' && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => markAsPaid(order)}
+                                                            className="text-muted-foreground hover:text-green-400"
+                                                            title="Tandai Paid & Kirim Email"
+                                                        >
+                                                            <CheckCircle className="h-4 w-4" />
+                                                        </Button>
+                                                    )}
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => deleteOrder(order)}
+                                                        className="text-muted-foreground hover:text-destructive"
+                                                        title="Hapus Order"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))

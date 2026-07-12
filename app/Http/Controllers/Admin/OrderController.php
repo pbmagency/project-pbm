@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderConfirmationMail;
 use App\Models\Order;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -60,6 +62,19 @@ class OrderController extends Controller
         ]);
 
         $order->update(['status' => $request->status]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function markAsPaid(Order $order): JsonResponse
+    {
+        if ($order->status === 'paid') {
+            return response()->json(['success' => true, 'message' => 'Already paid']);
+        }
+
+        $order->update(['status' => 'paid']);
+
+        Mail::to($order->email)->queue(new OrderConfirmationMail($order));
 
         return response()->json(['success' => true]);
     }

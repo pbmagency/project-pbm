@@ -28,6 +28,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders');
     Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
     Route::patch('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::post('/orders/{order}/mark-paid', [AdminOrderController::class, 'markAsPaid'])->name('orders.mark-paid');
 
     Route::get('/labs', [LabsController::class, 'index'])->name('labs');
     Route::post('/labs/clear-cache', [LabsController::class, 'clearCache'])->name('labs.clear-cache');

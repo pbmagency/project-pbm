@@ -6,9 +6,12 @@ interface PaymentPendingProps {
     order_number?: string;
 }
 
-const WA_SUPPORT = 'https://wa.me/6285931018333?text=' + encodeURIComponent('Halo, pembayaran saya untuk webinar The Silent Conversion Leak masih pending.');
-
 export default function PaymentPending({ order_number }: PaymentPendingProps) {
+    const waText = encodeURIComponent(
+        `Halo, saya sudah transfer untuk webinar The Silent Conversion Leak tapi status belum berubah. No. Order: ${order_number ?? '-'}`
+    );
+    const WA_SUPPORT = `https://wa.me/6285931018333?text=${waText}`;
+
     return (
         <>
             <Head title="Pembayaran Diproses — The Silent Conversion Leak" />
