@@ -32,29 +32,29 @@ export default function Checkout({ price, originalPrice }: CheckoutProps) {
         phone: '',
     });
 
-    useEffect(() => {
-        // Fire InitiateCheckout (AddToCart already fired on landing CTA click)
+        useEffect(() => {
+        trackCTA('checkout_page_view', 'ViewContent', '/checkout');
+    }, []);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
         const eventId =
             typeof crypto !== 'undefined' && crypto.randomUUID
                 ? crypto.randomUUID()
                 : `${Date.now()}-checkout`;
-
         window.fbq?.('track', 'InitiateCheckout', { value: price, currency: 'IDR' }, { eventID: eventId });
+        trackCTA('checkout_form_submit', 'InitiateCheckout', '/checkout');
 
-        trackCTA('checkout_page_view', 'InitiateCheckout', '/checkout');
-    }, []);
-
-const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    post('/checkout', {
-        onSuccess: (page) => {
-            const redirectUrl = (page.props as { redirect_url?: string }).redirect_url;
-            if (redirectUrl) {
-                window.location.href = redirectUrl;
-            }
-        },
-    });
-};
+        post('/checkout', {
+            onSuccess: (page) => {
+                const redirectUrl = (page.props as { redirect_url?: string }).redirect_url;
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                }
+            },
+        });
+    };
 
     const discount = originalPrice - price;
     const discountPct = Math.round((discount / originalPrice) * 100);
