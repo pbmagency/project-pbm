@@ -65,7 +65,6 @@ import type {
 
 const PAGE_FILTER_STORAGE_KEY = 'labs_page_filter';
 
-/** Normalise a landing_source to a clean pathname (strips protocol+domain if present). */
 const normalizePath = (source: string): string => {
     try {
         if (source.startsWith('http://') || source.startsWith('https://')) {
@@ -86,6 +85,8 @@ const CHART_COLORS = [
     'var(--chart-5)',
 ];
 
+const FUNNEL_STAGES = ['Visits', 'Engaged', 'Intent', 'Initiate Checkout', 'Leads', 'Sales'];
+
 const transformFunnelData = (
     funnel: FunnelItem[],
     selectedSources: string[],
@@ -94,9 +95,7 @@ const transformFunnelData = (
         return [];
     }
 
-    const stages = ['Visits', 'Engaged', 'Intent', 'Conversions', 'Payments'];
-
-    return stages.map((stage) => {
+    return FUNNEL_STAGES.map((stage) => {
         const dataPoint: Record<string, string | number> = { name: stage };
         selectedSources.forEach((source) => {
             const funnelItem = funnel.find((f) => f.landing_source === source);
@@ -132,7 +131,6 @@ export default function LabsIndex({
     const sectionHeatmap = toSafeArray(rawSectionHeatmap);
     const availableSources = toSafeArray<string>(rawAvailableSources);
 
-    // ── Page / URL filter (persisted to localStorage) ──────────
     const availablePages = useMemo(
         () =>
             [
@@ -818,6 +816,79 @@ export default function LabsIndex({
                                     <div className="py-12 text-center text-muted-foreground">
                                         Select at least one landing page to view
                                         the funnel chart
+                                    </div>
+                                )}
+
+                                {selectedFunnelSources.length > 0 && (
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-sm">
+                                            <thead>
+                                                <tr className="border-b border-border">
+                                                    <th className="p-3 text-left font-medium text-muted-foreground">
+                                                        Stage
+                                                    </th>
+                                                    {selectedFunnelSources.map(
+                                                        (source) => (
+                                                            <th
+                                                                key={source}
+                                                                className="p-3 text-left font-medium text-muted-foreground"
+                                                            >
+                                                                {source}
+                                                            </th>
+                                                        ),
+                                                    )}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {FUNNEL_STAGES.map((stage) => (
+                                                    <tr
+                                                        key={stage}
+                                                        className="border-b border-border"
+                                                    >
+                                                        <td className="p-3 font-medium text-foreground">
+                                                            {stage}
+                                                        </td>
+                                                        {selectedFunnelSources.map(
+                                                            (source) => {
+                                                                const step =
+                                                                    toSafeArray(
+                                                                        filteredFunnel.find(
+                                                                            (f) =>
+                                                                                f.landing_source ===
+                                                                                source,
+                                                                        )?.steps,
+                                                                    ).find(
+                                                                        (s) =>
+                                                                            s.stage ===
+                                                                            stage,
+                                                                    );
+
+                                                                return (
+                                                                    <td
+                                                                        key={source}
+                                                                        className="p-3"
+                                                                    >
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className="text-foreground">
+                                                                                {formatNumber(
+                                                                                    step?.count ?? 0,
+                                                                                )}
+                                                                            </span>
+                                                                            <span className="text-xs text-muted-foreground">
+                                                                                ({formatPercent(
+                                                                                    step?.percentage,
+                                                                                    1,
+                                                                                )}%)
+                                                                            </span>
+                                                                        </div>
+                                                                    </td>
+                                                                );
+                                                            },
+                                                        )}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
                                     </div>
                                 )}
                             </CardContent>
