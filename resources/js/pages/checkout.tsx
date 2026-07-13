@@ -23,7 +23,7 @@ function formatRupiah(amount: number): string {
 }
 
 export default function Checkout({ price, originalPrice }: CheckoutProps) {
-    const { trackCTA, trackLeadConversion } = useAnalytics();
+    const { trackLeadConversion } = useAnalytics();
 
     const { data, setData, post, processing, errors } = useForm({
         name: '',
@@ -33,9 +33,9 @@ export default function Checkout({ price, originalPrice }: CheckoutProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        trackLeadConversion();
         post('/checkout', {
             onSuccess: (page) => {
+                trackLeadConversion();
                 const redirectUrl = (page.props as { redirect_url?: string }).redirect_url;
                 if (redirectUrl) {
                     window.location.href = redirectUrl;
