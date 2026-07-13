@@ -151,6 +151,7 @@ class AnalyticsController extends Controller
             'engaged_users' => $engagedUsers,
             'intent_rate' => $engagedUsers > 0 ? round(($ctaClicks / $engagedUsers) * 100, 2) : 0,
             'cta_clicks' => $ctaClicks,
+            'add_to_cart_rate' => $uniqueVisitors > 0 ? round(($ctaClicks / $uniqueVisitors) * 100, 2) : 0,
             'conversion_rate' => $ctaClicks > 0 ? round(($conversions / $ctaClicks) * 100, 2) : 0,
             'conversions' => $conversions,
             'conversion_to_payment_rate' => $conversions > 0 ? round(($payments / $conversions) * 100, 2) : 0,

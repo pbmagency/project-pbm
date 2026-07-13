@@ -22,6 +22,7 @@ export interface AnalyticsStats {
     engaged_users: number;
     intent_rate: number;
     cta_clicks: number;
+    add_to_cart_rate: number;
     conversion_rate: number;
     conversions: number;
     conversion_to_payment_rate: number;
