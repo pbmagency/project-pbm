@@ -1,19 +1,28 @@
 import { Head, router, useHttp } from '@inertiajs/react';
 import {
     Activity,
+    AlertTriangle,
     ArrowUpDown,
     BarChart3,
     CheckCircle,
+    ChevronLeft,
+    ChevronRight,
+    Clock,
+    Eye,
     Filter,
     FlaskConical,
     Globe,
+    MousePointerClick,
     RefreshCw,
+    ShoppingCart,
     Target,
+    TrendingUp,
     Trophy,
     Users,
     X,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import type { SimpleDateRange } from '@/components/date-range-picker';
 import {
     Bar,
     BarChart,
@@ -25,7 +34,6 @@ import {
     YAxis,
 } from 'recharts';
 import { DateRangePicker } from '@/components/date-range-picker';
-import type { SimpleDateRange } from '@/components/date-range-picker';
 import { AudienceSegmentation } from '@/components/labs/audience-segmentation';
 import { CtaAnalysis } from '@/components/labs/cta-analysis';
 import { DeviceComparison } from '@/components/labs/device-comparison';
@@ -61,20 +69,43 @@ import type {
     LabsPageProps,
     MatrixItem,
     QualityMetrics,
+    SectionHeatmapItem,
 } from '@/types/analytics';
 
-const PAGE_FILTER_STORAGE_KEY = 'labs_page_filter';
+// ==================== HELPERS ====================
 
-const normalizePath = (source: string): string => {
-    try {
-        if (source.startsWith('http://') || source.startsWith('https://')) {
-            return new URL(source).pathname;
-        }
-    } catch {
-        // ignore invalid URLs
+const transformFunnelData = (
+    funnel: FunnelItem[],
+    selectedSources: string[],
+) => {
+    if (funnel.length === 0 || selectedSources.length === 0) {
+        return [];
     }
 
-    return source.startsWith('/') ? source : `/${source}`;
+    const stages = [
+        'Visits',
+        'Engaged',
+        'Intent',
+        'Initiate Checkout',
+        'Leads',
+        'Sales',
+    ];
+
+    return stages.map((stage) => {
+        const dataPoint: Record<string, string | number> = { name: stage };
+
+        selectedSources.forEach((source) => {
+            const funnelItem = funnel.find((f) => f.landing_source === source);
+
+            if (funnelItem) {
+                const steps = toSafeArray(funnelItem.steps);
+                const step = steps.find((s) => s.stage === stage);
+                dataPoint[source] = step?.count ?? 0;
+            }
+        });
+
+        return dataPoint;
+    });
 };
 
 const CHART_COLORS = [
@@ -85,29 +116,7 @@ const CHART_COLORS = [
     'var(--chart-5)',
 ];
 
-const FUNNEL_STAGES = ['Visits', 'Engaged', 'Intent', 'Initiate Checkout', 'Leads', 'Sales'];
-
-const transformFunnelData = (
-    funnel: FunnelItem[],
-    selectedSources: string[],
-) => {
-    if (funnel.length === 0 || selectedSources.length === 0) {
-        return [];
-    }
-
-    return FUNNEL_STAGES.map((stage) => {
-        const dataPoint: Record<string, string | number> = { name: stage };
-        selectedSources.forEach((source) => {
-            const funnelItem = funnel.find((f) => f.landing_source === source);
-            const step = toSafeArray(funnelItem?.steps).find(
-                (s) => s.stage === stage,
-            );
-            dataPoint[source] = step?.count ?? 0;
-        });
-
-        return dataPoint;
-    });
-};
+// ==================== MAIN COMPONENT ====================
 
 export default function LabsIndex({
     matrix: rawMatrix,
@@ -121,53 +130,84 @@ export default function LabsIndex({
     availableSources: rawAvailableSources,
     filters,
 }: LabsPageProps) {
+    // Normalise all props — PHP Collections can serialize as objects
     const matrix = toSafeArray<MatrixItem>(rawMatrix);
-    const funnel = toSafeArray<FunnelItem>(rawFunnel);
+    const safeFunnel = toSafeArray<FunnelItem>(rawFunnel);
     const quality = toSafeArray(rawQuality);
     const devices = toSafeArray(rawDevices);
     const cta = toSafeArray(rawCta);
     const readers = toSafeArray(rawReaders);
     const heatmap = toSafeArray(rawHeatmap);
-    const sectionHeatmap = toSafeArray(rawSectionHeatmap);
+    const sectionHeatmap = toSafeArray<SectionHeatmapItem>(rawSectionHeatmap);
     const availableSources = toSafeArray<string>(rawAvailableSources);
 
+    // useHttp for cache-clear (replaces deprecated axios)
+    const http = useHttp({
+        range: filters.range,
+        source: filters.source ?? '',
+        start_date: filters.start_date,
+        end_date: filters.end_date,
+    });
+    // State
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [sortColumn, setSortColumn] = useState<keyof MatrixItem>('rpv');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState<'success' | 'error'>('success');
+
+    // Date range state for custom filter
+    // AFTER
+    const [dateRange, setDateRange] = useState<SimpleDateRange | undefined>(() => {
+        if (filters.start_date && filters.end_date) {
+            return {
+                from: filters.start_date,
+                to: filters.end_date,
+            };
+        }
+        return undefined;
+    });
+
+    // ── Page Filter (localStorage persisted) ──────────────────
+    // Normalize any landing_source to a clean pathname (strip protocol+domain if present)
+    const normalizePath = (source: string): string => {
+        try {
+            // If it looks like a full URL, extract just the pathname
+            if (source.startsWith('http://') || source.startsWith('https://')) {
+                return new URL(source).pathname;
+            }
+        } catch {
+            // ignore invalid URLs
+        }
+        // Already a path — ensure it starts with /
+        return source.startsWith('/') ? source : `/${source}`;
+    };
+
     const availablePages = useMemo(
-        () =>
-            [
-                ...new Set(matrix.map((m) => normalizePath(m.landing_source))),
-            ].sort(),
+        () => [...new Set(matrix.map((m) => normalizePath(m.landing_source)))].sort(),
         [matrix],
     );
 
     const [selectedPages, setSelectedPages] = useState<string[]>(() => {
-        if (typeof window === 'undefined') {
-            return [];
-        }
-
+        if (typeof window === 'undefined') return [];
         try {
-            const stored = localStorage.getItem(PAGE_FILTER_STORAGE_KEY);
-
+            const stored = localStorage.getItem('labs_page_filter');
             if (stored) {
                 const parsed = JSON.parse(stored) as string[];
-
+                // Only keep pages that still exist in the data
                 return parsed.filter((p) => availablePages.includes(p));
             }
         } catch {
             // ignore malformed JSON
         }
-
-        return [];
+        return []; // empty = show all
     });
 
+    // Persist page filter to localStorage
     useEffect(() => {
-        if (typeof window === 'undefined') {
-            return;
-        }
-
-        localStorage.setItem(
-            PAGE_FILTER_STORAGE_KEY,
-            JSON.stringify(selectedPages),
-        );
+        if (typeof window === 'undefined') return;
+        localStorage.setItem('labs_page_filter', JSON.stringify(selectedPages));
     }, [selectedPages]);
 
     const togglePage = (page: string) => {
@@ -180,7 +220,9 @@ export default function LabsIndex({
 
     const clearPageFilter = () => setSelectedPages([]);
 
+    // ── Filtered data (page filter applied) ──────────────────
     const isPageFiltered = selectedPages.length > 0;
+    // Normalize both sides so /test-v1 matches whether stored as path or full URL
     const pageMatch = (source: string) =>
         !isPageFiltered || selectedPages.includes(normalizePath(source));
 
@@ -189,27 +231,27 @@ export default function LabsIndex({
         [matrix, selectedPages],
     );
     const filteredFunnel = useMemo(
-        () => funnel.filter((f) => pageMatch(f.landing_source)),
-        [funnel, selectedPages],
+        () => safeFunnel.filter((f) => pageMatch(f.landing_source)),
+        [safeFunnel, selectedPages],
     );
     const filteredQuality = useMemo(
-        () => quality.filter((q) => pageMatch(q.landing_source)),
+        () => quality.filter((q: any) => pageMatch(q.landing_source)),
         [quality, selectedPages],
     );
     const filteredDevices = useMemo(
-        () => devices.filter((d) => pageMatch(d.landing_source)),
+        () => devices.filter((d: any) => pageMatch(d.landing_source)),
         [devices, selectedPages],
     );
     const filteredCta = useMemo(
-        () => cta.filter((c) => pageMatch(c.landing_source)),
+        () => cta.filter((c: any) => pageMatch(c.landing_source)),
         [cta, selectedPages],
     );
     const filteredReaders = useMemo(
-        () => readers.filter((r) => pageMatch(r.landing_source)),
+        () => readers.filter((r: any) => pageMatch(r.landing_source)),
         [readers, selectedPages],
     );
     const filteredHeatmap = useMemo(
-        () => heatmap.filter((h) => pageMatch(h.landing_source)),
+        () => heatmap.filter((h: any) => pageMatch(h.landing_source)),
         [heatmap, selectedPages],
     );
     const filteredSectionHeatmap = useMemo(
@@ -217,34 +259,27 @@ export default function LabsIndex({
         [sectionHeatmap, selectedPages],
     );
 
-    const http = useHttp({
-        range: filters.range,
-        source: filters.source ?? '',
-        start_date: filters.start_date,
-        end_date: filters.end_date,
-    });
-
-    const [isRefreshing, setIsRefreshing] = useState(false);
-    const [sortColumn, setSortColumn] = useState<keyof MatrixItem>('rpv');
-    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-    const [toast, setToast] = useState<{
-        message: string;
-        type: 'success' | 'error';
-    } | null>(null);
-    const [dateRange, setDateRange] = useState<SimpleDateRange | undefined>(
-        filters.start_date && filters.end_date
-            ? { from: filters.start_date, to: filters.end_date }
-            : undefined,
-    );
-    const [selectedFunnelSources, setSelectedFunnelSources] = useState<
-        string[]
-    >(() => matrix.slice(0, 2).map((m) => m.landing_source));
-
     const triggerToast = (message: string, type: 'success' | 'error') => {
-        setToast({ message, type });
-        setTimeout(() => setToast(null), 4000);
+        setToastMessage(message);
+        setToastType(type);
+        setShowToast(true);
+
+        setTimeout(() => {
+            setShowToast(false);
+            setToastMessage('');
+        }, 4000);
     };
 
+    const [selectedFunnelSources, setSelectedFunnelSources] = useState<
+        string[]
+    >(() => {
+        // Default: Top 2 by RPV
+        return matrix.slice(0, 2).map((m) => m.landing_source);
+    });
+
+    const itemsPerPage = 10;
+
+    // Find winner (highest RPV)
     const winner = useMemo(() => {
         if (filteredMatrix.length === 0) {
             return null;
@@ -255,37 +290,72 @@ export default function LabsIndex({
         );
     }, [filteredMatrix]);
 
+    // Sorted matrix data
     const sortedMatrix = useMemo(() => {
         return [...filteredMatrix].sort((a, b) => {
-            const aVal = a[sortColumn] as number;
-            const bVal = b[sortColumn] as number;
+            const aVal = a[sortColumn];
+            const bVal = b[sortColumn];
 
-            return sortDirection === 'asc'
-                ? aVal > bVal
-                    ? 1
-                    : -1
-                : aVal < bVal
-                  ? 1
-                  : -1;
+            if (sortDirection === 'asc') {
+                return (aVal as number) > (bVal as number) ? 1 : -1;
+            }
+
+            return (aVal as number) < (bVal as number) ? 1 : -1;
         });
     }, [filteredMatrix, sortColumn, sortDirection]);
 
-    const chartData = useMemo(
-        () => transformFunnelData(filteredFunnel, selectedFunnelSources),
-        [filteredFunnel, selectedFunnelSources],
-    );
+    // Paginated matrix
+    const paginatedMatrix = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
 
+        return sortedMatrix.slice(startIndex, startIndex + itemsPerPage);
+    }, [sortedMatrix, currentPage]);
+
+    const totalPages = Math.ceil(sortedMatrix.length / itemsPerPage);
+
+    // Transform funnel data for chart
+    const chartData = useMemo(() => {
+        return transformFunnelData(filteredFunnel, selectedFunnelSources);
+    }, [filteredFunnel, selectedFunnelSources]);
+
+    // Handlers
     const handleRangeChange = (value: string) => {
-        router.get(
-            '/admin/labs',
-            { range: value, source: filters.source || undefined },
-            { preserveState: true, preserveScroll: true, replace: true },
-        );
+        if (value === 'custom') {
+            // Just show the date picker, don't trigger router yet
+            router.get(
+                '/admin/labs',
+                {
+                    range: 'custom',
+                    start_date: filters.start_date,
+                    end_date: filters.end_date,
+                    source: filters.source || undefined,
+                },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                },
+            );
+        } else {
+            // Preset range - trigger immediately
+            router.get(
+                '/admin/labs',
+                {
+                    range: value,
+                    source: filters.source || undefined,
+                },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                },
+            );
+        }
     };
 
+    // AFTER
     const handleDateUpdate = (date: SimpleDateRange | undefined) => {
         setDateRange(date);
-
         if (date?.from && date?.to) {
             router.get(
                 '/admin/labs',
@@ -295,20 +365,52 @@ export default function LabsIndex({
                     end_date: date.to,
                     source: filters.source || undefined,
                 },
-                { preserveState: true, preserveScroll: true, replace: true },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                },
             );
         }
     };
 
     const handleSourceChange = (value: string) => {
-        router.get(
-            '/admin/labs',
-            {
-                range: filters.range,
-                source: value === 'all' ? undefined : value,
-            },
-            { preserveState: true, preserveScroll: true, replace: true },
-        );
+        const sourceValue = value === 'all' ? undefined : value;
+        const params: Record<string, string | undefined> = {
+            range: filters.range,
+            source: sourceValue,
+        };
+
+        // Preserve custom date range parameters
+        if (filters.range === 'custom') {
+            params.start_date = filters.start_date;
+            params.end_date = filters.end_date;
+        }
+
+        router.get('/admin/labs', params, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    };
+
+    const handleClearSource = () => {
+        const params: Record<string, string | undefined> = {
+            range: filters.range,
+            source: undefined,
+        };
+
+        // Preserve custom date range parameters
+        if (filters.range === 'custom') {
+            params.start_date = filters.start_date;
+            params.end_date = filters.end_date;
+        }
+
+        router.get('/admin/labs', params, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
     };
 
     const handleRefreshCache = () => {
@@ -318,8 +420,12 @@ export default function LabsIndex({
                 triggerToast('Data cached successfully', 'success');
                 router.reload();
             },
-            onError: () => triggerToast('Failed to refresh cache', 'error'),
-            onFinish: () => setIsRefreshing(false),
+            onError: () => {
+                triggerToast('Failed to cache data', 'error');
+            },
+            onFinish: () => {
+                setIsRefreshing(false);
+            },
         });
     };
 
@@ -347,21 +453,34 @@ export default function LabsIndex({
             <Head title="A/B Testing Labs" />
 
             <div className="container mx-auto space-y-8 p-4 md:p-6">
-                {toast && (
+                {showToast && (
                     <div className="animate-fade-in fixed top-20 right-4 z-50 w-auto max-w-sm">
                         <Alert
                             className={
-                                toast.type === 'success'
-                                    ? 'border-primary/50 bg-primary/10'
-                                    : 'border-destructive/50 bg-destructive/10'
+                                toastType === 'success'
+                                    ? 'border-primary/50 bg-primary/10 backdrop-blur-sm'
+                                    : 'border-red-500/50 bg-red-900/50 backdrop-blur-sm'
                             }
                         >
-                            <CheckCircle className="h-4 w-4" />
-                            <AlertDescription>{toast.message}</AlertDescription>
+                            {toastType === 'success' ? (
+                                <CheckCircle className="h-4 w-4 text-primary" />
+                            ) : (
+                                <AlertTriangle className="h-4 w-4 text-red-400" />
+                            )}
+                            <AlertDescription
+                                className={
+                                    toastType === 'success'
+                                        ? 'font-medium text-primary'
+                                        : 'font-medium text-red-300'
+                                }
+                            >
+                                {toastMessage}
+                            </AlertDescription>
                         </Alert>
                     </div>
                 )}
 
+                {/* ==================== CONTROL BAR ==================== */}
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                     <div className="flex items-center gap-4">
                         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20">
@@ -372,12 +491,13 @@ export default function LabsIndex({
                                 A/B Testing Labs
                             </h1>
                             <p className="text-sm text-muted-foreground">
-                                Optimize your landing page performance
+                                Optimize your landing page performances
                             </p>
                         </div>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
+                        {/* Source Filter */}
                         <div className="flex items-center gap-2">
                             <Filter className="h-4 w-4 text-muted-foreground" />
                             <Select
@@ -400,17 +520,24 @@ export default function LabsIndex({
                                     ))}
                                 </SelectContent>
                             </Select>
+                            {filters.source && (
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={handleClearSource}
+                                    className="h-8 w-8"
+                                >
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            )}
                         </div>
 
+                        {/* Page / URL Filter */}
                         {availablePages.length > 1 && (
                             <div className="flex items-center gap-2">
                                 <Globe className="h-4 w-4 text-muted-foreground" />
                                 <Select
-                                    value={
-                                        selectedPages.length === 1
-                                            ? selectedPages[0]
-                                            : '__multi__'
-                                    }
+                                    value={selectedPages.length === 1 ? selectedPages[0] : '__multi__'}
                                     onValueChange={(val) => {
                                         if (val === '__all__') {
                                             clearPageFilter();
@@ -424,8 +551,8 @@ export default function LabsIndex({
                                             {selectedPages.length === 0
                                                 ? 'All Pages'
                                                 : selectedPages.length === 1
-                                                  ? selectedPages[0]
-                                                  : `${selectedPages.length} pages`}
+                                                ? selectedPages[0]
+                                                : `${selectedPages.length} pages`}
                                         </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
@@ -435,15 +562,9 @@ export default function LabsIndex({
                                         {availablePages.map((page) => (
                                             <SelectItem key={page} value={page}>
                                                 <span className="flex items-center gap-2">
-                                                    <span
-                                                        className={`inline-block h-2 w-2 rounded-full ${
-                                                            selectedPages.includes(
-                                                                page,
-                                                            )
-                                                                ? 'bg-primary'
-                                                                : 'bg-muted-foreground/30'
-                                                        }`}
-                                                    />
+                                                    <span className={`inline-block h-2 w-2 rounded-full ${
+                                                        selectedPages.includes(page) ? 'bg-primary' : 'bg-muted-foreground/30'
+                                                    }`} />
                                                     {page}
                                                 </span>
                                             </SelectItem>
@@ -463,6 +584,7 @@ export default function LabsIndex({
                             </div>
                         )}
 
+                        {/* Date Range Dropdown */}
                         <Select
                             value={filters.range}
                             onValueChange={handleRangeChange}
@@ -482,6 +604,7 @@ export default function LabsIndex({
                             </SelectContent>
                         </Select>
 
+                        {/* Custom Date Range Picker - Conditional */}
                         {filters.range === 'custom' && (
                             <DateRangePicker
                                 date={dateRange}
@@ -506,6 +629,7 @@ export default function LabsIndex({
                     </div>
                 </div>
 
+                {/* Date Range Info & Active Filters */}
                 <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                     <span>
                         Showing data from{' '}
@@ -528,8 +652,7 @@ export default function LabsIndex({
                     {isPageFiltered && (
                         <Badge variant="secondary" className="gap-1">
                             <Globe className="h-3 w-3" />
-                            {selectedPages.length} page
-                            {selectedPages.length > 1 ? 's' : ''} selected
+                            {selectedPages.length} page{selectedPages.length > 1 ? 's' : ''} selected
                         </Badge>
                     )}
                 </div>
@@ -543,12 +666,14 @@ export default function LabsIndex({
                             </h3>
                             <p className="mt-2 text-muted-foreground">
                                 There's no data available for the selected
-                                filters yet.
+                                filters. Try adjusting the date range or source
+                                filter.
                             </p>
                         </CardContent>
                     </Card>
                 ) : (
                     <>
+                        {/* ==================== SECTION A: PERFORMANCE MATRIX ==================== */}
                         <Card>
                             <CardHeader>
                                 <div className="flex items-center gap-3">
@@ -565,58 +690,119 @@ export default function LabsIndex({
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm">
+                                {/* Desktop Table */}
+                                <div className="hidden overflow-x-auto lg:block">
+                                    <table className="w-full">
                                         <thead>
                                             <tr className="border-b border-border">
-                                                <th className="p-4 text-left font-medium text-muted-foreground">
+                                                <th className="p-4 text-left text-sm font-medium text-muted-foreground">
                                                     Source
                                                 </th>
-                                                {(
-                                                    [
-                                                        ['visits', 'Visits'],
-                                                        [
-                                                            'bounce_rate',
-                                                            'Bounce',
-                                                        ],
-                                                        [
-                                                            'intent_rate',
-                                                            'Intent',
-                                                        ],
-                                                        ['lead_cr', 'Conv. CR'],
-                                                        [
-                                                            'strict_cr',
-                                                            'Sales CR',
-                                                        ],
-                                                        ['rpv', 'RPV'],
-                                                    ] as const
-                                                ).map(([key, label]) => (
-                                                    <th
-                                                        key={key}
-                                                        className="p-4 text-left font-medium text-muted-foreground"
+                                                <th className="p-4 text-left text-sm font-medium text-muted-foreground">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleSort('visits')
+                                                        }
+                                                        className="flex items-center gap-1 hover:text-foreground"
                                                     >
-                                                        <button
-                                                            onClick={() =>
-                                                                handleSort(key)
-                                                            }
-                                                            className="flex items-center gap-1 hover:text-foreground"
-                                                        >
-                                                            {label}{' '}
-                                                            <ArrowUpDown className="h-3 w-3" />
-                                                        </button>
-                                                    </th>
-                                                ))}
-                                                <th className="p-4 text-left font-medium text-muted-foreground">
+                                                        <Eye className="h-4 w-4" />{' '}
+                                                        Visits
+                                                        <ArrowUpDown className="h-3 w-3" />
+                                                    </button>
+                                                </th>
+                                                <th className="p-4 text-left text-sm font-medium text-muted-foreground">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleSort(
+                                                                'bounce_rate',
+                                                            )
+                                                        }
+                                                        className="flex items-center gap-1 hover:text-foreground"
+                                                    >
+                                                        Bounce
+                                                        <ArrowUpDown className="h-3 w-3" />
+                                                    </button>
+                                                </th>
+                                                <th className="p-4 text-left text-sm font-medium text-muted-foreground">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleSort(
+                                                                'conversions',
+                                                            )
+                                                        }
+                                                        className="flex items-center gap-1 hover:text-foreground"
+                                                    >
+                                                        <MousePointerClick className="h-4 w-4" />{' '}
+                                                        Intent
+                                                        <ArrowUpDown className="h-3 w-3" />
+                                                    </button>
+                                                </th>
+                                                <th className="p-4 text-left text-sm font-medium text-muted-foreground">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleSort(
+                                                                'initiate_checkout_rate',
+                                                            )
+                                                        }
+                                                        className="flex items-center gap-1 hover:text-foreground"
+                                                    >
+                                                        <ShoppingCart className="h-4 w-4" />{' '}
+                                                        Initiate Checkout
+                                                        <ArrowUpDown className="h-3 w-3" />
+                                                    </button>
+                                                </th>
+                                                <th className="p-4 text-left text-sm font-medium text-muted-foreground">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleSort(
+                                                                'lead_cr',
+                                                            )
+                                                        }
+                                                        className="flex items-center gap-1 hover:text-foreground"
+                                                    >
+                                                        Lead CR
+                                                        <ArrowUpDown className="h-3 w-3" />
+                                                    </button>
+                                                </th>
+                                                <th className="p-4 text-left text-sm font-medium text-muted-foreground">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleSort(
+                                                                'strict_cr',
+                                                            )
+                                                        }
+                                                        className="flex items-center gap-1 hover:text-foreground"
+                                                    >
+                                                        <Target className="h-4 w-4" />{' '}
+                                                        Sales CR
+                                                        <ArrowUpDown className="h-3 w-3" />
+                                                    </button>
+                                                </th>
+                                                <th className="p-4 text-left text-sm font-medium text-muted-foreground">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleSort('rpv')
+                                                        }
+                                                        className="flex items-center gap-1 hover:text-foreground"
+                                                    >
+                                                        <TrendingUp className="h-4 w-4" />{' '}
+                                                        RPV
+                                                        <ArrowUpDown className="h-3 w-3" />
+                                                    </button>
+                                                </th>
+                                                <th className="p-4 text-left text-sm font-medium text-muted-foreground">
                                                     Revenue
                                                 </th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {sortedMatrix.map((item) => {
+                                            {paginatedMatrix.map((item) => {
                                                 const isWinner =
                                                     winner &&
                                                     item.landing_source ===
                                                         winner.landing_source;
+                                                const isHighBounce =
+                                                    item.bounce_rate > 80;
 
                                                 return (
                                                     <tr
@@ -627,7 +813,7 @@ export default function LabsIndex({
                                                     >
                                                         <td className="p-4">
                                                             <div className="flex items-center gap-2">
-                                                                <span className="font-mono font-medium text-foreground">
+                                                                <span className="font-mono text-sm font-medium text-foreground">
                                                                     {
                                                                         item.landing_source
                                                                     }
@@ -643,21 +829,36 @@ export default function LabsIndex({
                                                                 )}
                                                             </div>
                                                         </td>
-                                                        <td className="p-4 text-foreground">
+                                                        <td className="p-4 font-medium text-foreground">
                                                             {formatNumber(
                                                                 item.visits,
                                                             )}
                                                         </td>
+                                                        <td className="p-4">
+                                                            <span
+                                                                className={
+                                                                    isHighBounce
+                                                                        ? 'font-medium text-destructive'
+                                                                        : 'text-foreground'
+                                                                }
+                                                            >
+                                                                {formatPercent(
+                                                                    item.bounce_rate,
+                                                                    1,
+                                                                )}
+                                                                %
+                                                            </span>
+                                                        </td>
                                                         <td className="p-4 text-foreground">
                                                             {formatPercent(
-                                                                item.bounce_rate,
-                                                                1,
+                                                                item.intent_rate,
+                                                                2,
                                                             )}
                                                             %
                                                         </td>
                                                         <td className="p-4 text-foreground">
                                                             {formatPercent(
-                                                                item.intent_rate,
+                                                                item.initiate_checkout_rate,
                                                                 2,
                                                             )}
                                                             %
@@ -700,23 +901,194 @@ export default function LabsIndex({
                                         </tbody>
                                     </table>
                                 </div>
+
+                                {/* Mobile Cards */}
+                                <div className="space-y-4 lg:hidden">
+                                    {paginatedMatrix.map((item) => {
+                                        const isWinner =
+                                            winner &&
+                                            item.landing_source ===
+                                                winner.landing_source;
+                                        const isHighBounce =
+                                            item.bounce_rate > 80;
+
+                                        return (
+                                            <Card
+                                                key={item.landing_source}
+                                                className={`${isWinner ? 'border-2 border-chart-4' : ''}`}
+                                            >
+                                                <CardContent className="space-y-3 pt-4">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="font-mono font-medium text-foreground">
+                                                            {
+                                                                item.landing_source
+                                                            }
+                                                        </span>
+                                                        {isWinner && (
+                                                            <Badge
+                                                                variant="default"
+                                                                className="gap-1 bg-chart-4 text-foreground"
+                                                            >
+                                                                <Trophy className="h-3 w-3" />{' '}
+                                                                Winner
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-3 text-sm">
+                                                        <div>
+                                                            <span className="text-muted-foreground">
+                                                                Visits:
+                                                            </span>{' '}
+                                                            <span className="font-medium text-foreground">
+                                                                {formatNumber(
+                                                                    item.visits,
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-muted-foreground">
+                                                                Bounce:
+                                                            </span>{' '}
+                                                            <span
+                                                                className={
+                                                                    isHighBounce
+                                                                        ? 'text-destructive'
+                                                                        : 'text-foreground'
+                                                                }
+                                                            >
+                                                                {formatPercent(
+                                                                    item.bounce_rate,
+                                                                    1,
+                                                                )}
+                                                                %
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-muted-foreground">
+                                                                Checkout:
+                                                            </span>{' '}
+                                                            <span className="text-foreground">
+                                                                {formatPercent(
+                                                                    item.initiate_checkout_rate,
+                                                                    2,
+                                                                )}
+                                                                %
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-muted-foreground">
+                                                                Lead CR:
+                                                            </span>{' '}
+                                                            <Badge variant="secondary">
+                                                                {formatPercent(
+                                                                    item.lead_cr,
+                                                                    2,
+                                                                )}
+                                                                %
+                                                            </Badge>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-muted-foreground">
+                                                                Sales CR:
+                                                            </span>{' '}
+                                                            <Badge variant="outline">
+                                                                {formatPercent(
+                                                                    item.strict_cr,
+                                                                    2,
+                                                                )}
+                                                                %
+                                                            </Badge>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-muted-foreground">
+                                                                RPV:
+                                                            </span>{' '}
+                                                            <span
+                                                                className={`font-bold ${isWinner ? 'text-chart-4' : 'text-foreground'}`}
+                                                            >
+                                                                {formatCurrency(
+                                                                    item.rpv,
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-muted-foreground">
+                                                                Revenue:
+                                                            </span>{' '}
+                                                            <span className="text-foreground">
+                                                                {formatCurrency(
+                                                                    item.revenue,
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Pagination */}
+                                {totalPages > 1 && (
+                                    <div className="mt-6 flex items-center justify-center gap-4">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() =>
+                                                setCurrentPage(
+                                                    Math.max(
+                                                        1,
+                                                        currentPage - 1,
+                                                    ),
+                                                )
+                                            }
+                                            disabled={currentPage === 1}
+                                        >
+                                            <ChevronLeft className="h-4 w-4" />
+                                        </Button>
+                                        <span className="text-sm text-muted-foreground">
+                                            Page {currentPage} of {totalPages}
+                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() =>
+                                                setCurrentPage(
+                                                    Math.min(
+                                                        totalPages,
+                                                        currentPage + 1,
+                                                    ),
+                                                )
+                                            }
+                                            disabled={
+                                                currentPage === totalPages
+                                            }
+                                        >
+                                            <ChevronRight className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
 
+                        {/* ==================== SECTION B: SPLIT FUNNEL ==================== */}
                         <Card>
                             <CardHeader>
-                                <div className="flex items-center gap-3">
-                                    <Activity className="h-5 w-5 text-primary" />
-                                    <div>
-                                        <CardTitle>Split Funnel</CardTitle>
-                                        <CardDescription>
-                                            Compare conversion journey across
-                                            landing pages
-                                        </CardDescription>
+                                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <Activity className="h-5 w-5 text-primary" />
+                                        <div>
+                                            <CardTitle>Split Funnel</CardTitle>
+                                            <CardDescription>
+                                                Compare conversion journey
+                                                across landing pages
+                                            </CardDescription>
+                                        </div>
                                     </div>
                                 </div>
                             </CardHeader>
                             <CardContent className="space-y-6">
+                                {/* Source Selector */}
                                 <div className="flex flex-wrap gap-4">
                                     {filteredFunnel.map((f, index) => (
                                         <div
@@ -754,8 +1126,9 @@ export default function LabsIndex({
                                     ))}
                                 </div>
 
+                                {/* Chart */}
                                 {selectedFunnelSources.length > 0 ? (
-                                    <div className="h-[350px] w-full">
+                                    <div className="h-[400px] w-full">
                                         <ResponsiveContainer
                                             width="100%"
                                             height="100%"
@@ -786,6 +1159,15 @@ export default function LabsIndex({
                                                         borderRadius: '8px',
                                                         color: 'var(--popover-foreground)',
                                                     }}
+                                                    formatter={(
+                                                        value,
+                                                        name,
+                                                    ) => [
+                                                        formatNumber(
+                                                            Number(value ?? 0),
+                                                        ),
+                                                        String(name ?? ''),
+                                                    ]}
                                                 />
                                                 <Legend />
                                                 {selectedFunnelSources.map(
@@ -795,7 +1177,7 @@ export default function LabsIndex({
                                                             dataKey={source}
                                                             fill={
                                                                 CHART_COLORS[
-                                                                    filteredFunnel.findIndex(
+                                                                    safeFunnel.findIndex(
                                                                         (f) =>
                                                                             f.landing_source ===
                                                                             source,
@@ -819,6 +1201,7 @@ export default function LabsIndex({
                                     </div>
                                 )}
 
+                                {/* Funnel Details Table */}
                                 {selectedFunnelSources.length > 0 && (
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-sm">
@@ -840,7 +1223,14 @@ export default function LabsIndex({
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {FUNNEL_STAGES.map((stage) => (
+                                                {[
+                                                    'Visits',
+                                                    'Engaged',
+                                                    'Intent',
+                                                    'Initiate Checkout',
+                                                    'Leads',
+                                                    'Sales',
+                                                ].map((stage) => (
                                                     <tr
                                                         key={stage}
                                                         className="border-b border-border"
@@ -850,14 +1240,18 @@ export default function LabsIndex({
                                                         </td>
                                                         {selectedFunnelSources.map(
                                                             (source) => {
-                                                                const step =
+                                                                const funnelItem =
+                                                                    filteredFunnel.find(
+                                                                        (f) =>
+                                                                            f.landing_source ===
+                                                                            source,
+                                                                    );
+                                                                const steps =
                                                                     toSafeArray(
-                                                                        filteredFunnel.find(
-                                                                            (f) =>
-                                                                                f.landing_source ===
-                                                                                source,
-                                                                        )?.steps,
-                                                                    ).find(
+                                                                        funnelItem?.steps,
+                                                                    );
+                                                                const step =
+                                                                    steps.find(
                                                                         (s) =>
                                                                             s.stage ===
                                                                             stage,
@@ -865,20 +1259,25 @@ export default function LabsIndex({
 
                                                                 return (
                                                                     <td
-                                                                        key={source}
+                                                                        key={
+                                                                            source
+                                                                        }
                                                                         className="p-3"
                                                                     >
                                                                         <div className="flex items-center gap-2">
                                                                             <span className="text-foreground">
                                                                                 {formatNumber(
-                                                                                    step?.count ?? 0,
+                                                                                    step?.count ??
+                                                                                        0,
                                                                                 )}
                                                                             </span>
                                                                             <span className="text-xs text-muted-foreground">
-                                                                                ({formatPercent(
+                                                                                (
+                                                                                {formatPercent(
                                                                                     step?.percentage,
                                                                                     1,
-                                                                                )}%)
+                                                                                )}
+                                                                                %)
                                                                             </span>
                                                                         </div>
                                                                     </td>
@@ -894,22 +1293,26 @@ export default function LabsIndex({
                             </CardContent>
                         </Card>
 
-                        {filteredDevices.length > 0 && (
+                        {/* ==================== SECTION C: DEVICE PERFORMANCE ==================== */}
+                        {filteredDevices && filteredDevices.length > 0 && (
                             <DeviceComparison data={filteredDevices} />
                         )}
-                        {filteredCta.length > 0 && (
-                            <CtaAnalysis data={filteredCta} />
-                        )}
-                        {(filteredReaders.length > 0 ||
-                            filteredHeatmap.length > 0 ||
-                            filteredSectionHeatmap.length > 0) && (
+
+                        {/* ==================== SECTION D: CTA ANALYSIS ==================== */}
+                        {filteredCta && filteredCta.length > 0 && <CtaAnalysis data={filteredCta} />}
+
+                        {/* ==================== SECTION E: AUDIENCE SEGMENTATION ==================== */}
+                        {((filteredReaders && filteredReaders.length > 0) ||
+                            (filteredHeatmap && filteredHeatmap.length > 0) ||
+                            (filteredSectionHeatmap && filteredSectionHeatmap.length > 0)) && (
                             <AudienceSegmentation
-                                readers={filteredReaders}
-                                heatmap={filteredHeatmap}
-                                sectionHeatmap={filteredSectionHeatmap}
+                                readers={filteredReaders || []}
+                                heatmap={filteredHeatmap || []}
+                                sectionHeatmap={filteredSectionHeatmap || []}
                             />
                         )}
 
+                        {/* ==================== SECTION F: QUALITY ANALYSIS ==================== */}
                         <div className="space-y-4">
                             <div className="flex items-center gap-3">
                                 <Users className="h-5 w-5 text-primary" />
@@ -918,8 +1321,7 @@ export default function LabsIndex({
                                         Behavior Analysis
                                     </h2>
                                     <p className="text-sm text-muted-foreground">
-                                        Converted vs non-converted engagement
-                                        comparison
+                                        Leads vs Non-Leads engagement comparison
                                     </p>
                                 </div>
                             </div>
@@ -935,62 +1337,128 @@ export default function LabsIndex({
                                     const nonLeads =
                                         item.non_leads ?? defaultMetrics;
 
+                                    const scrollGap = Math.abs(
+                                        leads.avg_scroll_depth -
+                                            nonLeads.avg_scroll_depth,
+                                    );
+                                    const dwellGap = Math.abs(
+                                        leads.avg_dwell_time -
+                                            nonLeads.avg_dwell_time,
+                                    );
+                                    const hasSignificantGap =
+                                        scrollGap > 30 || dwellGap > 60;
+
                                     return (
-                                        <Card key={item.landing_source}>
+                                        <Card
+                                            key={item.landing_source}
+                                            className={
+                                                hasSignificantGap
+                                                    ? 'border-chart-4/50'
+                                                    : ''
+                                            }
+                                        >
                                             <CardHeader className="pb-3">
-                                                <CardTitle className="font-mono text-sm">
-                                                    {item.landing_source}
-                                                </CardTitle>
+                                                <div className="flex items-center justify-between">
+                                                    <CardTitle className="font-mono text-sm">
+                                                        {item.landing_source}
+                                                    </CardTitle>
+                                                    {hasSignificantGap && (
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="border-chart-4 text-xs text-chart-4"
+                                                        >
+                                                            High Gap
+                                                        </Badge>
+                                                    )}
+                                                </div>
                                             </CardHeader>
                                             <CardContent className="space-y-4">
-                                                <div className="space-y-1 text-xs">
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-primary">
-                                                            Converted (
-                                                            {leads.count})
-                                                        </span>
-                                                        <span className="font-medium text-foreground">
-                                                            {formatPercent(
-                                                                leads.avg_scroll_depth,
-                                                                1,
-                                                            )}
-                                                            % scroll
+                                                {/* Scroll Depth Comparison */}
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center justify-between text-sm">
+                                                        <span className="flex items-center gap-1 text-muted-foreground">
+                                                            <TrendingUp className="h-3 w-3" />{' '}
+                                                            Scroll Depth
                                                         </span>
                                                     </div>
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-muted-foreground">
-                                                            Others (
-                                                            {nonLeads.count})
-                                                        </span>
-                                                        <span className="text-foreground">
-                                                            {formatPercent(
-                                                                nonLeads.avg_scroll_depth,
-                                                                1,
-                                                            )}
-                                                            % scroll
-                                                        </span>
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center justify-between text-xs">
+                                                            <span className="text-primary">
+                                                                Leads (
+                                                                {leads.count})
+                                                            </span>
+                                                            <span className="font-medium text-foreground">
+                                                                {formatPercent(
+                                                                    leads.avg_scroll_depth,
+                                                                    1,
+                                                                )}
+                                                                %
+                                                            </span>
+                                                        </div>
+                                                        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                                                            <div
+                                                                className="h-full rounded-full bg-primary transition-all"
+                                                                style={{
+                                                                    width: `${Math.min(leads.avg_scroll_depth, 100)}%`,
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="flex items-center justify-between text-xs">
+                                                            <span className="text-muted-foreground">
+                                                                Others (
+                                                                {nonLeads.count}
+                                                                )
+                                                            </span>
+                                                            <span className="text-foreground">
+                                                                {formatPercent(
+                                                                    nonLeads.avg_scroll_depth,
+                                                                    1,
+                                                                )}
+                                                                %
+                                                            </span>
+                                                        </div>
+                                                        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                                                            <div
+                                                                className="h-full rounded-full bg-muted-foreground transition-all"
+                                                                style={{
+                                                                    width: `${Math.min(nonLeads.avg_scroll_depth, 100)}%`,
+                                                                }}
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center justify-between gap-4 border-t border-border pt-3">
-                                                    <div className="text-center">
-                                                        <div className="text-lg font-bold text-primary">
-                                                            {formatDuration(
-                                                                leads.avg_dwell_time,
-                                                            )}
-                                                        </div>
-                                                        <div className="text-xs text-muted-foreground">
-                                                            Converted
-                                                        </div>
+
+                                                {/* Dwell Time Comparison */}
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center justify-between text-sm">
+                                                        <span className="flex items-center gap-1 text-muted-foreground">
+                                                            <Clock className="h-3 w-3" />{' '}
+                                                            Dwell Time
+                                                        </span>
                                                     </div>
-                                                    <Target className="h-4 w-4 text-muted-foreground" />
-                                                    <div className="text-center">
-                                                        <div className="text-lg font-bold text-foreground">
-                                                            {formatDuration(
-                                                                nonLeads.avg_dwell_time,
-                                                            )}
+                                                    <div className="flex items-center justify-between gap-4">
+                                                        <div className="text-center">
+                                                            <div className="text-lg font-bold text-primary">
+                                                                {formatDuration(
+                                                                    leads.avg_dwell_time,
+                                                                )}
+                                                            </div>
+                                                            <div className="text-xs text-muted-foreground">
+                                                                Leads
+                                                            </div>
                                                         </div>
-                                                        <div className="text-xs text-muted-foreground">
-                                                            Others
+                                                        <div className="text-xl text-muted-foreground">
+                                                            vs
+                                                        </div>
+                                                        <div className="text-center">
+                                                            <div className="text-lg font-bold text-foreground">
+                                                                {formatDuration(
+                                                                    nonLeads.avg_dwell_time,
+                                                                )}
+                                                            </div>
+                                                            <div className="text-xs text-muted-foreground">
+                                                                Others
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

@@ -51,6 +51,7 @@ export interface MatrixItem {
     intent_rate: number;
     lead_cr: number;
     strict_cr: number;
+    initiate_checkout_rate: number;
     rpv: number;
     revenue: number;
     conversions: number;
