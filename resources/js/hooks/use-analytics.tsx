@@ -224,7 +224,7 @@ const trackLeadConversion = useCallback(
         }
 
         track({
-            event_type: 'conversion',
+            event_type: 'lead',
             event_data: {
                 page: window.location.pathname,
                 timestamp: new Date().toISOString(),
@@ -253,7 +253,7 @@ const trackLeadConversion = useCallback(
         }
 
         track({
-            event_type: 'conversion',
+            event_type: 'lead',
             event_data: {
                 page: window.location.pathname,
                 timestamp: new Date().toISOString(),
