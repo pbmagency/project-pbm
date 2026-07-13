@@ -179,34 +179,65 @@ export function useAnalytics() {
     );
 
     /** Pricing CTA click → AddToCart pixel + cta_click event in DB */
-    const trackConversion = useCallback(
-        (location: string) => {
-            const eventId = generateEventId();
+/** Pricing CTA click: fires AddToCart Meta + tracks initiate_checkout backend event */
+const trackInitiateCheckout = useCallback(
+    (location: string) => {
+        const eventId = generateEventId();
 
-            if (typeof window.fbq === 'function') {
-                window.fbq(
-                    'track',
-                    'AddToCart',
-                    { value: coursePrice, currency: 'IDR' },
-                    { eventID: eventId },
-                );
-            }
+        if (typeof window.fbq === 'function') {
+            window.fbq(
+                'track',
+                'AddToCart',
+                { value: coursePrice, currency: 'IDR' },
+                { eventID: eventId },
+            );
+        }
 
-            track({
-                event_type: 'cta_click',
-                event_data: {
-                    location,
-                    page: window.location.pathname,
-                    timestamp: new Date().toISOString(),
-                    event_id: eventId,
-                    meta_event: 'AddToCart',
-                    _fbp: getCookieValue('_fbp'),
-                    _fbc: getCookieValue('_fbc'),
-                },
-            });
-        },
-        [track, coursePrice],
-    );
+        track({
+            event_type: 'initiate_checkout',
+            event_data: {
+                location,
+                page: window.location.pathname,
+                timestamp: new Date().toISOString(),
+                event_id: eventId,
+                meta_event: 'AddToCart',
+                _fbp: getCookieValue('_fbp'),
+                _fbc: getCookieValue('_fbc'),
+            },
+        });
+    },
+    [track, coursePrice],
+);
+
+/** Checkout form submit: fires InitiateCheckout Meta + tracks conversion backend event */
+const trackLeadConversion = useCallback(
+    (data?: Record<string, unknown>) => {
+        const eventId = generateEventId();
+
+        if (typeof window.fbq === 'function') {
+            window.fbq(
+                'track',
+                'InitiateCheckout',
+                { value: coursePrice, currency: 'IDR' },
+                { eventID: eventId },
+            );
+        }
+
+        track({
+            event_type: 'conversion',
+            event_data: {
+                page: window.location.pathname,
+                timestamp: new Date().toISOString(),
+                event_id: eventId,
+                meta_event: 'InitiateCheckout',
+                _fbp: getCookieValue('_fbp'),
+                _fbc: getCookieValue('_fbc'),
+                ...data,
+            },
+        });
+    },
+    [track, coursePrice],
+);
 
     /** Checkout form submit → InitiateCheckout pixel + conversion event in DB */
     const trackCheckoutSubmit = useCallback(() => {
@@ -270,7 +301,8 @@ export function useAnalytics() {
         trackScroll,
         trackEngagement,
         trackCTA,
-        trackConversion,
+        trackLeadConversion,
+        trackInitiateCheckout,
         trackCheckoutSubmit,
         trackPayment,
         trackSectionView,

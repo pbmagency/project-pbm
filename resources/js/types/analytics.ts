@@ -9,6 +9,8 @@ export type AnalyticsEventType =
     | 'scroll'
     | 'engagement'
     | 'cta_click'
+    | 'initiate_checkout'
+    | 'lead'
     | 'conversion'
     | 'payment'
     | 'section_view';

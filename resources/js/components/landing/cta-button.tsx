@@ -34,7 +34,7 @@ export function CtaButton({
     variant = 'gradient',
     showTrustBadges = false,
 }: CtaButtonProps) {
-    const { trackCTA, trackConversion } = useAnalytics();
+    const { trackCTA, trackInitiateCheckout } = useAnalytics();
 
     const handleClick = () => {
         const destinationStr = isPricingCta
@@ -47,7 +47,7 @@ export function CtaButton({
         );
 
         if (isPricingCta) {
-            trackConversion(location);
+            trackInitiateCheckout(location);
         }
     };
 
