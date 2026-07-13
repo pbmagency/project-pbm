@@ -393,6 +393,69 @@ export function AudienceSegmentation({
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
+
+                            {/* Drop-off Analysis */}
+                            <div className="space-y-3">
+                                <h4 className="text-sm font-medium text-foreground">
+                                    Drop-off Analysis
+                                </h4>
+                                {safeHeatmap.map((h) => {
+                                    const depths = toSafeArray<DepthAnalysis>(
+                                        h.depth_analysis,
+                                    ).sort(
+                                        (a, b) =>
+                                            safeNumber(a.depth) - safeNumber(b.depth),
+                                    );
+                                    const hasCliff =
+                                        depths.length >= 2 &&
+                                        safeNumber(depths[0].percentage) -
+                                            safeNumber(depths[1].percentage) >
+                                            40;
+
+                                    return (
+                                        <div
+                                            key={h.landing_source}
+                                            className={`rounded-lg border p-3 ${hasCliff ? 'border-destructive/50' : 'border-border'}`}
+                                        >
+                                            <div className="mb-2 flex items-center justify-between">
+                                                <span className="font-mono text-sm font-medium text-foreground">
+                                                    {h.landing_source}
+                                                </span>
+                                                {hasCliff && (
+                                                    <Badge variant="destructive" className="text-xs">
+                                                        Drop-off Cliff
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                {depths.map((d) => (
+                                                    <div key={d.depth} className="flex-1">
+                                                        <div className="mb-1 text-center text-xs">
+                                                            <span className="text-muted-foreground">
+                                                                {d.depth}%
+                                                            </span>
+                                                        </div>
+                                                        <div className="h-8 w-full overflow-hidden rounded bg-muted">
+                                                            <div
+                                                                className="h-full bg-primary transition-all"
+                                                                style={{
+                                                                    height: `${safeNumber(d.percentage)}%`,
+                                                                    opacity:
+                                                                        0.4 +
+                                                                        (safeNumber(d.percentage) / 100) * 0.6,
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="mt-1 text-center text-xs font-medium">
+                                                            {formatPercent(d.percentage, 0)}%
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     )}
 
