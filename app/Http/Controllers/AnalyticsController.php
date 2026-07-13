@@ -31,7 +31,7 @@ class AnalyticsController extends Controller
     public function track(Request $request, MetaConversionService $metaService): JsonResponse
     {
         $validated = $request->validate([
-            'event_type' => 'required|string|in:visit,scroll,engagement,cta_click,conversion,payment,section_view',
+            'event_type' => 'required|string|in:visit,scroll,engagement,cta_click,initiate_checkout,lead,conversion,payment,section_view',
             'event_data' => 'nullable|array',
             'referral_source' => 'nullable|string|max:255',
             'utm_source' => 'nullable|string|max:255',
@@ -64,8 +64,12 @@ class AnalyticsController extends Controller
                 $metaService->sendPageView($request, $eventId);
             }
 
-            if ($validated['event_type'] === 'conversion') {
+            if ($validated['event_type'] === 'initiate_checkout') {
                 $metaService->sendAddToCart($request, $eventId);
+            }
+
+            if ($validated['event_type'] === 'lead') {
+                $metaService->sendInitiateCheckout($request, $eventId);
             }
         }
 

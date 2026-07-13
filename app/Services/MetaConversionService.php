@@ -83,6 +83,33 @@ class MetaConversionService
 
         $this->sendEvents([$event]);
     }
+    /**
+     * Send an InitiateCheckout event when the user submits the checkout form,
+     * sharing $eventId with the browser-side fbq('track', 'InitiateCheckout') call.
+     */
+    public function sendInitiateCheckout(Request $request, string $eventId): void
+    {
+        if (! $this->isConfigured()) {
+            return;
+        }
+
+        $customData = (new CustomData)
+            ->setContentName('The Silent Conversion Leak')
+            ->setContentType('product')
+            ->setValue((float) config('services.meta.course_price', 129000))
+            ->setCurrency('IDR');
+
+        $event = (new Event)
+            ->setEventName('InitiateCheckout')
+            ->setEventTime(time())
+            ->setEventId($eventId)
+            ->setEventSourceUrl($request->header('Referer', $request->url()))
+            ->setActionSource(ActionSource::WEBSITE)
+            ->setUserData($this->buildUserData($request))
+            ->setCustomData($customData);
+
+        $this->sendEvents([$event]);
+    }
 
     /**
      * Send a Purchase event after a confirmed payment callback.
