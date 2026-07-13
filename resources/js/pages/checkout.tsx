@@ -9,7 +9,6 @@ import {
     Star,
     Users,
 } from 'lucide-react';
-import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { home } from '@/routes';
@@ -24,7 +23,7 @@ function formatRupiah(amount: number): string {
 }
 
 export default function Checkout({ price, originalPrice }: CheckoutProps) {
-    const { trackCTA } = useAnalytics();
+    const { trackCheckoutSubmit } = useAnalytics();
 
     const { data, setData, post, processing, errors } = useForm({
         name: '',
@@ -32,20 +31,9 @@ export default function Checkout({ price, originalPrice }: CheckoutProps) {
         phone: '',
     });
 
-        useEffect(() => {
-        trackCTA('checkout_page_view', 'ViewContent', '/checkout');
-    }, []);
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
-        const eventId =
-            typeof crypto !== 'undefined' && crypto.randomUUID
-                ? crypto.randomUUID()
-                : `${Date.now()}-checkout`;
-        window.fbq?.('track', 'InitiateCheckout', { value: price, currency: 'IDR' }, { eventID: eventId });
-        trackCTA('checkout_form_submit', 'InitiateCheckout', '/checkout');
-
+        trackCheckoutSubmit();
         post('/checkout', {
             onSuccess: (page) => {
                 const redirectUrl = (page.props as { redirect_url?: string }).redirect_url;

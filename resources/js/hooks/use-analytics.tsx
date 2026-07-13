@@ -11,11 +11,6 @@ declare global {
     }
 }
 
-/**
- * Generate a unique event ID shared between the browser-side Meta Pixel call
- * and the server-side Conversions API call, so Meta Events Manager
- * deduplicates them into a single "Browser & Server" event.
- */
 export function generateEventId(): string {
     if (typeof crypto !== 'undefined' && crypto.randomUUID) {
         return crypto.randomUUID();
@@ -108,7 +103,6 @@ export function useAnalytics() {
         }
     }, []);
 
-    /** Fires once per browser session — safe to call on every page load. */
     const trackVisit = useCallback(() => {
         if (
             typeof window === 'undefined' ||
@@ -168,7 +162,6 @@ export function useAnalytics() {
         [track],
     );
 
-    /** Every CTA click, tagged with a location_id (e.g. "hero_primary"). */
     const trackCTA = useCallback(
         (location: string, text: string, destination?: string) => {
             track({
@@ -185,10 +178,7 @@ export function useAnalytics() {
         [track],
     );
 
-    /**
-     * The pricing section CTA click: fires client side fbq('track', 'AddToCart')
-     * and sends the same event_id to the backend so the CAPI call deduplicates.
-     */
+    /** Pricing CTA click → AddToCart pixel + cta_click event in DB */
     const trackConversion = useCallback(
         (location: string) => {
             const eventId = generateEventId();
@@ -203,7 +193,7 @@ export function useAnalytics() {
             }
 
             track({
-                event_type: 'conversion',
+                event_type: 'cta_click',
                 event_data: {
                     location,
                     page: window.location.pathname,
@@ -218,7 +208,32 @@ export function useAnalytics() {
         [track, coursePrice],
     );
 
-    /** Fired once per section per page load, when a section first becomes visible. */
+    /** Checkout form submit → InitiateCheckout pixel + conversion event in DB */
+    const trackCheckoutSubmit = useCallback(() => {
+        const eventId = generateEventId();
+
+        if (typeof window.fbq === 'function') {
+            window.fbq(
+                'track',
+                'InitiateCheckout',
+                { value: coursePrice, currency: 'IDR' },
+                { eventID: eventId },
+            );
+        }
+
+        track({
+            event_type: 'conversion',
+            event_data: {
+                page: window.location.pathname,
+                timestamp: new Date().toISOString(),
+                event_id: eventId,
+                meta_event: 'InitiateCheckout',
+                _fbp: getCookieValue('_fbp'),
+                _fbc: getCookieValue('_fbc'),
+            },
+        });
+    }, [track, coursePrice]);
+
     const trackSectionView = useCallback(
         (sectionId: string) => {
             track({
@@ -233,7 +248,6 @@ export function useAnalytics() {
         [track],
     );
 
-    /** Shape ready for the future checkout/payment integration. */
     const trackPayment = useCallback(
         (status: string, data?: Record<string, unknown>) => {
             track({
@@ -257,6 +271,7 @@ export function useAnalytics() {
         trackEngagement,
         trackCTA,
         trackConversion,
+        trackCheckoutSubmit,
         trackPayment,
         trackSectionView,
     };
