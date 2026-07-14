@@ -38,6 +38,7 @@ export function Pricing() {
             landing_source: getLandingSource(),
         }));
         post('/checkout', {
+            preserveScroll: true,
             onSuccess: (page) => {
                 // NOTE: this callback never actually fires. CheckoutController::store()
                 // responds with Inertia::location(), which Inertia's client intercepts
