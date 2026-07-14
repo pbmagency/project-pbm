@@ -10,7 +10,6 @@ export type AnalyticsEventType =
     | 'engagement'
     | 'cta_click'
     | 'initiate_checkout'
-    | 'lead'
     | 'conversion'
     | 'payment'
     | 'section_view';
@@ -24,6 +23,7 @@ export interface AnalyticsStats {
     engaged_users: number;
     intent_rate: number;
     cta_clicks: number;
+    add_to_cart: number;
     add_to_cart_rate: number;
     conversion_rate: number;
     conversions: number;

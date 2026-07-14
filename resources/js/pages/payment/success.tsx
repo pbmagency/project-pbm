@@ -2,7 +2,7 @@ import { Head } from '@inertiajs/react';
 import { BookOpen, Calendar, CheckCircle, MessageCircle } from 'lucide-react';
 import { useEffect } from 'react';
 import { useAnalytics } from '@/hooks/use-analytics';
-import { home } from '@/routes';
+;
 
 interface OrderData {
     order_number: string;
@@ -35,6 +35,7 @@ export default function PaymentSuccess({ order }: PaymentSuccessProps) {
         trackPayment('success', {
             order_number: order.order_number,
             amount: order.amount,
+            email: order.email,
             event_id: eventId,
         });
     }, []);

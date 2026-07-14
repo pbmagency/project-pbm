@@ -17,7 +17,7 @@ class AbTestingService
             $startDate,
             $endDate,
             $sourceFilter,
-            ['visit', 'engagement', 'initiate_checkout', 'lead', 'payment', 'cta_click']
+            ['visit', 'engagement', 'initiate_checkout', 'conversion', 'payment', 'cta_click']
         );
 
         if (empty($counts)) {
@@ -32,7 +32,7 @@ class AbTestingService
             $visits = $typeCounts['visit'] ?? 0;
             $engaged = $typeCounts['engagement'] ?? 0;
             $initiateCheckouts = $typeCounts['initiate_checkout'] ?? 0;
-            $leads = $typeCounts['lead'] ?? 0;
+            $leads = $typeCounts['conversion'] ?? 0;
             $payments = $typeCounts['payment'] ?? 0;
             $ctaClicks = $typeCounts['cta_click'] ?? 0;
 
@@ -68,7 +68,7 @@ class AbTestingService
             $startDate,
             $endDate,
             $sourceFilter,
-            ['visit', 'engagement', 'cta_click', 'initiate_checkout', 'lead', 'payment']
+            ['visit', 'engagement', 'cta_click', 'initiate_checkout', 'conversion', 'payment']
         );
 
         if (empty($counts)) {
@@ -81,7 +81,7 @@ class AbTestingService
             $engaged = $typeCounts['engagement'] ?? 0;
             $intent = $typeCounts['cta_click'] ?? 0;
             $initiateCheckouts = $typeCounts['initiate_checkout'] ?? 0;
-            $leads = $typeCounts['lead'] ?? 0;
+            $leads = $typeCounts['conversion'] ?? 0;
             $sales = $typeCounts['payment'] ?? 0;
 
             $funnel[] = [
@@ -155,7 +155,7 @@ class AbTestingService
         $ctaClicks = $query->get();
 
         $leadSessions = DB::table('user_analytics')
-            ->where('event_type', 'lead')
+            ->where('event_type', 'conversion')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->distinct()
             ->pluck('session_id');
@@ -547,7 +547,7 @@ class AbTestingService
                 DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
                 'session_id',
             ])
-            ->where('event_type', 'lead')
+            ->where('event_type', 'conversion')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))

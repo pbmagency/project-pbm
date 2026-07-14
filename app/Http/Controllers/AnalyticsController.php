@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -41,6 +42,25 @@ public function track(Request $request, MetaConversionService $metaService): Jso
         'utm_term' => 'nullable|string|max:255',
     ]);
 
+    if ($validated['event_type'] === 'payment') {
+        $incomingEventId = $validated['event_data']['event_id'] ?? null;
+
+        if ($incomingEventId) {
+            $alreadyRecorded = UserAnalytic::where('event_type', 'payment')
+                ->whereRaw("json_extract(event_data, '$.event_id') = ?", [$incomingEventId])
+                ->exists();
+
+            if ($alreadyRecorded) {
+                // Same payment event_id already logged — most likely a
+                // refresh of the success page. Meta dedupes this on its own
+                // side via event_id, but our own UserAnalytic table has no
+                // such protection, so without this check every refresh would
+                // inflate payments/total_revenue on the internal dashboard.
+                return response()->json(['success' => true, 'duplicate' => true]);
+            }
+        }
+    }
+
     UserAnalytic::create([
         'session_id' => $request->session()->getId(),
         'event_type' => $validated['event_type'],
@@ -70,6 +90,42 @@ public function track(Request $request, MetaConversionService $metaService): Jso
 
         if ($validated['event_type'] === 'conversion') {
             $metaService->sendInitiateCheckout($request, $eventId);
+        }
+
+        if ($validated['event_type'] === 'payment' && ($validated['event_data']['status'] ?? null) === 'success') {
+            $email = $validated['event_data']['email'] ?? null;
+
+            if (! $email) {
+                // The checkout form already collected this at the conversion
+                // step (see checkout.tsx) — fall back to it here rather than
+                // requiring whatever calls trackPayment() to re-supply it.
+                // ASSUMPTION: payment success is confirmed in the same browser
+                // session as checkout (e.g. gateway redirect back to a
+                // same-session "thank you" page). If payment is instead
+                // confirmed via a server-to-server webhook with no session,
+                // this lookup won't find anything — verify this before relying on it.
+                $conversionEvent = UserAnalytic::where('session_id', $request->session()->getId())
+                    ->where('event_type', 'conversion')
+                    ->latest('created_at')
+                    ->first();
+
+                $email = $conversionEvent?->event_data['email'] ?? null;
+            }
+
+            if ($email) {
+                $metaService->sendPurchase(
+                    $request,
+                    $eventId,
+                    (int) ($validated['event_data']['amount'] ?? 0),
+                    $email,
+                );
+            } else {
+                // sendPurchase()'s $email param is non-nullable — calling it
+                // without one would throw a TypeError, not fail quietly.
+                Log::warning('Skipped Meta Purchase CAPI: no email found for payment event', [
+                    'session_id' => $request->session()->getId(),
+                ]);
+            }
         }
     }
 
@@ -135,6 +191,11 @@ public function track(Request $request, MetaConversionService $metaService): Jso
             ->distinct('session_id')
             ->count('session_id');
 
+        $addToCart = UserAnalytic::where('event_type', 'initiate_checkout')
+            ->where('created_at', '>=', $startDate)
+            ->distinct('session_id')
+            ->count('session_id');
+
         $conversions = UserAnalytic::where('event_type', 'conversion')
             ->where('created_at', '>=', $startDate)
             ->distinct('session_id')
@@ -153,10 +214,11 @@ public function track(Request $request, MetaConversionService $metaService): Jso
             'unique_visitors' => $uniqueVisitors,
             'engagement_rate' => $uniqueVisitors > 0 ? round(($engagedUsers / $uniqueVisitors) * 100, 2) : 0,
             'engaged_users' => $engagedUsers,
-            'intent_rate' => $engagedUsers > 0 ? round(($ctaClicks / $engagedUsers) * 100, 2) : 0,
+            'intent_rate' => $uniqueVisitors > 0 ? round(($ctaClicks / $uniqueVisitors) * 100, 2) : 0,
             'cta_clicks' => $ctaClicks,
-            'add_to_cart_rate' => $uniqueVisitors > 0 ? round(($ctaClicks / $uniqueVisitors) * 100, 2) : 0,
-            'conversion_rate' => $ctaClicks > 0 ? round(($conversions / $ctaClicks) * 100, 2) : 0,
+            'add_to_cart' => $addToCart,
+            'add_to_cart_rate' => $uniqueVisitors > 0 ? round(($addToCart / $uniqueVisitors) * 100, 2) : 0,
+            'conversion_rate' => $addToCart > 0 ? round(($conversions / $addToCart) * 100, 2) : 0,
             'conversions' => $conversions,
             'conversion_to_payment_rate' => $conversions > 0 ? round(($payments / $conversions) * 100, 2) : 0,
             'payment_rate' => $totalVisits > 0 ? round(($payments / $totalVisits) * 100, 2) : 0,
@@ -173,7 +235,7 @@ public function track(Request $request, MetaConversionService $metaService): Jso
             'event_type'
         )
             ->where('created_at', '>=', $startDate)
-            ->whereIn('event_type', ['visit', 'engagement', 'conversion', 'payment'])
+            ->whereIn('event_type', ['visit', 'cta_click', 'initiate_checkout', 'conversion', 'payment'])
             ->groupBy(['date', 'event_type'])
             ->orderBy('date')
             ->get()
@@ -195,15 +257,15 @@ public function track(Request $request, MetaConversionService $metaService): Jso
     private function getConversionFunnel(Carbon $startDate): array
     {
         $visits = UserAnalytic::where('event_type', 'visit')->where('created_at', '>=', $startDate)->distinct('session_id')->count('session_id');
-        $engaged = UserAnalytic::where('event_type', 'engagement')->where('created_at', '>=', $startDate)->distinct('session_id')->count('session_id');
-        $ctaClicks = UserAnalytic::where('event_type', 'cta_click')->where('created_at', '>=', $startDate)->distinct('session_id')->count('session_id');
+        $intent = UserAnalytic::where('event_type', 'cta_click')->where('created_at', '>=', $startDate)->distinct('session_id')->count('session_id');
+        $addToCart = UserAnalytic::where('event_type', 'initiate_checkout')->where('created_at', '>=', $startDate)->distinct('session_id')->count('session_id');
         $conversions = UserAnalytic::where('event_type', 'conversion')->where('created_at', '>=', $startDate)->distinct('session_id')->count('session_id');
         $payments = UserAnalytic::where('event_type', 'payment')->where('created_at', '>=', $startDate)->whereRaw("json_extract(event_data, '$.status') = 'success'")->distinct('session_id')->count('session_id');
 
         return [
             ['stage' => 'Visits', 'count' => $visits, 'percentage' => 100],
-            ['stage' => 'Engaged', 'count' => $engaged, 'percentage' => $visits > 0 ? round(($engaged / $visits) * 100, 1) : 0],
-            ['stage' => 'CTA Clicks', 'count' => $ctaClicks, 'percentage' => $visits > 0 ? round(($ctaClicks / $visits) * 100, 1) : 0],
+            ['stage' => 'Intent', 'count' => $intent, 'percentage' => $visits > 0 ? round(($intent / $visits) * 100, 1) : 0],
+            ['stage' => 'Add to Cart', 'count' => $addToCart, 'percentage' => $visits > 0 ? round(($addToCart / $visits) * 100, 1) : 0],
             ['stage' => 'Conversions', 'count' => $conversions, 'percentage' => $visits > 0 ? round(($conversions / $visits) * 100, 1) : 0],
             ['stage' => 'Payments', 'count' => $payments, 'percentage' => $visits > 0 ? round(($payments / $visits) * 100, 1) : 0],
         ];

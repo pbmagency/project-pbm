@@ -35,7 +35,7 @@ export default function Checkout({ price, originalPrice }: CheckoutProps) {
         e.preventDefault();
         post('/checkout', {
             onSuccess: (page) => {
-                trackLeadConversion();
+                trackLeadConversion({ email: data.email });
                 const redirectUrl = (page.props as { redirect_url?: string }).redirect_url;
                 if (redirectUrl) {
                     window.location.href = redirectUrl;

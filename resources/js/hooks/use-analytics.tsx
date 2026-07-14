@@ -86,7 +86,7 @@ export function useAnalytics() {
                 utm_term: event.utm_term || urlParams.get('utm_term'),
             };
 
-            await fetch('/analytics/track', {
+            const response = await fetch('/analytics/track', {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: {
@@ -98,6 +98,16 @@ export function useAnalytics() {
                 },
                 body: JSON.stringify(eventData),
             });
+
+            if (!response.ok) {
+                // fetch() does NOT reject on 4xx/5xx — without this check,
+                // a rejected event_type (422) fails completely silently.
+                const body = await response.text().catch(() => '');
+                console.error(
+                    `Analytics tracking rejected (${response.status}) for event_type "${event.event_type}":`,
+                    body,
+                );
+            }
         } catch (error) {
             console.debug('Analytics tracking failed:', error);
         }
@@ -209,7 +219,13 @@ const trackInitiateCheckout = useCallback(
     [track, coursePrice],
 );
 
-/** Checkout form submit: fires InitiateCheckout Meta + tracks conversion backend event */
+/**
+ * Checkout form submit: fires InitiateCheckout Meta pixel + tracks the
+ * "conversion" backend event (spec: "submit form checkout -> conversion").
+ * NOTE: this previously sent event_type 'lead', which is not in the backend's
+ * validation whitelist — every call was rejected with a 422 and silently
+ * dropped. Fixed to 'conversion', which the backend already accepts.
+ */
 const trackLeadConversion = useCallback(
     (data?: Record<string, unknown>) => {
         const eventId = generateEventId();
@@ -224,7 +240,7 @@ const trackLeadConversion = useCallback(
         }
 
         track({
-            event_type: 'lead',
+            event_type: 'conversion',
             event_data: {
                 page: window.location.pathname,
                 timestamp: new Date().toISOString(),
@@ -238,32 +254,6 @@ const trackLeadConversion = useCallback(
     },
     [track, coursePrice],
 );
-
-    /** Checkout form submit → InitiateCheckout pixel + conversion event in DB */
-    const trackCheckoutSubmit = useCallback(() => {
-        const eventId = generateEventId();
-
-        if (typeof window.fbq === 'function') {
-            window.fbq(
-                'track',
-                'InitiateCheckout',
-                { value: coursePrice, currency: 'IDR' },
-                { eventID: eventId },
-            );
-        }
-
-        track({
-            event_type: 'lead',
-            event_data: {
-                page: window.location.pathname,
-                timestamp: new Date().toISOString(),
-                event_id: eventId,
-                meta_event: 'InitiateCheckout',
-                _fbp: getCookieValue('_fbp'),
-                _fbc: getCookieValue('_fbc'),
-            },
-        });
-    }, [track, coursePrice]);
 
     const trackSectionView = useCallback(
         (sectionId: string) => {
@@ -281,6 +271,15 @@ const trackLeadConversion = useCallback(
 
     const trackPayment = useCallback(
         (status: string, data?: Record<string, unknown>) => {
+            // NOTE: this does NOT fire its own browser pixel. The Meta docs
+            // and this codebase's actual usage (see PaymentSuccess page)
+            // expect the CALLER to fire fbq('track', 'Purchase', ...) itself
+            // with a deterministic event_id (e.g. derived from order number,
+            // not a fresh UUID — stable across page refreshes), and pass that
+            // same event_id through `data.event_id` so the backend's
+            // sendPurchase() call shares it for CAPI dedup. Firing a second,
+            // independently-generated pixel here would create two
+            // undeduplicated Purchase events per sale in Meta.
             track({
                 event_type: 'payment',
                 event_data: {
@@ -303,7 +302,6 @@ const trackLeadConversion = useCallback(
         trackCTA,
         trackLeadConversion,
         trackInitiateCheckout,
-        trackCheckoutSubmit,
         trackPayment,
         trackSectionView,
     };
