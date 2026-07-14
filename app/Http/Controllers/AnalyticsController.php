@@ -28,53 +28,53 @@ class AnalyticsController extends Controller
         ]);
     }
 
-    public function track(Request $request, MetaConversionService $metaService): JsonResponse
-    {
-        $validated = $request->validate([
-            'event_type' => 'required|string|in:visit,scroll,engagement,cta_click,initiate_checkout,lead,conversion,payment,section_view',
-            'event_data' => 'nullable|array',
-            'referral_source' => 'nullable|string|max:255',
-            'utm_source' => 'nullable|string|max:255',
-            'utm_medium' => 'nullable|string|max:255',
-            'utm_campaign' => 'nullable|string|max:255',
-            'utm_content' => 'nullable|string|max:255',
-            'utm_term' => 'nullable|string|max:255',
-        ]);
+public function track(Request $request, MetaConversionService $metaService): JsonResponse
+{
+    $validated = $request->validate([
+        'event_type' => 'required|string|in:visit,scroll,engagement,cta_click,initiate_checkout,conversion,payment,section_view',
+        'event_data' => 'nullable|array',
+        'referral_source' => 'nullable|string|max:255',
+        'utm_source' => 'nullable|string|max:255',
+        'utm_medium' => 'nullable|string|max:255',
+        'utm_campaign' => 'nullable|string|max:255',
+        'utm_content' => 'nullable|string|max:255',
+        'utm_term' => 'nullable|string|max:255',
+    ]);
 
-        UserAnalytic::create([
-            'session_id' => $request->session()->getId(),
-            'event_type' => $validated['event_type'],
-            'event_data' => $validated['event_data'] ?? [],
-            'referral_source' => $validated['referral_source'] ?? null,
-            'utm_source' => $validated['utm_source'] ?? null,
-            'utm_medium' => $validated['utm_medium'] ?? null,
-            'utm_campaign' => $validated['utm_campaign'] ?? null,
-            'utm_content' => $validated['utm_content'] ?? null,
-            'utm_term' => $validated['utm_term'] ?? null,
-            'ip_hash' => hash('sha256', $request->ip().config('app.key')),
-            'user_agent' => $request->userAgent(),
-            'user_id' => $request->user()?->id,
-            'created_at' => now(),
-        ]);
+    UserAnalytic::create([
+        'session_id' => $request->session()->getId(),
+        'event_type' => $validated['event_type'],
+        'event_data' => $validated['event_data'] ?? [],
+        'referral_source' => $validated['referral_source'] ?? null,
+        'utm_source' => $validated['utm_source'] ?? null,
+        'utm_medium' => $validated['utm_medium'] ?? null,
+        'utm_campaign' => $validated['utm_campaign'] ?? null,
+        'utm_content' => $validated['utm_content'] ?? null,
+        'utm_term' => $validated['utm_term'] ?? null,
+        'ip_hash' => hash('sha256', $request->ip().config('app.key')),
+        'user_agent' => $request->userAgent(),
+        'user_id' => $request->user()?->id,
+        'created_at' => now(),
+    ]);
 
-        $eventId = $request->input('event_data.event_id');
+    $eventId = $request->input('event_data.event_id');
 
-        if ($eventId) {
-            if ($validated['event_type'] === 'visit') {
-                $metaService->sendPageView($request, $eventId);
-            }
-
-            if ($validated['event_type'] === 'initiate_checkout') {
-                $metaService->sendAddToCart($request, $eventId);
-            }
-
-            if ($validated['event_type'] === 'lead') {
-                $metaService->sendInitiateCheckout($request, $eventId);
-            }
+    if ($eventId) {
+        if ($validated['event_type'] === 'visit') {
+            $metaService->sendPageView($request, $eventId);
         }
 
-        return response()->json(['success' => true]);
+        if ($validated['event_type'] === 'initiate_checkout') {
+            $metaService->sendAddToCart($request, $eventId);
+        }
+
+        if ($validated['event_type'] === 'conversion') {
+            $metaService->sendInitiateCheckout($request, $eventId);
+        }
     }
+
+    return response()->json(['success' => true]);
+}
 
     public function export(Request $request): StreamedResponse
     {
