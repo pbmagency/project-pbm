@@ -77,6 +77,17 @@ class PaymentCallbackController extends Controller
                 'amount' => $order->amount,
                 'currency' => 'IDR',
                 'event_id' => $eventId,
+                // A server-to-server webhook has no browser context, so it
+                // can't know the real landing_source. If Order ever gains a
+                // landing_source column (captured at checkout time, when
+                // there IS browser context), this starts using the real
+                // value automatically. Until then, fall back to a labeled
+                // bucket rather than omitting it — AbTestingService's
+                // per-source queries silently drop rows with no
+                // landing_source, which is what was making this revenue
+                // invisible in the Performance Matrix despite being counted
+                // correctly in the global Analytics Dashboard.
+                'landing_source' => $order->landing_source ?? 'server-callback',
                 'timestamp' => now()->toISOString(),
             ],
             'created_at' => now(),
