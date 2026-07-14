@@ -9,6 +9,7 @@ use App\Services\DuitkuService;
 use App\Services\MetaConversionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -47,28 +48,38 @@ class CheckoutController extends Controller
         // client-side onSuccess handler after this POST will NEVER fire.
         // That's why 'conversion' tracking happens here, server-side, where
         // it's actually guaranteed to run — not in pricing.tsx's onSuccess.
-        $eventId = 'conversion-' . $order->order_number;
+        //
+        // Wrapped in try/catch: a failure in analytics/CAPI must never be
+        // able to block the actual checkout/payment redirect. Losing a
+        // tracking event is recoverable; losing a sale is not.
+        try {
+            $eventId = 'conversion-' . $order->order_number;
 
-        $meta->sendInitiateCheckout($request, $eventId);
+            $meta->sendInitiateCheckout($request, $eventId);
 
-        UserAnalytic::create([
-            'session_id' => $request->session()->getId(),
-            'event_type' => 'conversion',
-            'event_data' => [
+            UserAnalytic::create([
+                'session_id' => $request->session()->getId(),
+                'event_type' => 'conversion',
+                'event_data' => [
+                    'order_number' => $order->order_number,
+                    'name' => $order->name,
+                    'email' => $order->email,
+                    // Sent by pricing.tsx via useForm's transform() at submit time.
+                    'landing_source' => $request->input('landing_source', 'unknown'),
+                    'event_id' => $eventId,
+                    'timestamp' => now()->toISOString(),
+                ],
+                'referral_source' => $request->input('referral_source'),
+                'utm_source' => $request->input('utm_source'),
+                'utm_medium' => $request->input('utm_medium'),
+                'utm_campaign' => $request->input('utm_campaign'),
+                'created_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Checkout conversion tracking failed (order still proceeds): ' . $e->getMessage(), [
                 'order_number' => $order->order_number,
-                'name' => $order->name,
-                'email' => $order->email,
-                // Sent by pricing.tsx via useForm's transform() at submit time.
-                'landing_source' => $request->input('landing_source', 'unknown'),
-                'event_id' => $eventId,
-                'timestamp' => now()->toISOString(),
-            ],
-            'referral_source' => $request->input('referral_source'),
-            'utm_source' => $request->input('utm_source'),
-            'utm_medium' => $request->input('utm_medium'),
-            'utm_campaign' => $request->input('utm_campaign'),
-            'created_at' => now(),
-        ]);
+            ]);
+        }
 
         $paymentUrl = $duitku->createInvoice($order);
 
