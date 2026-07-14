@@ -206,7 +206,7 @@ public function track(Request $request, MetaConversionService $metaService): Jso
             ->whereRaw("json_extract(event_data, '$.status') = 'success'")
             ->get();
 
-        $payments = $paymentAnalytics->count();
+        $payments = $paymentAnalytics->pluck('session_id')->unique()->count();
         $revenue = $paymentAnalytics->sum(fn ($analytic) => (float) ($analytic->event_data['amount'] ?? 0));
 
         return [
@@ -218,10 +218,10 @@ public function track(Request $request, MetaConversionService $metaService): Jso
             'cta_clicks' => $ctaClicks,
             'add_to_cart' => $addToCart,
             'add_to_cart_rate' => $uniqueVisitors > 0 ? round(($addToCart / $uniqueVisitors) * 100, 2) : 0,
-            'conversion_rate' => $addToCart > 0 ? round(($conversions / $addToCart) * 100, 2) : 0,
+            'conversion_rate' => $uniqueVisitors > 0 ? round(($conversions / $uniqueVisitors) * 100, 2) : 0,
             'conversions' => $conversions,
             'conversion_to_payment_rate' => $conversions > 0 ? round(($payments / $conversions) * 100, 2) : 0,
-            'payment_rate' => $totalVisits > 0 ? round(($payments / $totalVisits) * 100, 2) : 0,
+            'payment_rate' => $uniqueVisitors > 0 ? round(($payments / $uniqueVisitors) * 100, 2) : 0,
             'total_revenue' => $revenue,
             'payments' => $payments,
         ];
