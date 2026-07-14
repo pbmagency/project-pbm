@@ -89,6 +89,7 @@ export function useAnalytics() {
             const response = await fetch('/analytics/track', {
                 method: 'POST',
                 credentials: 'same-origin',
+                keepalive: true, // survive navigation firing right after this call (e.g. redirect to payment gateway)
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN':
