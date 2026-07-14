@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CheckoutRequest;
 use App\Models\Order;
+use App\Models\UserAnalytic;
 use App\Services\DuitkuService;
+use App\Services\MetaConversionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -24,7 +26,7 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function store(CheckoutRequest $request, DuitkuService $duitku): \Symfony\Component\HttpFoundation\Response
+    public function store(CheckoutRequest $request, DuitkuService $duitku, MetaConversionService $meta): \Symfony\Component\HttpFoundation\Response
     {
         $price = (int) config('services.meta.course_price', 129000);
 
@@ -38,6 +40,35 @@ class CheckoutController extends Controller
                 'status' => 'pending',
             ]);
         });
+
+        // NOTE: this response ends in Inertia::location() below, which the
+        // Inertia client intercepts via a raw window.location redirect —
+        // it never resolves as a normal Inertia "success" visit. Any
+        // client-side onSuccess handler after this POST will NEVER fire.
+        // That's why 'conversion' tracking happens here, server-side, where
+        // it's actually guaranteed to run — not in pricing.tsx's onSuccess.
+        $eventId = 'conversion-' . $order->order_number;
+
+        $meta->sendInitiateCheckout($request, $eventId);
+
+        UserAnalytic::create([
+            'session_id' => $request->session()->getId(),
+            'event_type' => 'conversion',
+            'event_data' => [
+                'order_number' => $order->order_number,
+                'name' => $order->name,
+                'email' => $order->email,
+                // Sent by pricing.tsx via useForm's transform() at submit time.
+                'landing_source' => $request->input('landing_source', 'unknown'),
+                'event_id' => $eventId,
+                'timestamp' => now()->toISOString(),
+            ],
+            'referral_source' => $request->input('referral_source'),
+            'utm_source' => $request->input('utm_source'),
+            'utm_medium' => $request->input('utm_medium'),
+            'utm_campaign' => $request->input('utm_campaign'),
+            'created_at' => now(),
+        ]);
 
         $paymentUrl = $duitku->createInvoice($order);
 

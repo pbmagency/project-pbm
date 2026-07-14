@@ -68,6 +68,18 @@ class PaymentCallbackController extends Controller
         $meta->sendPurchase($request, $eventId, $order->amount, $order->email);
 
         // Internal analytics
+        // landing_source comes from the 'conversion' event created in
+        // CheckoutController::store() — correlated by order_number, which
+        // both events share. This avoids depending on an Order.landing_source
+        // column that hasn't been confirmed to exist; if store() ever fails
+        // to write that event for some reason, this falls back to a labeled
+        // bucket rather than breaking or guessing.
+        $conversionEvent = UserAnalytic::where('event_type', 'conversion')
+            ->whereRaw("json_extract(event_data, '$.order_number') = ?", [$order->order_number])
+            ->first();
+
+        $landingSource = $conversionEvent?->event_data['landing_source'] ?? 'server-callback';
+
         UserAnalytic::create([
             'session_id' => 'server-callback-' . $order->order_number,
             'event_type' => 'payment',
@@ -77,17 +89,7 @@ class PaymentCallbackController extends Controller
                 'amount' => $order->amount,
                 'currency' => 'IDR',
                 'event_id' => $eventId,
-                // A server-to-server webhook has no browser context, so it
-                // can't know the real landing_source. If Order ever gains a
-                // landing_source column (captured at checkout time, when
-                // there IS browser context), this starts using the real
-                // value automatically. Until then, fall back to a labeled
-                // bucket rather than omitting it — AbTestingService's
-                // per-source queries silently drop rows with no
-                // landing_source, which is what was making this revenue
-                // invisible in the Performance Matrix despite being counted
-                // correctly in the global Analytics Dashboard.
-                'landing_source' => $order->landing_source ?? 'server-callback',
+                'landing_source' => $landingSource,
                 'timestamp' => now()->toISOString(),
             ],
             'created_at' => now(),

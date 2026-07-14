@@ -3,7 +3,7 @@ import { AlertCircle, Check, Lock } from 'lucide-react';
 import { useRef } from 'react';
 import { CountdownTimer } from '@/components/landing/countdown-timer';
 import { Eyebrow } from '@/components/landing/eyebrow';
-import { useAnalytics } from '@/hooks/use-analytics';
+import { getLandingSource, useAnalytics } from '@/hooks/use-analytics';
 import { useSectionView } from '@/hooks/use-section-view';
 
 const INCLUDES = [
@@ -15,10 +15,10 @@ const INCLUDES = [
 
 export function Pricing() {
     const ref = useSectionView<HTMLElement>('pricing');
-    const { trackInitiateCheckout, trackLeadConversion } = useAnalytics();
+    const { trackInitiateCheckout } = useAnalytics();
     const hasTrackedIntent = useRef(false);
 
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, transform } = useForm({
         name: '',
         email: '',
         phone: '',
@@ -33,9 +33,18 @@ export function Pricing() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        transform((data) => ({
+            ...data,
+            landing_source: getLandingSource(),
+        }));
         post('/checkout', {
             onSuccess: (page) => {
-                trackLeadConversion({ name: data.name, email: data.email });
+                // NOTE: this callback never actually fires. CheckoutController::store()
+                // responds with Inertia::location(), which Inertia's client intercepts
+                // via a raw window.location redirect before resolving as a normal
+                // "success" visit — onSuccess/onError never run for this request.
+                // 'conversion' tracking happens server-side in store() instead, where
+                // it's guaranteed to execute regardless of what the client does next.
                 const redirectUrl = (page.props as { redirect_url?: string }).redirect_url;
                 if (redirectUrl) {
                     window.location.href = redirectUrl;
