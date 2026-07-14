@@ -1,7 +1,9 @@
-import { Check } from 'lucide-react';
+import { useForm } from '@inertiajs/react';
+import { AlertCircle, Check, Lock } from 'lucide-react';
+import { useRef } from 'react';
 import { CountdownTimer } from '@/components/landing/countdown-timer';
-import { CtaButton } from '@/components/landing/cta-button';
 import { Eyebrow } from '@/components/landing/eyebrow';
+import { useAnalytics } from '@/hooks/use-analytics';
 import { useSectionView } from '@/hooks/use-section-view';
 
 const INCLUDES = [
@@ -13,6 +15,34 @@ const INCLUDES = [
 
 export function Pricing() {
     const ref = useSectionView<HTMLElement>('pricing');
+    const { trackInitiateCheckout, trackLeadConversion } = useAnalytics();
+    const hasTrackedIntent = useRef(false);
+
+    const { data, setData, post, processing, errors } = useForm({
+        name: '',
+        email: '',
+        phone: '',
+    });
+
+    const handleFirstFocus = () => {
+        if (!hasTrackedIntent.current) {
+            hasTrackedIntent.current = true;
+            trackInitiateCheckout('pricing_form');
+        }
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post('/checkout', {
+            onSuccess: (page) => {
+                trackLeadConversion({ name: data.name, email: data.email });
+                const redirectUrl = (page.props as { redirect_url?: string }).redirect_url;
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                }
+            },
+        });
+    };
 
     return (
         <section
@@ -20,11 +50,6 @@ export function Pricing() {
             id="pricing"
             className="relative overflow-hidden bg-lp-bg"
         >
-            {/* <div className="pointer-events-none absolute inset-0">
-                <div className="absolute top-1/3 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-lp-primary-2/25 blur-[150px]" />
-                <div className="absolute inset-0 bg-lp-grid opacity-40" />
-            </div> */}
-
             <div className="relative mx-auto max-w-lg px-4 pt-16 pb-10 sm:px-6 sm:pt-24 sm:pb-12 lg:pt-28">
                 <div className="text-center">
                     <Eyebrow className="mx-auto" tone="amber">
@@ -65,7 +90,7 @@ export function Pricing() {
                             </ul>
                         </div>
 
-                        <div className="relative overflow-hidden bg-gradient-to-br from-lp-primary via-lp-primary-2 to-lp-primary-2 p-7 text-center sm:p-9">
+                        <div className="relative overflow-hidden bg-gradient-to-br from-lp-primary via-lp-primary-2 to-lp-primary-2 p-7 sm:p-9">
                             <div
                                 className="pointer-events-none absolute inset-0 opacity-40"
                                 style={{
@@ -75,18 +100,18 @@ export function Pricing() {
                             />
 
                             <div className="relative">
-                                <p className="text-[13px] text-white/80 line-through">
+                                <p className="text-center text-[13px] text-white/80 line-through">
                                     Harga Normal Rp299.000
                                 </p>
-                                <p className="mt-1.5 font-mono text-[11px] tracking-[0.18em] text-white/90 uppercase">
+                                <p className="mt-1.5 text-center font-mono text-[11px] tracking-[0.18em] text-white/90 uppercase">
                                     Harga Early Bird
                                 </p>
-                                <p className="mt-2 font-display text-6xl font-extrabold tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
+                                <p className="mt-2 text-center font-display text-6xl font-extrabold tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
                                     Rp129.000
                                 </p>
 
                                 <div className="mt-6 border-t border-white/25 pt-5">
-                                    <p className="font-mono text-[10.5px] tracking-[0.14em] text-white/80 uppercase">
+                                    <p className="text-center font-mono text-[10.5px] tracking-[0.14em] text-white/80 uppercase">
                                         Harga early bird berakhir dalam
                                     </p>
                                     <div className="mt-3">
@@ -94,19 +119,70 @@ export function Pricing() {
                                     </div>
                                 </div>
 
-                                <div className="mt-7">
-                                    <CtaButton
-                                        location="pricing_cta"
-                                        isPricingCta
-                                        variant="white"
-                                        className="w-full"
+                                <form onSubmit={handleSubmit} className="mt-7 space-y-3">
+                                    <div>
+                                        <input
+                                            type="text"
+                                            value={data.name}
+                                            onChange={(e) => setData('name', e.target.value)}
+                                            onFocus={handleFirstFocus}
+                                            placeholder="Nama Lengkap"
+                                            className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
+                                        />
+                                        {errors.name && (
+                                            <p className="mt-1 flex items-center gap-1 text-xs text-white/90">
+                                                <AlertCircle className="h-3 w-3" />
+                                                {errors.name}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <input
+                                            type="email"
+                                            value={data.email}
+                                            onChange={(e) => setData('email', e.target.value)}
+                                            onFocus={handleFirstFocus}
+                                            placeholder="Email"
+                                            className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
+                                        />
+                                        {errors.email && (
+                                            <p className="mt-1 flex items-center gap-1 text-xs text-white/90">
+                                                <AlertCircle className="h-3 w-3" />
+                                                {errors.email}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <input
+                                            type="tel"
+                                            value={data.phone}
+                                            onChange={(e) => setData('phone', e.target.value)}
+                                            onFocus={handleFirstFocus}
+                                            placeholder="Nomor WhatsApp"
+                                            className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
+                                        />
+                                        {errors.phone && (
+                                            <p className="mt-1 flex items-center gap-1 text-xs text-white/90">
+                                                <AlertCircle className="h-3 w-3" />
+                                                {errors.phone}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={processing}
+                                        className="mt-1 w-full rounded-2xl bg-white px-8 py-4 text-base font-bold text-lp-primary-2 shadow-[0_16px_40px_-14px_rgba(255,255,255,0.55)] transition hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:opacity-70"
                                     >
-                                        Amankan Seat Saya
-                                    </CtaButton>
-                                </div>
-                                <p className="mt-3.5 text-xs text-white/80">
-                                    Pembayaran aman, konfirmasi otomatis lewat
-                                    email.
+                                        {processing ? 'Memproses...' : 'Amankan Seat Saya'}
+                                    </button>
+                                </form>
+
+                                <p className="mt-3.5 flex items-center justify-center gap-1.5 text-xs text-white/80">
+                                    <Lock className="h-3 w-3" />
+                                    Pembayaran aman, konfirmasi otomatis lewat email.
                                 </p>
                             </div>
                         </div>
