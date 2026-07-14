@@ -36,7 +36,7 @@ class AbTestingService
             $payments = $typeCounts['payment'] ?? 0;
             $ctaClicks = $typeCounts['cta_click'] ?? 0;
 
-            $bounced = $bouncedBySource[$source] ?? 0;
+            $bounced = $bouncedBySource[$source] ?? ($visits - $engaged);
             $revenue = (float) ($revenueBySource[$source] ?? 0);
 
             $matrix[] = [
@@ -450,34 +450,21 @@ class AbTestingService
             ->whereRaw("json_extract(v.event_data, '$.landing_source') IS NOT NULL")
             ->whereRaw("json_extract(v.event_data, '$.landing_source') NOT IN ('', 'unknown')")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('v.referral_source', $sourceFilter))
-            // Bounced = did NOTHING after landing: no dwell engagement, no
-            // meaningful scroll, and no funnel progression of any kind.
-            // Previously this required BOTH a dwell ping AND 25%+ scroll
-            // simultaneously to avoid being counted as bounced (an OR of
-            // NOT-EXISTS is, by De Morgan's law, an AND-required condition).
-            // That misclassified fast converters — anyone who filled the
-            // form and paid before the ~30s dwell-ping interval fired — as
-            // bounced, despite having just paid. Now a session only counts
-            // as bounced if it truly did nothing at all.
-            ->whereNotExists(function ($sub) use ($startDate, $endDate) {
-                $sub->from('user_analytics as e')
-                    ->whereColumn('e.session_id', 'v.session_id')
-                    ->where('e.event_type', 'engagement')
-                    ->whereRaw("json_extract(e.event_data, '$.type') = 'dwell_ping'")
-                    ->whereBetween('e.created_at', [$startDate, $endDate]);
-            })
-            ->whereNotExists(function ($sub) use ($startDate, $endDate) {
-                $sub->from('user_analytics as s')
-                    ->whereColumn('s.session_id', 'v.session_id')
-                    ->where('s.event_type', 'scroll')
-                    ->whereRaw("CAST(json_extract(s.event_data, '$.depth') AS DECIMAL(10,2)) >= 25")
-                    ->whereBetween('s.created_at', [$startDate, $endDate]);
-            })
-            ->whereNotExists(function ($sub) use ($startDate, $endDate) {
-                $sub->from('user_analytics as f')
-                    ->whereColumn('f.session_id', 'v.session_id')
-                    ->whereIn('f.event_type', ['cta_click', 'initiate_checkout', 'conversion', 'payment'])
-                    ->whereBetween('f.created_at', [$startDate, $endDate]);
+            ->where(function ($q) use ($startDate, $endDate) {
+                $q->whereNotExists(function ($sub) use ($startDate, $endDate) {
+                    $sub->from('user_analytics as e')
+                        ->whereColumn('e.session_id', 'v.session_id')
+                        ->where('e.event_type', 'engagement')
+                        ->whereRaw("json_extract(e.event_data, '$.type') = 'dwell_ping'")
+                        ->whereBetween('e.created_at', [$startDate, $endDate]);
+                })
+                    ->orWhereNotExists(function ($sub) use ($startDate, $endDate) {
+                        $sub->from('user_analytics as s')
+                            ->whereColumn('s.session_id', 'v.session_id')
+                            ->where('s.event_type', 'scroll')
+                            ->whereRaw("CAST(json_extract(s.event_data, '$.depth') AS DECIMAL(10,2)) >= 25")
+                            ->whereBetween('s.created_at', [$startDate, $endDate]);
+                    });
             })
             ->groupBy(DB::raw("json_extract(v.event_data, '$.landing_source')"))
             ->get();
