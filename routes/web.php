@@ -15,9 +15,6 @@ Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.s
 Route::get('/payment/return', [CheckoutController::class, 'returnPage'])->name('payment.return');
 Route::post('/payment/callback', [PaymentCallbackController::class, 'handle'])->name('payment.callback')->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
-//configs
-Route::get('/configs', [\App\Http\Controllers\Admin\ConfigController::class, 'index'])->name('configs');
-Route::post('/configs', [\App\Http\Controllers\Admin\ConfigController::class, 'update'])->name('configs.update');
 Route::post('/analytics/track', [AnalyticsController::class, 'track'])->name('analytics.track');
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -35,6 +32,10 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 
     Route::get('/labs', [LabsController::class, 'index'])->name('labs');
     Route::post('/labs/clear-cache', [LabsController::class, 'clearCache'])->name('labs.clear-cache');
+
+    // configs (Now correctly inside the admin group!)
+    Route::get('/configs', [\App\Http\Controllers\Admin\ConfigController::class, 'index'])->name('configs');
+    Route::post('/configs', [\App\Http\Controllers\Admin\ConfigController::class, 'update'])->name('configs.update');
 });
 
 require __DIR__.'/settings.php';
