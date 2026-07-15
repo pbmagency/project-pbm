@@ -42,6 +42,23 @@ class CheckoutController extends Controller
             ]);
         });
 
+        // Fallback to the latest visit event in this session if the frontend
+        // fails to send tracking data (e.g. adblockers blocking the JS transform).
+        $visitEvent = UserAnalytic::where('session_id', $request->session()->getId())
+            ->where('event_type', 'visit')
+            ->latest('created_at')
+            ->first();
+
+        $landingSource = $request->input('landing_source');
+        if (empty($landingSource) || $landingSource === 'unknown') {
+            $landingSource = $visitEvent?->event_data['landing_source'] ?? 'unknown';
+        }
+
+        $referralSource = $request->input('referral_source') ?? $visitEvent?->referral_source;
+        $utmSource = $request->input('utm_source') ?? $visitEvent?->utm_source;
+        $utmMedium = $request->input('utm_medium') ?? $visitEvent?->utm_medium;
+        $utmCampaign = $request->input('utm_campaign') ?? $visitEvent?->utm_campaign;
+
         // NOTE: this response ends in Inertia::location() below, which the
         // Inertia client intercepts via a raw window.location redirect —
         // it never resolves as a normal Inertia "success" visit. Any
@@ -64,15 +81,14 @@ class CheckoutController extends Controller
                     'order_number' => $order->order_number,
                     'name' => $order->name,
                     'email' => $order->email,
-                    // Sent by pricing.tsx via useForm's transform() at submit time.
-                    'landing_source' => $request->input('landing_source', 'unknown'),
+                    'landing_source' => $landingSource,
                     'event_id' => $eventId,
                     'timestamp' => now()->toISOString(),
                 ],
-                'referral_source' => $request->input('referral_source'),
-                'utm_source' => $request->input('utm_source'),
-                'utm_medium' => $request->input('utm_medium'),
-                'utm_campaign' => $request->input('utm_campaign'),
+                'referral_source' => $referralSource,
+                'utm_source' => $utmSource,
+                'utm_medium' => $utmMedium,
+                'utm_campaign' => $utmCampaign,
                 'created_at' => now(),
             ]);
         } catch (\Throwable $e) {
