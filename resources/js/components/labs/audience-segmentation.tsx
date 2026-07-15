@@ -232,7 +232,7 @@ export function AudienceSegmentation({
                                             <span className="h-1.5 w-1.5 rounded-full bg-[var(--destructive)]" />
                                             Bouncers
                                         </span>
-                                        <span>Scroll &lt; 25% &amp; Dwell &lt; 15s (Immediate exit)</span>
+                                        <span>Scroll &lt; 25% &amp; Dwell &lt; 15s, no CTA/checkout/purchase (Immediate exit)</span>
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <span className="flex items-center gap-1 font-semibold text-foreground">
