@@ -148,7 +148,8 @@ export default function Configs({ settings }: ConfigsProps) {
                                         type="time"
                                         value={data.start_time}
                                         onChange={(e) => setData('start_time', e.target.value)}
-                                        className="w-[140px]"
+                                        onClick={(e) => e.currentTarget.showPicker && e.currentTarget.showPicker()}
+                                        className="w-[140px] cursor-pointer"
                                         required
                                     />
                                     <span className="text-sm font-medium text-muted-foreground">to</span>
@@ -156,7 +157,8 @@ export default function Configs({ settings }: ConfigsProps) {
                                         type="time"
                                         value={data.end_time}
                                         onChange={(e) => setData('end_time', e.target.value)}
-                                        className="w-[140px]"
+                                        onClick={(e) => e.currentTarget.showPicker && e.currentTarget.showPicker()}
+                                        className="w-[140px] cursor-pointer"
                                         required
                                     />
                                 </div>
