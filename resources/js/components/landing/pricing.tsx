@@ -24,7 +24,7 @@ export function Pricing() {
         phone: '',
     });
 
-    const handleFirstFocus = () => {
+    const handleFirstChange = () => {
         if (!hasTrackedIntent.current) {
             hasTrackedIntent.current = true;
             trackInitiateCheckout('pricing_form');
@@ -134,8 +134,10 @@ export function Pricing() {
                                         <input
                                             type="text"
                                             value={data.name}
-                                            onChange={(e) => setData('name', e.target.value)}
-                                            onFocus={handleFirstFocus}
+                                            onChange={(e) => {
+                                                setData('name', e.target.value);
+                                                handleFirstChange();
+                                            }}
                                             placeholder="Nama Lengkap"
                                             className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
                                         />
@@ -151,8 +153,10 @@ export function Pricing() {
                                         <input
                                             type="email"
                                             value={data.email}
-                                            onChange={(e) => setData('email', e.target.value)}
-                                            onFocus={handleFirstFocus}
+                                            onChange={(e) => {
+                                                setData('email', e.target.value);
+                                                handleFirstChange();
+                                            }}
                                             placeholder="Email"
                                             className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
                                         />
@@ -168,8 +172,10 @@ export function Pricing() {
                                         <input
                                             type="tel"
                                             value={data.phone}
-                                            onChange={(e) => setData('phone', e.target.value)}
-                                            onFocus={handleFirstFocus}
+                                            onChange={(e) => {
+                                                setData('phone', e.target.value);
+                                                handleFirstChange();
+                                            }}
                                             placeholder="Nomor WhatsApp"
                                             className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
                                         />
@@ -202,3 +208,4 @@ export function Pricing() {
         </section>
     );
 }
+

@@ -34,7 +34,7 @@ export function CtaButton({
     variant = 'gradient',
     showTrustBadges = false,
 }: CtaButtonProps) {
-    const { trackCTA, trackInitiateCheckout } = useAnalytics();
+    const { trackCTA } = useAnalytics();
 
     const handleClick = () => {
         const destinationStr = isPricingCta
@@ -45,10 +45,6 @@ export function CtaButton({
             typeof children === 'string' ? children : location,
             destinationStr,
         );
-
-        if (isPricingCta) {
-            trackInitiateCheckout(location);
-        }
     };
 
     const buttonClass = cn(
