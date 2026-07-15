@@ -7,7 +7,7 @@ export function SocialProofBar() {
         { id: 'brand-1', src: '/images/brands/brand12.webp', alt: 'Brand 1' },
         { id: 'brand-2', src: '/images/brands/brand6.webp', alt: 'Brand 2' },
         { id: 'brand-3', src: '/images/brands/brand3.webp', alt: 'Brand 3' },
-        { id: 'brand-4', src: '/images/brands/brand5.webp', alt: 'Brand 4' },
+        { id: 'brand-4', src: '/images/brands/brand51.webp', alt: 'Brand 4' },
     ];
 
     return (
