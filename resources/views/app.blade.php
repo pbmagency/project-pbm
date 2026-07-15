@@ -45,6 +45,12 @@
             }
         </style>
 
+        {{-- Preconnect to CDN serving Vite assets --}}
+        <link rel="preconnect" href="https://pbmagency-sub3.b-cdn.net" crossorigin>
+        <link rel="dns-prefetch" href="https://pbmagency-sub3.b-cdn.net">
+        {{-- Preconnect to font origin (self-hosted via Bunny) --}}
+        <link rel="preconnect" href="https://sub3.pbmagency.id">
+
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">

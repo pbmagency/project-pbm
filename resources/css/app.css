@@ -19,8 +19,8 @@
 
     /* Upgrades font-mono app-wide (currently used for data/labels on the
        landing page and in the admin analytics tables). */
-    --font-mono:
-        'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas,
+        --font-mono:
+        ui-monospace, SFMono-Regular, Menlo, Consolas,
         monospace;
 
     --radius-lg: var(--radius);
