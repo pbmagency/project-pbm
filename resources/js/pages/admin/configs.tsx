@@ -16,6 +16,13 @@ const ID_MONTHS = [
     'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'
 ];
 
+// Generate times from 00:00 to 23:30 in 30-minute increments
+const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
+    const hours = Math.floor(i / 2).toString().padStart(2, '0');
+    const minutes = i % 2 === 0 ? '00' : '30';
+    return `${hours}:${minutes}`;
+});
+
 function formatDateToIndonesian(dateString: string) {
     if (!dateString) return '';
     const [year, month, day] = dateString.split('-');
@@ -121,28 +128,33 @@ export default function Configs({ settings }: ConfigsProps) {
                             <div className="space-y-2">
                                 <Label>Event Time Range</Label>
                                 <div className="flex items-center gap-3">
-                                    <Input
-                                        type="time"
+                                    <select
                                         value={data.start_time}
                                         onChange={(e) => setData('start_time', e.target.value)}
-                                        className="w-[140px]"
-                                        required
-                                    />
+                                        className="flex h-10 w-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                    >
+                                        {TIME_OPTIONS.map((time) => (
+                                            <option key={time} value={time}>{time}</option>
+                                        ))}
+                                    </select>
                                     <span className="text-sm font-medium text-muted-foreground">to</span>
-                                    <Input
-                                        type="time"
+                                    <select
                                         value={data.end_time}
                                         onChange={(e) => setData('end_time', e.target.value)}
-                                        className="w-[140px]"
-                                        required
-                                    />
+                                        className="flex h-10 w-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                    >
+                                        {TIME_OPTIONS.map((time) => (
+                                            <option key={time} value={time}>{time}</option>
+                                        ))}
+                                    </select>
                                     <select
                                         value={data.time_suffix}
                                         onChange={(e) => setData('time_suffix', e.target.value)}
-                                        className="flex h-10 w-24 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                        className="flex h-10 w-[90px] rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     >
-                                        <option value="AM">AM</option>
-                                        <option value="PM">PM</option>
+                                        <option value="WIB">WIB</option>
+                                        <option value="WITA">WITA</option>
+                                        <option value="WIT">WIT</option>
                                     </select>
                                 </div>
                                 {errors.event_time && (
