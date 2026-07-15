@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { Benefit } from '@/components/landing/benefit';
 import { Faq } from '@/components/landing/faq';
+import { FloatingWhatsApp } from '@/components/landing/floating-whatsapp';
 import { Footer } from '@/components/landing/footer';
 import { Garansi } from '@/components/landing/garansi';
 import { Hero } from '@/components/landing/hero';
@@ -58,6 +59,7 @@ export default function Landing() {
                     <Module />
                     <Faq />
                 </main>
+                <FloatingWhatsApp />
                 <Footer />
             </div>
         </>

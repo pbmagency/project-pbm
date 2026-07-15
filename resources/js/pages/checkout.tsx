@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAnalytics } from '@/hooks/use-analytics';
+import { FloatingWhatsApp } from '@/components/landing/floating-whatsapp';
 import { home } from '@/routes';
 
 interface CheckoutProps {
@@ -204,6 +205,8 @@ export default function Checkout({ price, originalPrice }: CheckoutProps) {
                     </div>
                 </div>
             </div>
+            
+            <FloatingWhatsApp />
         </>
     );
 }
