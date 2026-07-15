@@ -1,6 +1,11 @@
 @import 'tailwindcss';
-
 @import 'tw-animate-css';
+
+/* Prevent fonts from blocking initial render */
+@layer base {
+    @font-face { font-family: 'Instrument Sans'; font-display: swap; }
+    @font-face { font-family: 'Space Grotesk'; font-display: swap; }
+}
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

@@ -32,7 +32,7 @@ class OrderConfirmationMail extends Mailable implements ShouldQueue
                 'eventDate' => 'TBA', // Update this with actual event date
                 'eventVenue' => 'Online via Zoom',
                 'waGroupUrl' => 'https://chat.whatsapp.com/PLACEHOLDER',
-                'ebookUrl' => config('app.url') . '/ebook',
+                'ebookUrl' => config('app.url') . '/PBM_Ebook_Boncos.pdf',
                 'calendarUrl' => $this->buildCalendarUrl(),
             ],
         );

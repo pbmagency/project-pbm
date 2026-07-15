@@ -59,7 +59,7 @@
         <hr class="divider">
         <p style="font-size:14px; color:#374151; line-height:1.6;">
             Ada pertanyaan? Hubungi kami melalui WhatsApp di
-            <a href="https://wa.me/628XXXXXXXXXX" style="color:#2563eb;">628XXXXXXXXXX</a>
+            <a href="https://wa.me/6285931018333" style="color:#2563eb;">6285931018333</a>
             atau balas email ini.
         </p>
     </div>
