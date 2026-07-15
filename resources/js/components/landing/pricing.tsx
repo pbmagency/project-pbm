@@ -25,8 +25,8 @@ export function Pricing() {
         phone: '',
     });
 
-    const handleFirstTyping = (value: string) => {
-        if (!hasTrackedIntent.current && value.trim() !== '') {
+    const handleBlur = () => {
+        if (!hasTrackedIntent.current && data.name.trim() !== '' && data.email.trim() !== '' && data.phone.trim() !== '') {
             hasTrackedIntent.current = true;
             trackInitiateCheckout('pricing_form');
         }
@@ -41,12 +41,6 @@ export function Pricing() {
         post('/checkout', {
             preserveScroll: true,
             onSuccess: (page) => {
-                // NOTE: this callback never actually fires. CheckoutController::store()
-                // responds with Inertia::location(), which Inertia's client intercepts
-                // via a raw window.location redirect before resolving as a normal
-                // "success" visit — onSuccess/onError never run for this request.
-                // 'conversion' tracking happens server-side in store() instead, where
-                // it's guaranteed to execute regardless of what the client does next.
                 const redirectUrl = (page.props as { redirect_url?: string }).redirect_url;
                 if (redirectUrl) {
                     window.location.href = redirectUrl;
@@ -148,7 +142,7 @@ export function Pricing() {
                                             type="text"
                                             value={data.name}
                                             onChange={(e) => setData('name', e.target.value)}
-                                            onBlur={(e) => handleFirstTyping(e.target.value)}
+                                            onBlur={handleBlur}
                                             placeholder="Nama Lengkap"
                                             className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
                                         />
@@ -165,7 +159,7 @@ export function Pricing() {
                                             type="email"
                                             value={data.email}
                                             onChange={(e) => setData('email', e.target.value)}
-                                            onBlur={(e) => handleFirstTyping(e.target.value)}
+                                            onBlur={handleBlur}
                                             placeholder="Email"
                                             className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
                                         />
@@ -182,7 +176,7 @@ export function Pricing() {
                                             type="tel"
                                             value={data.phone}
                                             onChange={(e) => setData('phone', e.target.value)}
-                                            onBlur={(e) => handleFirstTyping(e.target.value)}
+                                            onBlur={handleBlur}
                                             placeholder="Nomor WhatsApp"
                                             className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
                                         />
