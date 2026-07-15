@@ -16,13 +16,6 @@ const ID_MONTHS = [
     'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'
 ];
 
-// Generate times from 00:00 to 23:30 in 30-minute increments
-const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
-    const hours = Math.floor(i / 2).toString().padStart(2, '0');
-    const minutes = i % 2 === 0 ? '00' : '30';
-    return `${hours}:${minutes}`;
-});
-
 function formatDateToIndonesian(dateString: string) {
     if (!dateString) return '';
     const [year, month, day] = dateString.split('-');
@@ -43,18 +36,42 @@ function parseIndonesianDateToISO(indoDate: string) {
     return `${year}-${month}-${day}`;
 }
 
+// Convert "19:00" to "07:00 PM"
+function formatTimeTo12Hour(time: string) {
+    if (!time) return '';
+    let [hours, minutes] = time.split(':');
+    if (!hours || !minutes) return time;
+    let h = parseInt(hours, 10);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12;
+    h = h ? h : 12; // 0 becomes 12
+    return `${h.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+}
+
+// Convert "07:00 PM" to "19:00" (needed to populate the native time input)
+function parse12HourTo24Hour(timeStr: string) {
+    if (!timeStr) return '';
+    const match = timeStr.trim().match(/(\d{2}):(\d{2})\s*(AM|PM)/i);
+    if (!match) return timeStr.trim(); // fallback if already 24h
+    let h = parseInt(match[1], 10);
+    const m = match[2];
+    const ampm = match[3].toUpperCase();
+    if (ampm === 'PM' && h < 12) h += 12;
+    if (ampm === 'AM' && h === 12) h = 0;
+    return `${h.toString().padStart(2, '0')}:${m}`;
+}
+
 interface ConfigsProps {
     settings: Record<string, string>;
 }
 
 export default function Configs({ settings }: ConfigsProps) {
-    // Parse the stored time string (e.g., "19:00 - 20:30 WIB")
-    const initialTime = settings.event_time || '19:00 - 20:30 WIB';
-    const timeMatch = initialTime.match(/(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})\s*(.*)/);
+    // Parse the stored time string which could now be "07:00 PM - 08:30 PM"
+    const initialTime = settings.event_time || '07:00 PM - 08:30 PM';
+    const [startPart, endPart] = initialTime.split('-').map(s => s.trim());
     
-    const initialStart = timeMatch ? timeMatch[1] : '19:00';
-    const initialEnd = timeMatch ? timeMatch[2] : '20:30';
-    const initialSuffix = timeMatch && timeMatch[3] ? timeMatch[3] : 'WIB';
+    const initialStart = parse12HourTo24Hour(startPart || '19:00');
+    const initialEnd = parse12HourTo24Hour(endPart || '20:30');
 
     // Parse the stored date string (e.g., "16 JULI 2026") into YYYY-MM-DD
     const initialDateISO = settings.event_date ? parseIndonesianDateToISO(settings.event_date) : '';
@@ -65,7 +82,6 @@ export default function Configs({ settings }: ConfigsProps) {
         raw_date: initialDateISO, // Bound to the actual date picker
         start_time: initialStart,
         end_time: initialEnd,
-        time_suffix: initialSuffix,
         zoom_link: settings.zoom_link || '',
         wa_group_link: settings.wa_group_link || '',
     });
@@ -73,10 +89,10 @@ export default function Configs({ settings }: ConfigsProps) {
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        // Transform the separated/raw values back into the format the backend/frontend expects
+        // Transform values to standard Indonesian date and 12-hour AM/PM time
         transform((data) => ({
             event_date: formatDateToIndonesian(data.raw_date),
-            event_time: `${data.start_time} - ${data.end_time} ${data.time_suffix}`,
+            event_time: `${formatTimeTo12Hour(data.start_time)} - ${formatTimeTo12Hour(data.end_time)}`,
             zoom_link: data.zoom_link,
             wa_group_link: data.wa_group_link,
         }));
@@ -128,34 +144,21 @@ export default function Configs({ settings }: ConfigsProps) {
                             <div className="space-y-2">
                                 <Label>Event Time Range</Label>
                                 <div className="flex items-center gap-3">
-                                    <select
+                                    <Input
+                                        type="time"
                                         value={data.start_time}
                                         onChange={(e) => setData('start_time', e.target.value)}
-                                        className="flex h-10 w-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                                    >
-                                        {TIME_OPTIONS.map((time) => (
-                                            <option key={time} value={time}>{time}</option>
-                                        ))}
-                                    </select>
+                                        className="w-[140px]"
+                                        required
+                                    />
                                     <span className="text-sm font-medium text-muted-foreground">to</span>
-                                    <select
+                                    <Input
+                                        type="time"
                                         value={data.end_time}
                                         onChange={(e) => setData('end_time', e.target.value)}
-                                        className="flex h-10 w-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                                    >
-                                        {TIME_OPTIONS.map((time) => (
-                                            <option key={time} value={time}>{time}</option>
-                                        ))}
-                                    </select>
-                                    <select
-                                        value={data.time_suffix}
-                                        onChange={(e) => setData('time_suffix', e.target.value)}
-                                        className="flex h-10 w-[90px] rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                                    >
-                                        <option value="WIB">WIB</option>
-                                        <option value="WITA">WITA</option>
-                                        <option value="WIT">WIT</option>
-                                    </select>
+                                        className="w-[140px]"
+                                        required
+                                    />
                                 </div>
                                 {errors.event_time && (
                                     <p className="text-sm text-destructive">{errors.event_time}</p>
