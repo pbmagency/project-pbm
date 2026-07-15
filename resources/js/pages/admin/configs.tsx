@@ -84,6 +84,7 @@ export default function Configs({ settings }: ConfigsProps) {
         end_time: initialEnd,
         zoom_link: settings.zoom_link || '',
         wa_group_link: settings.wa_group_link || '',
+        wa_support_number: settings.wa_support_number || '',
     });
 
     const submit = (e: React.FormEvent) => {
@@ -95,6 +96,7 @@ export default function Configs({ settings }: ConfigsProps) {
             event_time: `${formatTimeTo12Hour(data.start_time)} - ${formatTimeTo12Hour(data.end_time)}`,
             zoom_link: data.zoom_link,
             wa_group_link: data.wa_group_link,
+            wa_support_number: data.wa_support_number,
         }));
 
         post('/admin/configs', {
@@ -194,6 +196,21 @@ export default function Configs({ settings }: ConfigsProps) {
                                 />
                                 {errors.wa_group_link && (
                                     <p className="text-sm text-destructive">{errors.wa_group_link}</p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="wa_support_number">WhatsApp Support Number (Format: 628...)</Label>
+                                <Input
+                                    id="wa_support_number"
+                                    type="text"
+                                    value={data.wa_support_number}
+                                    onChange={(e) => setData('wa_support_number', e.target.value)}
+                                    placeholder="6285931018333"
+                                    className="w-full"
+                                />
+                                {errors.wa_support_number && (
+                                    <p className="text-sm text-destructive">{errors.wa_support_number}</p>
                                 )}
                             </div>
 

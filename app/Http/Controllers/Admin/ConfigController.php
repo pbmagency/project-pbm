@@ -25,6 +25,7 @@ class ConfigController extends Controller
             'event_time' => 'nullable|string|max:255',
             'zoom_link' => 'nullable|url|max:255',
             'wa_group_link' => 'nullable|url|max:255',
+            'wa_support_number' => 'nullable|string|max:255',
         ]);
 
         foreach ($data as $key => $value) {

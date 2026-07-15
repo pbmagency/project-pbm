@@ -61,6 +61,26 @@
                     </table>
                 </div>
 
+                @if($zoomLink)
+                <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
+                    <tr>
+                        <td align="center">
+                            <table cellpadding="0" cellspacing="0" style="width: 100%; max-width: 400px; font-size: 14px;">
+                                <tr>
+                                    <td style="padding: 10px 16px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; color: #64748b; font-weight: 600; text-align: center; width: 40%;">
+                                        Link Webinar:
+                                    </td>
+                                    <td style="width: 12px;"></td>
+                                    <td style="padding: 10px 16px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; text-align: center; width: 60%;">
+                                        <a href="{{ $zoomLink }}" style="color: #475569; text-decoration: none; word-break: break-all;">{{ $zoomLink }}</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                @endif
+
                 <p style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 16px 0; text-align: center;">Langkah Selanjutnya</p>
                 
                 <!-- Buttons stacked using tables for Gmail compatibility -->
@@ -71,16 +91,6 @@
                         </td>
                     </tr>
                 </table>
-
-                @if($zoomLink)
-                <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 8px;">
-                    <tr>
-                        <td align="center">
-                            <a href="{{ $zoomLink }}" style="display: inline-block; width: 100%; max-width: 300px; background-color: #2563eb; color: #ffffff; padding: 14px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; text-align: center;">📹 Link Zoom Webinar</a>
-                        </td>
-                    </tr>
-                </table>
-                @endif
 
                 <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 8px;">
                     <tr>
@@ -101,7 +111,7 @@
                 <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;">
                 
                 <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0; text-align: center;">
-                    Ada pertanyaan? Hubungi kami melalui WhatsApp di <a href="https://wa.me/6285931018333" style="color: #2563eb; text-decoration: none; font-weight: 600;">6285931018333</a><br>atau balas langsung email ini.
+                    Ada pertanyaan? Hubungi kami melalui WhatsApp di <a href="https://wa.me/{{ $waSupportNumber }}" style="color: #2563eb; text-decoration: none; font-weight: 600;">{{ $waSupportNumber }}</a><br>atau balas langsung email ini.
                 </p>
             </td>
         </tr>

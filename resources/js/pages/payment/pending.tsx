@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { ArrowLeft, Clock, MessageCircle } from 'lucide-react';
 import { home } from '@/routes';
 
@@ -7,10 +7,13 @@ interface PaymentPendingProps {
 }
 
 export default function PaymentPending({ order_number }: PaymentPendingProps) {
+    const { settings } = usePage<any>().props;
+    const waNumber = settings?.wa_support_number || '6285931018333';
+    
     const waText = encodeURIComponent(
         `Halo, saya sudah transfer untuk webinar The Silent Conversion Leak tapi status belum berubah. No. Order: ${order_number ?? '-'}`
     );
-    const WA_SUPPORT = `https://wa.me/6285931018333?text=${waText}`;
+    const WA_SUPPORT = `https://wa.me/${waNumber}?text=${waText}`;
 
     return (
         <>

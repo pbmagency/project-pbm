@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { AlertCircle, ArrowLeft, MessageCircle } from 'lucide-react';
 import { home } from '@/routes';
 
@@ -6,9 +6,11 @@ interface PaymentFailedProps {
     order_number?: string;
 }
 
-const WA_SUPPORT = 'https://wa.me/6285931018333?text=' + encodeURIComponent('Halo, saya mengalami masalah pembayaran untuk webinar The Silent Conversion Leak.');
-
 export default function PaymentFailed({ order_number }: PaymentFailedProps) {
+    const { settings } = usePage<any>().props;
+    const waNumber = settings?.wa_support_number || '6285931018333';
+    const WA_SUPPORT = `https://wa.me/${waNumber}?text=` + encodeURIComponent('Halo, saya mengalami masalah pembayaran untuk webinar The Silent Conversion Leak.');
+    
     return (
         <>
             <Head title="Pembayaran Gagal — The Silent Conversion Leak" />
