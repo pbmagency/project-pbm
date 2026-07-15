@@ -45,7 +45,7 @@ class PaymentCallbackController extends Controller
                     ]);
                 });
 
-                Mail::to($order->email)->queue(new OrderConfirmationMail($order));
+                Mail::to($order->email)->send(new OrderConfirmationMail($order));
 
                 $this->fireAnalytics($request, $order, $meta);
             } elseif ($result['status'] === 'failed') {
