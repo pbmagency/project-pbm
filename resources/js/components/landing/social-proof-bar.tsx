@@ -4,12 +4,11 @@
  */
 export function SocialProofBar() {
     const LOGOS = [
-        { id: 'brand-1', src: '/storage/brands/brand-1.png', alt: 'Brand 1' },
-        { id: 'brand-2', src: '/storage/brands/brand-2.png', alt: 'Brand 2' },
-        { id: 'brand-3', src: '/storage/brands/brand-3.png', alt: 'Brand 3' },
-        { id: 'brand-4', src: '/storage/brands/brand-4.png', alt: 'Brand 4' },
-        { id: 'brand-5', src: '/storage/brands/brand-5.png', alt: 'Brand 5' },
-        { id: 'brand-6', src: '/storage/brands/brand-6.png', alt: 'Brand 6' },
+        { id: 'brand-1', src: '/images/brands/brand1.webp', alt: 'Brand 1' },
+        { id: 'brand-2', src: '/images/brands/brand2.webp', alt: 'Brand 2' },
+        { id: 'brand-3', src: '/images/brands/brand3.webp', alt: 'Brand 3' },
+        { id: 'brand-4', src: '/images/brands/brand4.webp', alt: 'Brand 4' },
+        { id: 'brand-5', src: '/images/brands/brand5.webp', alt: 'Brand 5' },
     ];
 
     return (

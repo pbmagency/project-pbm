@@ -83,7 +83,7 @@ export function Solution() {
                         <div className="lp-gradient-border-inner lp-gradient-border aspect-square overflow-hidden rounded-[24px]">
                             {/* TODO: ganti src dengan URL poster webinar yang asli */}
                             <img
-                                src="https://placehold.co/600x600/0f0f1a/7c8cf8?text=Poster+Webinar"
+                                src="/images/poster/Poster.webp"
                                 alt="Poster Webinar The Silent Conversion Leak"
                                 className="h-full w-full object-cover"
                             />
