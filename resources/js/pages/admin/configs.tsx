@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,12 +11,37 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Configurations', href: '/admin/configs' },
 ];
 
+const ID_MONTHS = [
+    'JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI',
+    'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'
+];
+
+function formatDateToIndonesian(dateString: string) {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.split('-');
+    if (!year || !month || !day) return dateString;
+    const monthName = ID_MONTHS[parseInt(month, 10) - 1];
+    return `${parseInt(day, 10)} ${monthName} ${year}`;
+}
+
+function parseIndonesianDateToISO(indoDate: string) {
+    if (!indoDate) return '';
+    const parts = indoDate.split(' ');
+    if (parts.length !== 3) return '';
+    const day = parts[0].padStart(2, '0');
+    const monthIndex = ID_MONTHS.indexOf(parts[1].toUpperCase());
+    if (monthIndex === -1) return '';
+    const month = (monthIndex + 1).toString().padStart(2, '0');
+    const year = parts[2];
+    return `${year}-${month}-${day}`;
+}
+
 interface ConfigsProps {
     settings: Record<string, string>;
 }
 
 export default function Configs({ settings }: ConfigsProps) {
-    // Parse the stored time string (e.g., "19:00 - 20:30 WIB") to get start, end, and suffix
+    // Parse the stored time string (e.g., "19:00 - 20:30 WIB")
     const initialTime = settings.event_time || '19:00 - 20:30 WIB';
     const timeMatch = initialTime.match(/(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})\s*(.*)/);
     
@@ -24,11 +49,15 @@ export default function Configs({ settings }: ConfigsProps) {
     const initialEnd = timeMatch ? timeMatch[2] : '20:30';
     const initialSuffix = timeMatch && timeMatch[3] ? timeMatch[3] : 'WIB';
 
+    // Parse the stored date string (e.g., "16 JULI 2026") into YYYY-MM-DD
+    const initialDateISO = settings.event_date ? parseIndonesianDateToISO(settings.event_date) : '';
+
     const { data, setData, post, processing, errors, transform } = useForm({
-        event_date: settings.event_date || '',
+        event_date: '', // To avoid TS errors
+        event_time: '', // To avoid TS errors
+        raw_date: initialDateISO, // Bound to the actual date picker
         start_time: initialStart,
         end_time: initialEnd,
-        event_time: '',
         time_suffix: initialSuffix,
         zoom_link: settings.zoom_link || '',
         wa_group_link: settings.wa_group_link || '',
@@ -37,9 +66,9 @@ export default function Configs({ settings }: ConfigsProps) {
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        // Combine the start, end, and suffix back into the format the backend expects
+        // Transform the separated/raw values back into the format the backend/frontend expects
         transform((data) => ({
-            event_date: data.event_date,
+            event_date: formatDateToIndonesian(data.raw_date),
             event_time: `${data.start_time} - ${data.end_time} ${data.time_suffix}`,
             zoom_link: data.zoom_link,
             wa_group_link: data.wa_group_link,
@@ -75,14 +104,14 @@ export default function Configs({ settings }: ConfigsProps) {
 
                         <form onSubmit={submit} className="space-y-6">
                             <div className="space-y-2">
-                                <Label htmlFor="event_date">Event Date</Label>
+                                <Label htmlFor="raw_date">Event Date</Label>
                                 <Input
-                                    id="event_date"
-                                    type="text"
-                                    value={data.event_date}
-                                    onChange={(e) => setData('event_date', e.target.value)}
-                                    placeholder="e.g. 16 JULI 2026"
-                                    className="max-w-md"
+                                    id="raw_date"
+                                    type="date"
+                                    value={data.raw_date}
+                                    onChange={(e) => setData('raw_date', e.target.value)}
+                                    className="max-w-[200px]"
+                                    required
                                 />
                                 {errors.event_date && (
                                     <p className="text-sm text-destructive">{errors.event_date}</p>
