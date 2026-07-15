@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { AlertCircle, Check, Lock } from 'lucide-react';
 import { useRef } from 'react';
 import { CountdownTimer } from '@/components/landing/countdown-timer';
@@ -15,6 +15,7 @@ const INCLUDES = [
 
 export function Pricing() {
     const ref = useSectionView<HTMLElement>('pricing');
+    const { settings } = usePage<any>().props;
     const { trackInitiateCheckout } = useAnalytics();
     const hasTrackedIntent = useRef(false);
 
@@ -24,7 +25,7 @@ export function Pricing() {
         phone: '',
     });
 
-    const handleFirstChange = () => {
+    const handleFirstTyping = () => {
         if (!hasTrackedIntent.current) {
             hasTrackedIntent.current = true;
             trackInitiateCheckout('pricing_form');
@@ -40,12 +41,6 @@ export function Pricing() {
         post('/checkout', {
             preserveScroll: true,
             onSuccess: (page) => {
-                // NOTE: this callback never actually fires. CheckoutController::store()
-                // responds with Inertia::location(), which Inertia's client intercepts
-                // via a raw window.location redirect before resolving as a normal
-                // "success" visit — onSuccess/onError never run for this request.
-                // 'conversion' tracking happens server-side in store() instead, where
-                // it's guaranteed to execute regardless of what the client does next.
                 const redirectUrl = (page.props as { redirect_url?: string }).redirect_url;
                 if (redirectUrl) {
                     window.location.href = redirectUrl;
@@ -78,7 +73,19 @@ export function Pricing() {
                     <div className="absolute -inset-3 rounded-[28px] bg-gradient-to-br from-lp-primary via-lp-primary-2 to-lp-amber opacity-40 blur-2xl" />
 
                     <div className="lp-gradient-border-inner lp-gradient-border relative overflow-hidden rounded-[24px] bg-lp-bg-elevated shadow-[0_40px_80px_-20px_rgba(0,0,0,0.7)]">
-                        <div className="p-7 sm:p-9">
+                        <div className="border-b border-white/5 p-7 sm:p-9 pb-6">
+                            <h3 className="text-base font-bold text-lp-primary-2">
+                                Live Webinar: The Silent Conversion Leak
+                            </h3>
+                            <p className="mt-1.5 text-[14px] text-lp-text-muted">
+                                Online, Zoom Meeting
+                            </p>
+                            <p className="mt-0.5 text-[14px] text-lp-text-muted">
+                                {settings?.event_date || '16 JULI 2026'}, {settings?.event_time || '19:00 - 20:30 WIB'}
+                            </p>
+                        </div>
+
+                        <div className="p-7 pt-6 sm:p-9 sm:pt-6">
                             <p className="font-mono text-[11px] tracking-[0.16em] text-lp-text-dim uppercase">
                                 Yang Lo Dapatkan
                             </p>
@@ -136,7 +143,7 @@ export function Pricing() {
                                             value={data.name}
                                             onChange={(e) => {
                                                 setData('name', e.target.value);
-                                                handleFirstChange();
+                                                handleFirstTyping();
                                             }}
                                             placeholder="Nama Lengkap"
                                             className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
@@ -155,7 +162,7 @@ export function Pricing() {
                                             value={data.email}
                                             onChange={(e) => {
                                                 setData('email', e.target.value);
-                                                handleFirstChange();
+                                                handleFirstTyping();
                                             }}
                                             placeholder="Email"
                                             className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
@@ -174,7 +181,7 @@ export function Pricing() {
                                             value={data.phone}
                                             onChange={(e) => {
                                                 setData('phone', e.target.value);
-                                                handleFirstChange();
+                                                handleFirstTyping();
                                             }}
                                             placeholder="Nomor WhatsApp"
                                             className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
@@ -208,4 +215,3 @@ export function Pricing() {
         </section>
     );
 }
-

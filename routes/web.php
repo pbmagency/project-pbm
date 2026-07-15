@@ -15,6 +15,9 @@ Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.s
 Route::get('/payment/return', [CheckoutController::class, 'returnPage'])->name('payment.return');
 Route::post('/payment/callback', [PaymentCallbackController::class, 'handle'])->name('payment.callback')->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
+//configs
+Route::get('/configs', [\App\Http\Controllers\Admin\ConfigController::class, 'index'])->name('configs');
+Route::post('/configs', [\App\Http\Controllers\Admin\ConfigController::class, 'update'])->name('configs.update');
 Route::post('/analytics/track', [AnalyticsController::class, 'track'])->name('analytics.track');
 
 Route::middleware(['auth', 'verified'])->group(function () {

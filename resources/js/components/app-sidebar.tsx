@@ -6,6 +6,7 @@ import {
     LayoutGrid,
     LineChart,
     ShoppingCart,
+    Settings, // <-- Added this import right here!
 } from 'lucide-react';
 import OrderController from '@/actions/App/Http/Controllers/Admin/OrderController';
 import AnalyticsController from '@/actions/App/Http/Controllers/AnalyticsController';
@@ -60,6 +61,11 @@ export function AppSidebar() {
                     title: 'Orders',
                     href: OrderController.index(),
                     icon: ShoppingCart,
+                },
+                {
+                    title: 'Settings',
+                    href: '/admin/configs',
+                    icon: Settings,
                 },
               ]
             : []),

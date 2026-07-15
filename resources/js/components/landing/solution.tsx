@@ -1,3 +1,4 @@
+import { usePage } from '@inertiajs/react';
 import { Check } from 'lucide-react';
 import { CtaButton } from '@/components/landing/cta-button';
 import { useSectionView } from '@/hooks/use-section-view';
@@ -37,6 +38,7 @@ function ChecklistRow({
 
 export function Solution() {
     const ref = useSectionView<HTMLElement>('solution');
+    const { settings } = usePage<any>().props;
 
     return (
         <section
@@ -61,10 +63,10 @@ export function Solution() {
                 </h2>
 
                 <p className="mt-4 font-mono text-[13px] tracking-wide text-lp-text-dim">
-                    16 JULI 2026 &middot; LIVE VIA ZOOM
+                    {settings?.event_date || '16 JULI 2026'} &middot; LIVE VIA ZOOM
                 </p>
                 <p className="mt-2 font-mono text-[13px] tracking-wide text-lp-text-dim">
-                    19:00 - 20:30 WIB
+                    {settings?.event_time || '19:00 - 20:30 WIB'}
                 </p>
 
                 <p className="mx-auto mt-5 hidden max-w-[56ch] text-lg text-lp-text-muted md:block">

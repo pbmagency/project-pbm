@@ -28,9 +28,11 @@ class OrderConfirmationMail extends Mailable
             view: 'emails.order-confirmation',
             with: [
                 'order' => $this->order,
-                'eventDate' => 'TBA', // Update this with actual event date
+                'eventDate' => \App\Models\Setting::where('key', 'event_date')->value('value') ?? '16 JULI 2026',
+                'eventTime' => \App\Models\Setting::where('key', 'event_time')->value('value') ?? '19:00 - 20:30 WIB',
                 'eventVenue' => 'Online via Zoom',
-                'waGroupUrl' => 'https://chat.whatsapp.com/PLACEHOLDER',
+                'zoomLink' => \App\Models\Setting::where('key', 'zoom_link')->value('value'),
+                'waGroupUrl' => \App\Models\Setting::where('key', 'wa_group_link')->value('value') ?? 'https://chat.whatsapp.com/PLACEHOLDER',
                 'ebookUrl' => config('app.url') . '/PBM_Ebook_Boncos.pdf',
                 'calendarUrl' => $this->buildCalendarUrl(),
             ],

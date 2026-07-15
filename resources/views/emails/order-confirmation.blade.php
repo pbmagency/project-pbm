@@ -45,13 +45,16 @@
             <p><strong>Nama:</strong> {{ $order->name }}</p>
             <p><strong>Email:</strong> {{ $order->email }}</p>
             <p><strong>Total:</strong> Rp{{ number_format($order->amount, 0, ',', '.') }}</p>
-            <p><strong>Tanggal Event:</strong> {{ $eventDate }}</p>
+            <p><strong>Waktu Event:</strong> {{ $eventDate }} Pukul {{ $eventTime }}</p>
             <p><strong>Platform:</strong> {{ $eventVenue }}</p>
         </div>
 
         <p class="section-title">Langkah Selanjutnya</p>
         <div class="buttons">
             <a href="{{ $waGroupUrl }}" class="btn btn-green">💬 Bergabung WhatsApp Group</a>
+            @if($zoomLink)
+            <a href="{{ $zoomLink }}" class="btn btn-primary" style="background:#3b82f6;">📹 Link Zoom Webinar</a>
+            @endif
             <a href="{{ $ebookUrl }}" class="btn btn-primary">📥 Download Ebook Bonus</a>
             <a href="{{ $calendarUrl }}" class="btn btn-outline">📅 Tambahkan ke Google Calendar</a>
         </div>

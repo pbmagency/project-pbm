@@ -35,6 +35,12 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        try {
+            $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
+        } catch (\Exception $e) {
+            $settings = [];
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -42,6 +48,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'settings' => $settings, // <--- ADD THIS LINE
         ];
     }
 }
