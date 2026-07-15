@@ -16,15 +16,35 @@ interface ConfigsProps {
 }
 
 export default function Configs({ settings }: ConfigsProps) {
-    const { data, setData, post, processing, errors } = useForm({
+    // Parse the stored time string (e.g., "19:00 - 20:30 WIB") to get start, end, and suffix
+    const initialTime = settings.event_time || '19:00 - 20:30 WIB';
+    const timeMatch = initialTime.match(/(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})\s*(.*)/);
+    
+    const initialStart = timeMatch ? timeMatch[1] : '19:00';
+    const initialEnd = timeMatch ? timeMatch[2] : '20:30';
+    const initialSuffix = timeMatch && timeMatch[3] ? timeMatch[3] : 'WIB';
+
+    const { data, setData, post, processing, errors, transform } = useForm({
         event_date: settings.event_date || '',
-        event_time: settings.event_time || '',
+        start_time: initialStart,
+        end_time: initialEnd,
+        event_time: '',
+        time_suffix: initialSuffix,
         zoom_link: settings.zoom_link || '',
         wa_group_link: settings.wa_group_link || '',
     });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Combine the start, end, and suffix back into the format the backend expects
+        transform((data) => ({
+            event_date: data.event_date,
+            event_time: `${data.start_time} - ${data.end_time} ${data.time_suffix}`,
+            zoom_link: data.zoom_link,
+            wa_group_link: data.wa_group_link,
+        }));
+
         post('/admin/configs', {
             preserveScroll: true,
         });
@@ -70,15 +90,32 @@ export default function Configs({ settings }: ConfigsProps) {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="event_time">Event Time</Label>
-                                <Input
-                                    id="event_time"
-                                    type="text"
-                                    value={data.event_time}
-                                    onChange={(e) => setData('event_time', e.target.value)}
-                                    placeholder="e.g. 19:00 - 20:30 WIB"
-                                    className="max-w-md"
-                                />
+                                <Label>Event Time Range</Label>
+                                <div className="flex items-center gap-3">
+                                    <Input
+                                        type="time"
+                                        value={data.start_time}
+                                        onChange={(e) => setData('start_time', e.target.value)}
+                                        className="w-[140px]"
+                                        required
+                                    />
+                                    <span className="text-sm font-medium text-muted-foreground">to</span>
+                                    <Input
+                                        type="time"
+                                        value={data.end_time}
+                                        onChange={(e) => setData('end_time', e.target.value)}
+                                        className="w-[140px]"
+                                        required
+                                    />
+                                    <select
+                                        value={data.time_suffix}
+                                        onChange={(e) => setData('time_suffix', e.target.value)}
+                                        className="flex h-10 w-24 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                    >
+                                        <option value="AM">AM</option>
+                                        <option value="PM">PM</option>
+                                    </select>
+                                </div>
                                 {errors.event_time && (
                                     <p className="text-sm text-destructive">{errors.event_time}</p>
                                 )}
