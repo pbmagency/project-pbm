@@ -30,13 +30,12 @@ class AbTestingService
         $matrix = [];
         foreach ($counts as $source => $typeCounts) {
             $visits = $typeCounts['visit'] ?? 0;
-            $engaged = $typeCounts['engagement'] ?? 0;
             $initiateCheckouts = $typeCounts['initiate_checkout'] ?? 0;
             $leads = $typeCounts['conversion'] ?? 0;
             $payments = $typeCounts['payment'] ?? 0;
             $ctaClicks = $typeCounts['cta_click'] ?? 0;
 
-            $bounced = $bouncedBySource[$source] ?? ($visits - $engaged);
+            $bounced = $bouncedBySource[$source] ?? 0;
             $revenue = (float) ($revenueBySource[$source] ?? 0);
 
             $matrix[] = [
@@ -191,6 +190,7 @@ class AbTestingService
         $allSessions = $this->batchAllSessions($startDate, $endDate, $sourceFilter);
         $scrollDepths = $this->batchMaxScrollDepth($startDate, $endDate, $sourceFilter);
         $dwellTimes = $this->batchTotalDwellTime($startDate, $endDate, $sourceFilter);
+        $progressedSessions = $this->batchFunnelProgressedSessions($startDate, $endDate, $sourceFilter);
 
         $segmentation = [];
         foreach ($sources as $source) {
@@ -207,7 +207,15 @@ class AbTestingService
                 $depth = $scrollDepths[$sessionId] ?? 0;
                 $dwell = $dwellTimes[$sessionId] ?? 0;
 
-                if ($depth < 25 || $dwell < 15) {
+                // A session that clicked a CTA, started checkout, converted,
+                // or paid can never be a "Bouncer" — same fix as
+                // batchBouncedCounts() below. Raw scroll depth and dwell
+                // time alone (depth < 25 || dwell < 15) previously
+                // misclassified fast, high-intent converters — someone who
+                // fills the form and pays in 10 seconds without scrolling
+                // much — as bounced, despite them being the best possible
+                // outcome for this funnel.
+                if (! isset($progressedSessions[$sessionId]) && ($depth < 25 || $dwell < 15)) {
                     $personas['bouncers']++;
                 } elseif ($dwell > 120) {
                     $personas['deep_readers']++;
@@ -450,21 +458,34 @@ class AbTestingService
             ->whereRaw("json_extract(v.event_data, '$.landing_source') IS NOT NULL")
             ->whereRaw("json_extract(v.event_data, '$.landing_source') NOT IN ('', 'unknown')")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('v.referral_source', $sourceFilter))
-            ->where(function ($q) use ($startDate, $endDate) {
-                $q->whereNotExists(function ($sub) use ($startDate, $endDate) {
-                    $sub->from('user_analytics as e')
-                        ->whereColumn('e.session_id', 'v.session_id')
-                        ->where('e.event_type', 'engagement')
-                        ->whereRaw("json_extract(e.event_data, '$.type') = 'dwell_ping'")
-                        ->whereBetween('e.created_at', [$startDate, $endDate]);
-                })
-                    ->orWhereNotExists(function ($sub) use ($startDate, $endDate) {
-                        $sub->from('user_analytics as s')
-                            ->whereColumn('s.session_id', 'v.session_id')
-                            ->where('s.event_type', 'scroll')
-                            ->whereRaw("CAST(json_extract(s.event_data, '$.depth') AS DECIMAL(10,2)) >= 25")
-                            ->whereBetween('s.created_at', [$startDate, $endDate]);
-                    });
+            // Bounced = did NOTHING after landing: no dwell engagement, no
+            // meaningful scroll, and no funnel progression of any kind.
+            // Previously this required BOTH a dwell ping AND 25%+ scroll
+            // simultaneously to avoid being counted as bounced (an OR of
+            // NOT-EXISTS is, by De Morgan's law, an AND-required condition).
+            // That misclassified fast converters — anyone who filled the
+            // form and paid before the ~30s dwell-ping interval fired — as
+            // bounced, despite having just paid. Now a session only counts
+            // as bounced if it truly did nothing at all.
+            ->whereNotExists(function ($sub) use ($startDate, $endDate) {
+                $sub->from('user_analytics as e')
+                    ->whereColumn('e.session_id', 'v.session_id')
+                    ->where('e.event_type', 'engagement')
+                    ->whereRaw("json_extract(e.event_data, '$.type') = 'dwell_ping'")
+                    ->whereBetween('e.created_at', [$startDate, $endDate]);
+            })
+            ->whereNotExists(function ($sub) use ($startDate, $endDate) {
+                $sub->from('user_analytics as s')
+                    ->whereColumn('s.session_id', 'v.session_id')
+                    ->where('s.event_type', 'scroll')
+                    ->whereRaw("CAST(json_extract(s.event_data, '$.depth') AS DECIMAL(10,2)) >= 25")
+                    ->whereBetween('s.created_at', [$startDate, $endDate]);
+            })
+            ->whereNotExists(function ($sub) use ($startDate, $endDate) {
+                $sub->from('user_analytics as f')
+                    ->whereColumn('f.session_id', 'v.session_id')
+                    ->whereIn('f.event_type', ['cta_click', 'initiate_checkout', 'conversion', 'payment'])
+                    ->whereBetween('f.created_at', [$startDate, $endDate]);
             })
             ->groupBy(DB::raw("json_extract(v.event_data, '$.landing_source')"))
             ->get();
@@ -617,6 +638,25 @@ class AbTestingService
             ->get();
 
         return $rows->mapWithKeys(fn ($r) => [$r->session_id => (float) $r->total_ms / 1000])->all();
+    }
+
+    /**
+     * Session IDs that clicked a CTA, started checkout, converted, or paid —
+     * used to exclude high-intent sessions from bounce/bouncer
+     * classification regardless of their raw scroll/dwell numbers.
+     * Returns a flipped array (session_id as key) for O(1) isset() checks.
+     */
+    private function batchFunnelProgressedSessions(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
+    {
+        $sessionIds = DB::table('user_analytics')
+            ->select('session_id')
+            ->whereIn('event_type', ['cta_click', 'initiate_checkout', 'conversion', 'payment'])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
+            ->distinct()
+            ->pluck('session_id');
+
+        return $sessionIds->flip()->all();
     }
 
     private function getValidLandingSources(Carbon $startDate, Carbon $endDate, ?string $sourceFilter = null): Collection
