@@ -3,7 +3,7 @@ import { AlertCircle, Check, Lock } from 'lucide-react';
 import { useRef } from 'react';
 import { CountdownTimer } from '@/components/landing/countdown-timer';
 import { Eyebrow } from '@/components/landing/eyebrow';
-import { getLandingSource, useAnalytics } from '@/hooks/use-analytics';
+import { generateEventId, getLandingSource, useAnalytics } from '@/hooks/use-analytics';
 import { useSectionView } from '@/hooks/use-section-view';
 
 const INCLUDES = [
@@ -16,8 +16,11 @@ const INCLUDES = [
 export function Pricing() {
     const ref = useSectionView<HTMLElement>('pricing');
     const { settings } = usePage<any>().props;
+    const coursePrice = Number(import.meta.env.VITE_COURSE_PRICE ?? 129000);
     const { trackInitiateCheckout } = useAnalytics();
     const hasTrackedIntent = useRef(false);
+    // Generated once on first intent, shared with CAPI via meta_event_id for deduplication
+    const checkoutEventId = useRef<string>(generateEventId());
 
     const { data, setData, post, processing, errors, transform } = useForm({
         name: '',
@@ -34,14 +37,29 @@ export function Pricing() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Fire browser pixel BEFORE the Inertia post — Inertia::location() on the
+        // server side causes a full-page redirect, so onSuccess never runs.
+        // We fire synchronously here to guarantee the pixel fires before navigation.
+        // The same event_id is sent to the server (meta_event_id) so the CAPI
+        // InitiateCheckout call in CheckoutController can share it → proper dedup.
+        window.fbq?.(
+            'track',
+            'InitiateCheckout',
+            { value: coursePrice, currency: 'IDR' },
+            { eventID: checkoutEventId.current },
+        );
+
         transform((data) => ({
             ...data,
             landing_source: getLandingSource(),
+            meta_event_id: checkoutEventId.current,
         }));
         post('/checkout', {
             preserveScroll: true,
             onSuccess: (page) => {
-                const redirectUrl = (page.props as { redirect_url?: string }).redirect_url;
+                const redirectUrl = (page.props as { redirect_url?: string })
+                    .redirect_url;
                 if (redirectUrl) {
                     window.location.href = redirectUrl;
                 }
@@ -73,15 +91,16 @@ export function Pricing() {
                     <div className="absolute -inset-3 rounded-[28px] bg-gradient-to-br from-lp-primary via-lp-primary-2 to-lp-amber opacity-40 blur-2xl" />
 
                     <div className="lp-gradient-border-inner lp-gradient-border relative overflow-hidden rounded-[24px] bg-lp-bg-elevated shadow-[0_40px_80px_-20px_rgba(0,0,0,0.7)]">
-                        <div className="border-b border-white/5 p-7 sm:p-9 pb-6">
-                            <h3 className="text-base font-bold text-lp-primary-2">
-                                Live Webinar: The Silent Conversion Leak
+                        <div className="border-b border-white/5 p-7 pb-6 text-center sm:p-9">
+                            <h3 className="text-lg font-bold text-lp-primary">
+                                Webinar: The Silent Conversion Leak
                             </h3>
                             <p className="mt-1.5 text-[14px] text-lp-text-muted">
                                 Online, Zoom Meeting
                             </p>
                             <p className="mt-0.5 text-[14px] text-lp-text-muted">
-                                {settings?.event_date || '16 JULI 2026'}, {settings?.event_time || '19:00 - 20:30 WIB'}
+                                {settings?.event_date || '16 JULI 2026'},{' '}
+                                {settings?.event_time || '19:00 - 20:30 WIB'}
                             </p>
                         </div>
 
@@ -136,15 +155,24 @@ export function Pricing() {
                                     </div>
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="mt-7 space-y-3">
+                                <form
+                                    onSubmit={handleSubmit}
+                                    className="mt-7 space-y-3"
+                                >
                                     <div>
                                         <input
                                             type="text"
                                             value={data.name}
-                                            onChange={(e) => setData('name', e.target.value)}
-                                            onBlur={(e) => handleFirstTyping(e.target.value)}
+                                            onChange={(e) =>
+                                                setData('name', e.target.value)
+                                            }
+                                            onBlur={(e) =>
+                                                handleFirstTyping(
+                                                    e.target.value,
+                                                )
+                                            }
                                             placeholder="Nama Lengkap"
-                                            className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
+                                            className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 transition outline-none focus:border-white/70 focus:bg-white/20"
                                         />
                                         {errors.name && (
                                             <p className="mt-1 flex items-center gap-1 text-xs text-white/90">
@@ -158,10 +186,16 @@ export function Pricing() {
                                         <input
                                             type="email"
                                             value={data.email}
-                                            onChange={(e) => setData('email', e.target.value)}
-                                            onBlur={(e) => handleFirstTyping(e.target.value)}
+                                            onChange={(e) =>
+                                                setData('email', e.target.value)
+                                            }
+                                            onBlur={(e) =>
+                                                handleFirstTyping(
+                                                    e.target.value,
+                                                )
+                                            }
                                             placeholder="Email"
-                                            className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
+                                            className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 transition outline-none focus:border-white/70 focus:bg-white/20"
                                         />
                                         {errors.email && (
                                             <p className="mt-1 flex items-center gap-1 text-xs text-white/90">
@@ -175,10 +209,16 @@ export function Pricing() {
                                         <input
                                             type="tel"
                                             value={data.phone}
-                                            onChange={(e) => setData('phone', e.target.value)}
-                                            onBlur={(e) => handleFirstTyping(e.target.value)}
+                                            onChange={(e) =>
+                                                setData('phone', e.target.value)
+                                            }
+                                            onBlur={(e) =>
+                                                handleFirstTyping(
+                                                    e.target.value,
+                                                )
+                                            }
                                             placeholder="Nomor WhatsApp"
-                                            className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/70 focus:bg-white/20"
+                                            className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 transition outline-none focus:border-white/70 focus:bg-white/20"
                                         />
                                         {errors.phone && (
                                             <p className="mt-1 flex items-center gap-1 text-xs text-white/90">
@@ -193,13 +233,16 @@ export function Pricing() {
                                         disabled={processing}
                                         className="mt-1 w-full rounded-2xl bg-white px-8 py-4 text-base font-bold text-lp-primary-2 shadow-[0_16px_40px_-14px_rgba(255,255,255,0.55)] transition hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:opacity-70"
                                     >
-                                        {processing ? 'Memproses...' : 'Amankan Seat Saya'}
+                                        {processing
+                                            ? 'Memproses...'
+                                            : 'Amankan Seat Saya'}
                                     </button>
                                 </form>
 
                                 <p className="mt-3.5 flex items-center justify-center gap-1.5 text-xs text-white/80">
                                     <Lock className="h-3 w-3" />
-                                    Pembayaran aman, konfirmasi otomatis lewat email.
+                                    Pembayaran aman, konfirmasi otomatis lewat
+                                    email.
                                 </p>
                             </div>
                         </div>

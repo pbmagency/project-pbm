@@ -4,13 +4,13 @@ import { CtaButton } from '@/components/landing/cta-button';
 import { useSectionView } from '@/hooks/use-section-view';
 
 const AFTER_SESSION = [
-    'Diagnosa sendiri di bagian mana conversion lo benar benar bocor.',
+    'Diagnosa sendiri di bagian mana conversion kamu benar benar bocor.',
     'Tahu cara membenahi titik bocor itu, bukan sekadar tahu masalahnya.',
 ];
 
 const NO_MORE_WORRY = [
     'Budget iklan lebih efisien, gak lagi habis buat coba coba.',
-    'Lo bisa perbaiki dengan akurat, bukan nebak lagi. Jadi penjualan beneran naik',
+    'Kamu bisa perbaiki dengan akurat, bukan nebak lagi. Jadi penjualan beneran naik',
 ];
 
 function ChecklistRow({
@@ -63,7 +63,8 @@ export function Solution() {
                 </h2>
 
                 <p className="mt-4 font-mono text-[13px] tracking-wide text-lp-text-dim">
-                    {settings?.event_date || '16 JULI 2026'} &middot; LIVE VIA ZOOM
+                    {settings?.event_date || '16 JULI 2026'} &middot; LIVE VIA
+                    ZOOM
                 </p>
                 <p className="mt-2 font-mono text-[13px] tracking-wide text-lp-text-dim">
                     {settings?.event_time || '19:00 - 20:30 WIB'}
@@ -107,8 +108,8 @@ export function Solution() {
 
                         <div className="lp-gradient-border-inner lp-gradient-border mt-6 rounded-[18px] p-6 lp-glass">
                             <p className="mb-3.5 text-base font-bold text-lp-text">
-                                Sehingga lo gak perlu pusing lagi soal penjualan
-                                yang mahal:
+                                Sehingga kamu gak perlu pusing lagi soal
+                                penjualan yang mahal:
                             </p>
                             <div className="flex flex-col gap-3">
                                 {NO_MORE_WORRY.map((text) => (

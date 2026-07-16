@@ -68,9 +68,9 @@ export function Benefit() {
                     {/* <Eyebrow className="mx-auto">Yang Lo Dapatkan</Eyebrow> */}
 
                     <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-lp-text sm:text-4xl lg:text-5xl">
-                        Yang Lo Bawa Pulang{' '}
+                        Apa Saja Yang Kamu{' '}
                         <span className="bg-gradient-to-r from-lp-primary to-lp-primary-2 bg-clip-text text-transparent">
-                            dari Sesi Ini
+                            Dapatkan
                         </span>
                     </h2>
                     {/* <p className="mx-auto mt-5 max-w-[56ch] text-[16.5px] font-normal">

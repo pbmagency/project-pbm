@@ -70,9 +70,18 @@ class CheckoutController extends Controller
         // able to block the actual checkout/payment redirect. Losing a
         // tracking event is recoverable; losing a sale is not.
         try {
-            $eventId = 'conversion-' . $order->order_number;
+            // Prefer the browser-generated event_id (sent as meta_event_id) so the
+            // CAPI InitiateCheckout and the browser pixel share the same ID and
+            // Meta can deduplicate them into a single "Browser & Server" event.
+            // Fall back to a deterministic ID if the browser didn't send one.
+            $eventId = $request->input('meta_event_id') ?: ('conversion-' . $order->order_number);
 
-            $meta->sendInitiateCheckout($request, $eventId);
+            // Parse first/last name for CAPI — split on first whitespace
+            $nameParts = preg_split('/\s+/', trim($order->name ?? ''), 2);
+            $firstName = $nameParts[0] ?? null;
+            $lastName = $nameParts[1] ?? null;
+
+            $meta->sendInitiateCheckout($request, $eventId, $order->email, $order->phone, $firstName, $lastName);
 
             UserAnalytic::create([
                 'session_id' => $request->session()->getId(),
@@ -81,6 +90,7 @@ class CheckoutController extends Controller
                     'order_number' => $order->order_number,
                     'name' => $order->name,
                     'email' => $order->email,
+                    'phone' => $order->phone,
                     'landing_source' => $landingSource,
                     'event_id' => $eventId,
                     'timestamp' => now()->toISOString(),
@@ -116,6 +126,7 @@ class CheckoutController extends Controller
                 'order_number' => $order->order_number,
                 'name' => $order->name,
                 'email' => $order->email,
+                'phone' => $order->phone,
                 'amount' => $order->amount,
             ]]),
             'failed' => Inertia::render('payment/failed', ['order_number' => $order->order_number]),

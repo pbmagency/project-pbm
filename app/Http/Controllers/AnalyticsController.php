@@ -94,22 +94,23 @@ public function track(Request $request, MetaConversionService $metaService): Jso
 
         if ($validated['event_type'] === 'payment' && ($validated['event_data']['status'] ?? null) === 'success') {
             $email = $validated['event_data']['email'] ?? null;
+            $phone = $validated['event_data']['phone'] ?? null;
+            $name  = $validated['event_data']['name'] ?? null;
 
-            if (! $email) {
-                // The checkout form already collected this at the conversion
-                // step (see checkout.tsx) — fall back to it here rather than
-                // requiring whatever calls trackPayment() to re-supply it.
-                // ASSUMPTION: payment success is confirmed in the same browser
-                // session as checkout (e.g. gateway redirect back to a
-                // same-session "thank you" page). If payment is instead
-                // confirmed via a server-to-server webhook with no session,
-                // this lookup won't find anything — verify this before relying on it.
+            if (! $email || ! $phone) {
+                // The checkout form already collected PII at the conversion step —
+                // fall back to the most recent conversion event in this session.
+                // ASSUMPTION: payment success page loads in the same browser session
+                // as checkout (gateway redirect). Server-to-server callbacks use the
+                // webhook path (PaymentCallbackController) which already carries Order PII.
                 $conversionEvent = UserAnalytic::where('session_id', $request->session()->getId())
                     ->where('event_type', 'conversion')
                     ->latest('created_at')
                     ->first();
 
-                $email = $conversionEvent?->event_data['email'] ?? null;
+                $email ??= $conversionEvent?->event_data['email'] ?? null;
+                $phone ??= $conversionEvent?->event_data['phone'] ?? null;
+                $name  ??= $conversionEvent?->event_data['name'] ?? null;
             }
 
             if ($email) {
@@ -118,6 +119,8 @@ public function track(Request $request, MetaConversionService $metaService): Jso
                     $eventId,
                     (int) ($validated['event_data']['amount'] ?? 0),
                     $email,
+                    $phone,
+                    $name,
                 );
             } else {
                 // sendPurchase()'s $email param is non-nullable — calling it

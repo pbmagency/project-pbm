@@ -8,6 +8,7 @@ interface OrderData {
     order_number: string;
     name: string;
     email: string;
+    phone: string;
     amount: number;
 }
 
@@ -36,6 +37,8 @@ export default function PaymentSuccess({ order }: PaymentSuccessProps) {
             order_number: order.order_number,
             amount: order.amount,
             email: order.email,
+            phone: order.phone,
+            name: order.name,
             event_id: eventId,
         });
     }, []);

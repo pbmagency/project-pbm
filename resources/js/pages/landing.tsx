@@ -59,7 +59,7 @@ export default function Landing() {
                     <Module />
                     <Faq />
                 </main>
-                <FloatingWhatsApp />
+                {/* <FloatingWhatsApp /> */}
                 <Footer />
             </div>
         </>

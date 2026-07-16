@@ -14,9 +14,11 @@ class CheckoutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'phone' => ['required', 'string', 'max:20'],
+            'name'           => ['required', 'string', 'max:255'],
+            'email'          => ['required', 'email', 'max:255'],
+            'phone'          => ['required', 'string', 'max:20'],
+            'landing_source' => ['nullable', 'string', 'max:255'],
+            'meta_event_id'  => ['nullable', 'string', 'max:255'],
         ];
     }
 

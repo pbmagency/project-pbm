@@ -140,12 +140,12 @@ export default function Analytics({
                                 icon={MousePointerClick}
                                 description={`${stats.cta_clicks} CTA clicks`}
                             />
-                                <MetricCard
-                        title="Add to Cart Rate"
-                        value={`${stats.add_to_cart_rate}%`}
-                        icon={ShoppingCart}
-                        description={`${stats.cta_clicks} add to cart clicks`}
-                    />
+                            <MetricCard
+                                title="Add to Cart Rate"
+                                value={`${stats.add_to_cart_rate}%`}
+                                icon={ShoppingCart}
+                                description={`${stats.add_to_cart} add to cart clicks`}
+                            />
                             <MetricCard
                                 title="Conversion Rate"
                                 value={`${stats.conversion_rate}%`}

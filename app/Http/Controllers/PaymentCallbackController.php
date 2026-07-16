@@ -64,8 +64,8 @@ class PaymentCallbackController extends Controller
     {
         $eventId = 'purchase-' . $order->order_number;
 
-        // Server-side Meta CAPI Purchase event
-        $meta->sendPurchase($request, $eventId, $order->amount, $order->email);
+        // Server-side Meta CAPI Purchase event — include all PII for EMQ score
+        $meta->sendPurchase($request, $eventId, $order->amount, $order->email, $order->phone, $order->name);
 
         // Internal analytics
         // landing_source comes from the 'conversion' event created in
