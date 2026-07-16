@@ -30,7 +30,7 @@ export default function Landing() {
 
     return (
         <>
-            <Head title="The Silent Conversion Leak, Webinar oleh Justin Wijaya">
+            <Head title="2X Konversi Anda | Webinar The Silent Conversion Leak">
                 <meta
                     name="description"
                     content="CTR bagus, CPC oke, tapi kenapa closing kamu masih flat? Webinar berbayar bersama Justin Wijaya, PBM Agency, membedah persis di mana funnel kamu bocor."

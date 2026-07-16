@@ -12,20 +12,12 @@ createInertiaApp({
     title: (title) => (title ? `${title}` : appName),
     layout: (name) => {
         switch (true) {
-            case name === 'welcome':
-            case name === 'landing':
-            case name === 'checkout':
-            case name.startsWith('payment/'):
-            case name.startsWith('admin/'):
-                // Public marketing pages render with no chrome; admin pages
-                // wrap themselves in AdminLayout already.
-                return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
             case name.startsWith('settings/'):
                 return [AppLayout, SettingsLayout];
             default:
-                return AppLayout;
+                return null;
         }
     },
     strictMode: true,

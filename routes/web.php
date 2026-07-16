@@ -4,10 +4,16 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\LabsController;
+use App\Http\Controllers\MiniAuditController;
 use App\Http\Controllers\PaymentCallbackController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'landing')->name('home');
+
+// mini-audit
+Route::get('/mini-audit', [MiniAuditController::class, 'create'])->name('mini-audit');
+Route::post('/mini-audit', [MiniAuditController::class, 'store'])->name('mini-audit.store');
+Route::get('/self-audit-checklist', [MiniAuditController::class, 'selfAuditChecklist'])->name('self-audit-checklist');
 
 // Checkout & payment
 Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout');
@@ -38,4 +44,4 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::post('/configs', [\App\Http\Controllers\Admin\ConfigController::class, 'update'])->name('configs.update');
 });
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';
