@@ -11,11 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SERVER_IP: "72.61.142.238"
-      SERVER_USER: "root"
-      TARGET_DIR_LARAVEL: "/home/pbmagency.id/laravel-sub3"
-      TARGET_DIR_PUBLIC: "/home/pbmagency.id/sub3"
-      DOMAIN_USERNAME: "pbmag2242"
+      SERVER_IP: '72.61.142.238'
+      SERVER_USER: 'root'
+      TARGET_DIR_LARAVEL: '/home/pbmagency.id/laravel'
+      TARGET_DIR_PUBLIC: '/home/pbmagency.id/public_html'
+      DOMAIN_USERNAME: 'pbmag2242'
 
     steps:
       - name: Checkout Code
@@ -24,7 +24,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.4"
+          php-version: '8.4'
 
       - name: Install Composer Dependencies
         run: |
@@ -33,7 +33,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
 
       - name: Install NPM & Build Inertia React
         run: |
