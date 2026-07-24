@@ -17,10 +17,13 @@ class MetaConversionService
 
     private string $accessToken;
 
+    private ?string $testEventCode;
+
     public function __construct()
     {
         $this->pixelId = config('services.meta.pixel_id', '');
         $this->accessToken = config('services.meta.access_token', '');
+        $this->testEventCode = config('services.meta.test_event_code');
 
         if ($this->isConfigured()) {
             Api::init(null, null, $this->accessToken, false);
@@ -285,13 +288,21 @@ class MetaConversionService
     private function sendEvents(array $events): void
     {
         try {
-            $response = (new EventRequest($this->pixelId))
-                ->setEvents($events)
-                ->execute();
+            $request = (new EventRequest($this->pixelId))
+                ->setEvents($events);
+
+            // Attach test event code when set — makes events appear in
+            // Meta Events Manager → Test Events tab instead of production.
+            if ($this->testEventCode) {
+                $request->setTestEventCode($this->testEventCode);
+            }
+
+            $response = $request->execute();
 
             Log::debug('Meta CAPI response', [
                 'events_received' => $response->getEventsReceived(),
                 'messages' => $response->getMessages(),
+                'test_event_code' => $this->testEventCode,
             ]);
         } catch (\Throwable $e) {
             Log::warning('Meta CAPI request failed', [
