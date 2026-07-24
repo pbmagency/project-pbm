@@ -2,13 +2,8 @@
 
 namespace App\Services;
 
-use FacebookAds\Api;
-use FacebookAds\Object\ServerSide\ActionSource;
-use FacebookAds\Object\ServerSide\CustomData;
-use FacebookAds\Object\ServerSide\Event;
-use FacebookAds\Object\ServerSide\EventRequest;
-use FacebookAds\Object\ServerSide\UserData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class MetaConversionService
@@ -19,15 +14,14 @@ class MetaConversionService
 
     private ?string $testEventCode;
 
+    /** Meta CAPI Graph API version */
+    private const API_VERSION = 'v22.0';
+
     public function __construct()
     {
         $this->pixelId = config('services.meta.pixel_id', '');
         $this->accessToken = config('services.meta.access_token', '');
-        $this->testEventCode = config('services.meta.test_event_code');
-
-        if ($this->isConfigured()) {
-            Api::init(null, null, $this->accessToken, false);
-        }
+        $this->testEventCode = config('services.meta.test_event_code') ?: null;
     }
 
     /**
@@ -48,15 +42,14 @@ class MetaConversionService
             return;
         }
 
-        $event = (new Event)
-            ->setEventName('PageView')
-            ->setEventTime(time())
-            ->setEventId($eventId)
-            ->setEventSourceUrl($request->header('Referer', $request->url()))
-            ->setActionSource(ActionSource::WEBSITE)
-            ->setUserData($this->buildUserData($request));
-
-        $this->sendEvents([$event]);
+        $this->sendEvents([
+            $this->buildEvent(
+                eventName: 'PageView',
+                eventId: $eventId,
+                sourceUrl: $request->header('Referer', $request->url()),
+                userData: $this->buildUserData($request),
+            ),
+        ]);
     }
 
     /**
@@ -69,24 +62,15 @@ class MetaConversionService
             return;
         }
 
-        $customData = (new CustomData)
-            ->setContentName('The Silent Conversion Leak')
-            ->setContentType('product')
-            ->setContentIds(['webinar-scl'])
-            ->setNumItems(1)
-            ->setValue((float) config('services.meta.course_price', 129000))
-            ->setCurrency('IDR');
-
-        $event = (new Event)
-            ->setEventName('AddToCart')
-            ->setEventTime(time())
-            ->setEventId($eventId)
-            ->setEventSourceUrl($request->header('Referer', $request->url()))
-            ->setActionSource(ActionSource::WEBSITE)
-            ->setUserData($this->buildUserData($request))
-            ->setCustomData($customData);
-
-        $this->sendEvents([$event]);
+        $this->sendEvents([
+            $this->buildEvent(
+                eventName: 'AddToCart',
+                eventId: $eventId,
+                sourceUrl: $request->header('Referer', $request->url()),
+                userData: $this->buildUserData($request),
+                customData: $this->buildProductCustomData((float) config('services.meta.course_price', 129000)),
+            ),
+        ]);
     }
 
     /**
@@ -105,24 +89,15 @@ class MetaConversionService
             return;
         }
 
-        $customData = (new CustomData)
-            ->setContentName('The Silent Conversion Leak')
-            ->setContentType('product')
-            ->setContentIds(['webinar-scl'])
-            ->setNumItems(1)
-            ->setValue((float) config('services.meta.course_price', 129000))
-            ->setCurrency('IDR');
-
-        $event = (new Event)
-            ->setEventName('InitiateCheckout')
-            ->setEventTime(time())
-            ->setEventId($eventId)
-            ->setEventSourceUrl($request->header('Referer', $request->url()))
-            ->setActionSource(ActionSource::WEBSITE)
-            ->setUserData($this->buildUserData($request, $email, $phone, $firstName, $lastName))
-            ->setCustomData($customData);
-
-        $this->sendEvents([$event]);
+        $this->sendEvents([
+            $this->buildEvent(
+                eventName: 'InitiateCheckout',
+                eventId: $eventId,
+                sourceUrl: $request->header('Referer', $request->url()),
+                userData: $this->buildUserData($request, $email, $phone, $firstName, $lastName),
+                customData: $this->buildProductCustomData((float) config('services.meta.course_price', 129000)),
+            ),
+        ]);
     }
 
     /**
@@ -147,37 +122,60 @@ class MetaConversionService
 
         [$firstName, $lastName] = $this->splitName($name);
 
-        $customData = (new CustomData)
-            ->setContentName('The Silent Conversion Leak')
-            ->setContentType('product')
-            ->setContentIds(['webinar-scl'])
-            ->setNumItems(1)
-            ->setValue((float) $amount)
-            ->setCurrency('IDR');
+        $this->sendEvents([
+            $this->buildEvent(
+                eventName: 'Purchase',
+                eventId: $eventId,
+                sourceUrl: config('app.url'),
+                userData: $this->buildUserData($request, $email, $phone, $firstName, $lastName),
+                customData: $this->buildProductCustomData((float) $amount),
+            ),
+        ]);
+    }
 
-        $event = (new Event)
-            ->setEventName('Purchase')
-            ->setEventTime(time())
-            ->setEventId($eventId)
-            ->setEventSourceUrl(config('app.url'))
-            ->setActionSource(ActionSource::WEBSITE)
-            ->setUserData($this->buildUserData($request, $email, $phone, $firstName, $lastName))
-            ->setCustomData($customData);
+    // -------------------------------------------------------------------------
+    // Private helpers
+    // -------------------------------------------------------------------------
 
-        $this->sendEvents([$event]);
+    /**
+     * Build a single event array in Meta CAPI payload format.
+     *
+     * @param  array<string, mixed>  $userData
+     * @param  array<string, mixed>|null  $customData
+     * @return array<string, mixed>
+     */
+    private function buildEvent(
+        string $eventName,
+        string $eventId,
+        string $sourceUrl,
+        array $userData,
+        ?array $customData = null,
+    ): array {
+        $event = [
+            'event_name' => $eventName,
+            'event_time' => time(),
+            'event_id' => $eventId,
+            'event_source_url' => $sourceUrl,
+            'action_source' => 'website',
+            'user_data' => $userData,
+        ];
+
+        if ($customData !== null) {
+            $event['custom_data'] = $customData;
+        }
+
+        return $event;
     }
 
     /**
-     * Build UserData from the HTTP request with browser cookie matching.
-     *
-     * All PII fields are hashed with SHA-256. The Facebook Business SDK will
-     * hash them again if they appear to be plain-text, but we pre-hash here
-     * so we never send raw PII over the wire.
+     * Build the user_data array from the HTTP request.
+     * All PII fields are SHA-256 hashed before sending.
      *
      * @param  string|null  $email       Plain-text email address
      * @param  string|null  $phone       Plain-text phone (any local Indonesian format)
      * @param  string|null  $firstName   Plain-text first name
      * @param  string|null  $lastName    Plain-text last name
+     * @return array<string, mixed>
      */
     private function buildUserData(
         Request $request,
@@ -185,49 +183,110 @@ class MetaConversionService
         ?string $phone = null,
         ?string $firstName = null,
         ?string $lastName = null,
-    ): UserData {
-        $userData = (new UserData)
-            ->setClientIpAddress($request->ip())
-            ->setClientUserAgent($request->userAgent())
-            ->setCountry(hash('sha256', 'id')); // Indonesia — stable, boosts EMQ
+    ): array {
+        $userData = [
+            'client_ip_address' => $request->ip(),
+            'client_user_agent' => $request->userAgent(),
+            'country' => hash('sha256', 'id'), // Indonesia ISO code — boosts EMQ
+        ];
 
         // ----- Browser-signal cookies (from browser-originating requests) -----
         $fbp = $request->input('event_data._fbp') ?? $request->cookie('_fbp');
         if ($fbp) {
-            $userData->setFbp($fbp);
+            $userData['fbp'] = $fbp;
         }
 
         $fbc = $request->input('event_data._fbc') ?? $request->cookie('_fbc');
         if ($fbc) {
-            $userData->setFbc($fbc);
+            $userData['fbc'] = $fbc;
         }
 
         // ----- Deterministic PII (hashed before sending) -----
         if ($email) {
             $hashedEmail = hash('sha256', strtolower(trim($email)));
-            $userData->setEmail($hashedEmail);
+            $userData['em'] = $hashedEmail;
 
             // Stable cross-event identifier — allows Meta to stitch PageView →
             // AddToCart → Purchase for the same person into a single journey.
-            $userData->setExternalId(hash('sha256', strtolower(trim($email))));
+            $userData['external_id'] = $hashedEmail;
         }
 
         if ($phone) {
             $normalised = $this->normalizePhone($phone);
             if ($normalised) {
-                $userData->setPhone(hash('sha256', $normalised));
+                $userData['ph'] = hash('sha256', $normalised);
             }
         }
 
         if ($firstName) {
-            $userData->setFirstName(hash('sha256', strtolower(trim($firstName))));
+            $userData['fn'] = hash('sha256', strtolower(trim($firstName)));
         }
 
         if ($lastName) {
-            $userData->setLastName(hash('sha256', strtolower(trim($lastName))));
+            $userData['ln'] = hash('sha256', strtolower(trim($lastName)));
         }
 
         return $userData;
+    }
+
+    /**
+     * Build the custom_data payload for product events.
+     *
+     * @return array<string, mixed>
+     */
+    private function buildProductCustomData(float $value): array
+    {
+        return [
+            'content_name' => 'The Silent Conversion Leak',
+            'content_type' => 'product',
+            'content_ids' => ['webinar-scl'],
+            'num_items' => 1,
+            'value' => $value,
+            'currency' => 'IDR',
+        ];
+    }
+
+    /**
+     * Send events to Meta CAPI via Guzzle HTTP (bypasses the broken SDK).
+     *
+     * @param  array<array<string, mixed>>  $events
+     */
+    private function sendEvents(array $events): void
+    {
+        try {
+            $payload = ['data' => $events];
+
+            // Attach test event code when set — makes events appear in
+            // Meta Events Manager → Test Events tab instead of production.
+            if ($this->testEventCode) {
+                $payload['test_event_code'] = $this->testEventCode;
+            }
+
+            $url = sprintf(
+                'https://graph.facebook.com/%s/%s/events',
+                self::API_VERSION,
+                $this->pixelId,
+            );
+
+            $response = Http::withToken($this->accessToken)
+                ->post($url, $payload);
+
+            if ($response->successful()) {
+                Log::debug('Meta CAPI response', [
+                    'body' => $response->json(),
+                    'test_event_code' => $this->testEventCode,
+                ]);
+            } else {
+                Log::warning('Meta CAPI non-2xx response', [
+                    'status' => $response->status(),
+                    'body' => $response->json(),
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Meta CAPI request failed', [
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
@@ -280,34 +339,5 @@ class MetaConversionService
             $parts[0] ?? null,
             $parts[1] ?? null,
         ];
-    }
-
-    /**
-     * @param  array<Event>  $events
-     */
-    private function sendEvents(array $events): void
-    {
-        try {
-            $request = (new EventRequest($this->pixelId))
-                ->setEvents($events);
-
-            // Attach test event code when set — makes events appear in
-            // Meta Events Manager → Test Events tab instead of production.
-            if ($this->testEventCode) {
-                $request->setTestEventCode($this->testEventCode);
-            }
-
-            $response = $request->execute();
-
-            Log::debug('Meta CAPI response', [
-                'events_received' => $response->getEventsReceived(),
-                'messages' => $response->getMessages(),
-                'test_event_code' => $this->testEventCode,
-            ]);
-        } catch (\Throwable $e) {
-            Log::warning('Meta CAPI request failed', [
-                'error' => $e->getMessage(),
-            ]);
-        }
     }
 }

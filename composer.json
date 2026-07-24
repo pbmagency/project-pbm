@@ -11,7 +11,7 @@
     "require": {
         "php": "^8.3",
         "duitkupg/duitku-php": "dev-master",
-        "facebook/php-business-sdk": "^25.0",
+        "facebook/php-business-sdk": "25.0.3",
         "inertiajs/inertia-laravel": "^3.0",
         "laravel/chisel": "^0.1.0",
         "laravel/fortify": "^1.37.2",

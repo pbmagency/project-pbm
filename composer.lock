@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6c0fd8f06ca39f59a5d6eb418f35a0e7",
+    "content-hash": "4aecf9e5d5d713fcbc798cb2473589e0",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -737,16 +737,16 @@
         },
         {
             "name": "facebook/php-business-sdk",
-            "version": "25.0.2",
+            "version": "25.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facebook/facebook-php-business-sdk.git",
-                "reference": "d494fb6271690ebdcd651d8a975de9827e53bc43"
+                "reference": "11ba90ef3f00cdeeeb5a8bf6657979f5c8c63b59"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facebook/facebook-php-business-sdk/zipball/d494fb6271690ebdcd651d8a975de9827e53bc43",
-                "reference": "d494fb6271690ebdcd651d8a975de9827e53bc43",
+                "url": "https://api.github.com/repos/facebook/facebook-php-business-sdk/zipball/11ba90ef3f00cdeeeb5a8bf6657979f5c8c63b59",
+                "reference": "11ba90ef3f00cdeeeb5a8bf6657979f5c8c63b59",
                 "shasum": ""
             },
             "require": {
@@ -778,9 +778,9 @@
             ],
             "support": {
                 "issues": "https://github.com/facebook/facebook-php-business-sdk/issues",
-                "source": "https://github.com/facebook/facebook-php-business-sdk/tree/25.0.2"
+                "source": "https://github.com/facebook/facebook-php-business-sdk/tree/25.0.3"
             },
-            "time": "2026-06-08T20:29:52+00:00"
+            "time": "2026-07-17T16:35:02+00:00"
         },
         {
             "name": "fruitcake/php-cors",
@@ -11523,5 +11523,5 @@
         "php": "^8.3"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
