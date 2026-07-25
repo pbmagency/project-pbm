@@ -36,29 +36,23 @@ function parseIndonesianDateToISO(indoDate: string) {
     return `${year}-${month}-${day}`;
 }
 
-// Convert "19:00" to "07:00 PM"
-function formatTimeTo12Hour(time: string) {
-    if (!time) return '';
-    let [hours, minutes] = time.split(':');
-    if (!hours || !minutes) return time;
-    let h = parseInt(hours, 10);
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    h = h % 12;
-    h = h ? h : 12; // 0 becomes 12
-    return `${h.toString().padStart(2, '0')}:${minutes} ${ampm}`;
-}
-
-// Convert "07:00 PM" to "19:00" (needed to populate the native time input)
-function parse12HourTo24Hour(timeStr: string) {
+// Parse time string (12h or 24h) to "HH:mm" for native time input
+function parseTo24Hour(timeStr: string) {
     if (!timeStr) return '';
-    const match = timeStr.trim().match(/(\d{2}):(\d{2})\s*(AM|PM)/i);
-    if (!match) return timeStr.trim(); // fallback if already 24h
-    let h = parseInt(match[1], 10);
-    const m = match[2];
-    const ampm = match[3].toUpperCase();
-    if (ampm === 'PM' && h < 12) h += 12;
-    if (ampm === 'AM' && h === 12) h = 0;
-    return `${h.toString().padStart(2, '0')}:${m}`;
+    const match12 = timeStr.trim().match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+    if (match12) {
+        let h = parseInt(match12[1], 10);
+        const m = match12[2];
+        const ampm = match12[3].toUpperCase();
+        if (ampm === 'PM' && h < 12) h += 12;
+        if (ampm === 'AM' && h === 12) h = 0;
+        return `${h.toString().padStart(2, '0')}:${m}`;
+    }
+    const match24 = timeStr.trim().match(/(\d{1,2}):(\d{2})/);
+    if (match24) {
+        return `${match24[1].padStart(2, '0')}:${match24[2]}`;
+    }
+    return '';
 }
 
 interface ConfigsProps {
@@ -66,12 +60,12 @@ interface ConfigsProps {
 }
 
 export default function Configs({ settings }: ConfigsProps) {
-    // Parse the stored time string which could now be "07:00 PM - 08:30 PM"
-    const initialTime = settings.event_time || '07:00 PM - 08:30 PM';
+    // Parse the stored time string which could be "07:00 PM - 08:30 PM" or "19:00 - 20:30 WIB"
+    const initialTime = settings.event_time || '19:00 - 20:30 WIB';
     const [startPart, endPart] = initialTime.split('-').map(s => s.trim());
     
-    const initialStart = parse12HourTo24Hour(startPart || '19:00');
-    const initialEnd = parse12HourTo24Hour(endPart || '20:30');
+    const initialStart = parseTo24Hour(startPart || '19:00');
+    const initialEnd = parseTo24Hour(endPart || '20:30');
 
     // Parse the stored date string (e.g., "16 JULI 2026") into YYYY-MM-DD
     const initialDateISO = settings.event_date ? parseIndonesianDateToISO(settings.event_date) : '';
@@ -90,10 +84,10 @@ export default function Configs({ settings }: ConfigsProps) {
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        // Transform values to standard Indonesian date and 12-hour AM/PM time
+        // Transform values to standard Indonesian date and 24-hour WIB time
         transform((data) => ({
             event_date: formatDateToIndonesian(data.raw_date),
-            event_time: `${formatTimeTo12Hour(data.start_time)} - ${formatTimeTo12Hour(data.end_time)}`,
+            event_time: `${data.start_time} - ${data.end_time} WIB`,
             zoom_link: data.zoom_link,
             wa_group_link: data.wa_group_link,
             wa_support_number: data.wa_support_number,

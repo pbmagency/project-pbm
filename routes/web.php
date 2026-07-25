@@ -20,7 +20,8 @@ Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/payment/return', [CheckoutController::class, 'returnPage'])->name('payment.return');
 Route::post('/payment/callback', [PaymentCallbackController::class, 'handle'])->name('payment.callback')->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-
+Route::inertia('/terms', 'terms')->name('terms');
+Route::inertia('/refund', 'refund')->name('refund');
 Route::post('/analytics/track', [AnalyticsController::class, 'track'])->name('analytics.track');
 
 Route::middleware(['auth', 'verified'])->group(function () {
