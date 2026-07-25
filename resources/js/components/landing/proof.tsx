@@ -118,7 +118,7 @@ export function Proof() {
                             }}
                         >
                             <iframe
-                                src="https://player.mediadelivery.net/embed/701292/9145e91d-ca23-48fc-806c-92cb383e1771?autoplay=false&loop=false&muted=false&preload=true&responsive=true"
+                                src="https://player.mediadelivery.net/embed/701292/623975dd-1d66-41c8-8aac-07a07c141d21?autoplay=false&loop=false&muted=false&preload=true&responsive=true"
                                 loading="lazy"
                                 allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen;"
                                 allowFullScreen
