@@ -1,22 +1,24 @@
 import { Head } from '@inertiajs/react';
-import { useEffect } from 'react';
-import { Benefit } from '@/components/landing/benefit';
-import { Faq } from '@/components/landing/faq';
-import { FloatingWhatsApp } from '@/components/landing/floating-whatsapp';
-import { Footer } from '@/components/landing/footer';
-import { Garansi } from '@/components/landing/garansi';
-import { Hero } from '@/components/landing/hero';
-import { Mentor } from '@/components/landing/mentor';
-import { Module } from '@/components/landing/module';
+import { useEffect, Suspense, lazy } from 'react';
 import { Navbar } from '@/components/landing/navbar';
-import { Pricing } from '@/components/landing/pricing';
-import { Problem } from '@/components/landing/problem';
-import { Proof } from '@/components/landing/proof';
+import { Hero } from '@/components/landing/hero';
 import { SocialProofBar } from '@/components/landing/social-proof-bar';
-import { Solution } from '@/components/landing/solution';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { useDwellTime } from '@/hooks/use-dwell-time';
 import { useScrollTracking } from '@/hooks/use-scroll-tracking';
+
+// Lazy load everything below the fold!
+const Problem = lazy(() => import('@/components/landing/problem').then(m => ({ default: m.Problem })));
+const Solution = lazy(() => import('@/components/landing/solution').then(m => ({ default: m.Solution })));
+const Benefit = lazy(() => import('@/components/landing/benefit').then(m => ({ default: m.Benefit })));
+const Proof = lazy(() => import('@/components/landing/proof').then(m => ({ default: m.Proof })));
+const Mentor = lazy(() => import('@/components/landing/mentor').then(m => ({ default: m.Mentor })));
+const Pricing = lazy(() => import('@/components/landing/pricing').then(m => ({ default: m.Pricing })));
+const Garansi = lazy(() => import('@/components/landing/garansi').then(m => ({ default: m.Garansi })));
+const Module = lazy(() => import('@/components/landing/module').then(m => ({ default: m.Module })));
+const Faq = lazy(() => import('@/components/landing/faq').then(m => ({ default: m.Faq })));
+const Footer = lazy(() => import('@/components/landing/footer').then(m => ({ default: m.Footer })));
+const FloatingWhatsApp = lazy(() => import('@/components/landing/floating-whatsapp').then(m => ({ default: m.FloatingWhatsApp })));
 
 export default function Landing() {
     const { trackVisit } = useAnalytics();
@@ -30,7 +32,7 @@ export default function Landing() {
 
     return (
         <>
-            <Head title="2X Konversi Anda | Webinar The Silent Conversion Leak">
+            <Head title="The Silent Conversion Leak, Webinar oleh Justin Wijaya">
                 <meta
                     name="description"
                     content="CTR bagus, CPC oke, tapi kenapa closing kamu masih flat? Webinar berbayar bersama Justin Wijaya, PBM Agency, membedah persis di mana funnel kamu bocor."
@@ -48,19 +50,23 @@ export default function Landing() {
                 <main>
                     <Hero />
                     <SocialProofBar />
-                    {/* <QuickProof /> */}
-                    <Problem />
-                    <Solution />
-                    <Benefit />
-                    <Proof />
-                    <Mentor />
-                    <Pricing />
-                    <Garansi />
-                    <Module />
-                    <Faq />
+                    
+                    <Suspense fallback={<div className="min-h-[200px]" />}>
+                        <Problem />
+                        <Solution />
+                        <Benefit />
+                        <Proof />
+                        <Mentor />
+                        <Pricing />
+                        <Garansi />
+                        <Module />
+                        <Faq />
+                    </Suspense>
                 </main>
-                {/* <FloatingWhatsApp /> */}
-                <Footer />
+
+                <Suspense fallback={<div className="min-h-[100px]" />}>
+                    <Footer />
+                </Suspense>
             </div>
         </>
     );
