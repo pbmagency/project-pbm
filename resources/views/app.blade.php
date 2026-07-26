@@ -9,6 +9,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    {{-- Preload the LCP Hero Image for the landing page to boost score --}}
+    @if (request()->path() === '/' || request()->routeIs('landing') || request()->routeIs('welcome'))
+        <link rel="preload" as="image" href="/images/poster/Poster.webp" type="image/webp" fetchpriority="high">
+    @endif
+
     <script>
         let trackingLoaded = false;
         function loadTrackingScripts() {
