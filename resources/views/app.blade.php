@@ -9,51 +9,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    @if ($metaPixelId = config('services.meta.pixel_id'))
-        <script>
-            ! function(f, b, e, v, n, t, s) {
-                if (f.fbq) return;
-                n = f.fbq = function() {
-                    n.callMethod ?
-                        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
-                };
-                if (!f._fbq) f._fbq = n;
-                n.push = n;
-                n.loaded = !0;
-                n.version = '2.0';
-                n.queue = [];
-                // Delay loading the heavy FB script by 2.5 seconds
-                window.addEventListener('load', function() {
-                    setTimeout(function() {
-                        t = b.createElement(e);
-                        t.async = !0;
-                        t.src = v;
-                        s = b.getElementsByTagName(e)[0];
-                        s.parentNode.insertBefore(t, s)
-                    }, 2500);
-                });
-            }(window, document, 'script',
-                'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '{{ $metaPixelId }}');
-        </script>
-    @endif
+    <script>
+        let trackingLoaded = false;
+        function loadTrackingScripts() {
+            if (trackingLoaded) return;
+            trackingLoaded = true;
 
-    <script type="text/javascript">
-        // Delay loading Microsoft Clarity by 2.5 seconds
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                (function(c, l, a, r, i, t, y) {
-                    c[a] = c[a] || function() {
-                        (c[a].q = c[a].q || []).push(arguments)
-                    };
-                    t = l.createElement(r);
-                    t.async = 1;
-                    t.src = "https://www.clarity.ms/tag/" + i;
-                    y = l.getElementsByTagName(r)[0];
-                    y.parentNode.insertBefore(t, y);
-                })(window, document, "clarity", "script", "xnf0g1adw1");
-            }, 2500);
+            @if ($metaPixelId = config('services.meta.pixel_id'))
+                // Load FB Pixel
+                ! function(f, b, e, v, n, t, s) {
+                    if (f.fbq) return;
+                    n = f.fbq = function() { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments) };
+                    if (!f._fbq) f._fbq = n;
+                    n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = [];
+                    t = b.createElement(e); t.async = !0; t.src = v;
+                    s = b.getElementsByTagName(e)[0];
+                    s.parentNode.insertBefore(t, s)
+                }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+                fbq('init', '{{ $metaPixelId }}');
+            @endif
+
+            // Load Microsoft Clarity
+            (function(c, l, a, r, i, t, y) {
+                c[a] = c[a] || function() { (c[a].q = c[a].q || []).push(arguments) };
+                t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+                y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+            })(window, document, "clarity", "script", "xnf0g1adw1");
+        }
+
+        // Load scripts instantly when the user interacts with the page (scroll, click, mousemove, touch)
+        ['scroll', 'mousemove', 'touchstart', 'keydown', 'click'].forEach(function(e) {
+            window.addEventListener(e, loadTrackingScripts, { once: true, passive: true });
         });
+
+        // Fallback: If they do nothing for 6 seconds, load them anyway
+        setTimeout(loadTrackingScripts, 6000);
     </script>
 
     {{-- Inline script to detect system dark mode preference and apply it immediately --}}
