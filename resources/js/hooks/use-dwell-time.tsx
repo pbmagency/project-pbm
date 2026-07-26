@@ -11,7 +11,10 @@ export function useDwellTime() {
     const timeActive = useRef(0);
     const lastPingTime = useRef(0);
     const hasInitialTracked = useRef(false);
-    const isVisible = useRef(!document.hidden);
+    
+    // FIX: Safely check if document exists before accessing it
+    const isVisible = useRef(typeof document !== 'undefined' ? !document.hidden : true);
+    
     const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const sendPing = useCallback(
