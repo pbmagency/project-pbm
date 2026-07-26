@@ -83,11 +83,7 @@ export function Solution() {
                     <div className="w-full max-w-sm lg:max-w-none">
                         <div className="lp-gradient-border-inner lp-gradient-border aspect-square overflow-hidden rounded-[24px]">
                             {/* TODO: ganti src dengan URL poster webinar yang asli */}
-                            <img
-                                src="/images/poster/Poster.webp"
-                                alt="Poster Webinar The Silent Conversion Leak"
-                                className="h-full w-full object-cover"
-                            />
+                           <img alt="Poster Webinar The Silent Conversion Leak" className="h-full w-full object-cover" src="/images/poster/Poster.webp" sizes="(max-width: 768px) 100vw, 800px" fetchPriority="high" />
                             
                         </div>
                     </div>
