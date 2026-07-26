@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowRight, Expand, X, ZoomIn } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Eyebrow } from '@/components/landing/eyebrow';
 import { useSectionView } from '@/hooks/use-section-view';
 import { CtaButton } from '@/components/landing/cta-button';
@@ -63,11 +63,6 @@ function ImageCard({
                     </div>
                 </div>
             </button>
-            {/* <p
-                className={`text-center font-mono text-[11px] tracking-[0.14em] uppercase ${item.labelClass}`}
-            >
-                {item.label}
-            </p> */}
         </div>
     );
 }
@@ -76,6 +71,18 @@ export function Proof() {
     const ref = useSectionView<HTMLElement>('proof');
     const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
     const [lightboxAlt, setLightboxAlt] = useState<string>('');
+
+    // --- We wait for the user to interact before loading the video ---
+    const [loadVideo, setLoadVideo] = useState(false);
+    useEffect(() => {
+        const handleInteraction = () => setLoadVideo(true);
+        ['scroll', 'mousemove', 'touchstart', 'keydown', 'click'].forEach(e => 
+            window.addEventListener(e, handleInteraction, { once: true, passive: true })
+        );
+        const timer = setTimeout(handleInteraction, 6000); // Fallback
+        return () => clearTimeout(timer);
+    }, []);
+    // -----------------------------------------------------------------
 
     const openLightbox = (src: string, alt: string) => {
         setLightboxSrc(src);
@@ -111,25 +118,27 @@ export function Proof() {
 
                     <div className="lp-gradient-border-inner lp-gradient-border mt-7 overflow-hidden rounded-[22px] bg-lp-bg-elevated/70 p-3 backdrop-blur-sm">
                         <div
-                            className="overflow-hidden rounded-[14px]"
+                            className="overflow-hidden rounded-[14px] bg-black/10"
                             style={{
                                 position: 'relative',
                                 paddingTop: '56.25%',
                             }}
                         >
-                            <iframe
-                                src="https://player.mediadelivery.net/embed/701292/623975dd-1d66-41c8-8aac-07a07c141d21?autoplay=false&loop=false&muted=false&preload=true&responsive=true"
-                                loading="lazy"
-                                allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen;"
-                                allowFullScreen
-                                style={{
-                                    border: 0,
-                                    position: 'absolute',
-                                    top: 0,
-                                    height: '100%',
-                                    width: '100%',
-                                }}
-                            />
+                            {/* We wrap the heavy iframe in our new variable! */}
+                            {loadVideo && (
+                                <iframe
+                                    src="https://player.mediadelivery.net/embed/701292/623975dd-1d66-41c8-8aac-07a07c141d21?autoplay=false&loop=false&muted=false&preload=true&responsive=true"
+                                    allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen;"
+                                    allowFullScreen
+                                    style={{
+                                        border: 0,
+                                        position: 'absolute',
+                                        top: 0,
+                                        height: '100%',
+                                        width: '100%',
+                                    }}
+                                />
+                            )}
                         </div>
                     </div>
                     <p className="mt-3 text-center text-sm tracking-[0.15em] text-lp-text">
@@ -215,37 +224,6 @@ export function Proof() {
                         </button>
                     </div>
 
-                    {/* <div className="lp-gradient-border-inner lp-gradient-border mt-5 rounded-[24px] bg-lp-bg-elevated/70 p-5 backdrop-blur-sm sm:p-7">
-                        <p className="font-mono text-[11.5px] tracking-[0.15em] text-lp-text-dim uppercase">
-                            Studi Kasus &middot;
-                        </p>
-
-                        <div className="mt-7 flex flex-wrap justify-center gap-3">
-                            {STATS.map((stat) => (
-                                <div
-                                    key={stat.label}
-                                    className={
-                                        stat.highlight
-                                            ? 'relative flex-1 basis-[140px] overflow-hidden rounded-[16px] border border-lp-primary/60 bg-gradient-to-br from-lp-primary/25 to-lp-primary-2/15 p-4 text-center font-mono lp-glow'
-                                            : 'flex-1 basis-[140px] rounded-[16px] border border-lp-border bg-lp-bg/60 p-4 text-center font-mono'
-                                    }
-                                >
-                                    <div className="text-[11px] tracking-[0.14em] text-lp-text-dim uppercase">
-                                        {stat.label}
-                                    </div>
-                                    <div
-                                        className={
-                                            stat.highlight
-                                                ? 'mt-1.5 bg-gradient-to-br from-white to-lp-primary-ink bg-clip-text font-display text-3xl font-extrabold text-transparent'
-                                                : 'mt-1.5 font-display text-2xl font-bold text-lp-text'
-                                        }
-                                    >
-                                        {stat.value}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div> */}
                     <div className="mt-8 flex flex-col items-center gap-4 lg:items-center">
                         <CtaButton location="solution_primary" showTrustBadges>
                             Amankan Seat Saya
