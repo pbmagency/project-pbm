@@ -22,11 +22,16 @@
                 n.loaded = !0;
                 n.version = '2.0';
                 n.queue = [];
-                t = b.createElement(e);
-                t.async = !0;
-                t.src = v;
-                s = b.getElementsByTagName(e)[0];
-                s.parentNode.insertBefore(t, s)
+                // Delay loading the heavy FB script by 2.5 seconds
+                window.addEventListener('load', function() {
+                    setTimeout(function() {
+                        t = b.createElement(e);
+                        t.async = !0;
+                        t.src = v;
+                        s = b.getElementsByTagName(e)[0];
+                        s.parentNode.insertBefore(t, s)
+                    }, 2500);
+                });
             }(window, document, 'script',
                 'https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '{{ $metaPixelId }}');
@@ -34,16 +39,21 @@
     @endif
 
     <script type="text/javascript">
-        (function(c, l, a, r, i, t, y) {
-            c[a] = c[a] || function() {
-                (c[a].q = c[a].q || []).push(arguments)
-            };
-            t = l.createElement(r);
-            t.async = 1;
-            t.src = "https://www.clarity.ms/tag/" + i;
-            y = l.getElementsByTagName(r)[0];
-            y.parentNode.insertBefore(t, y);
-        })(window, document, "clarity", "script", "xnf0g1adw1");
+        // Delay loading Microsoft Clarity by 2.5 seconds
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                (function(c, l, a, r, i, t, y) {
+                    c[a] = c[a] || function() {
+                        (c[a].q = c[a].q || []).push(arguments)
+                    };
+                    t = l.createElement(r);
+                    t.async = 1;
+                    t.src = "https://www.clarity.ms/tag/" + i;
+                    y = l.getElementsByTagName(r)[0];
+                    y.parentNode.insertBefore(t, y);
+                })(window, document, "clarity", "script", "xnf0g1adw1");
+            }, 2500);
+        });
     </script>
 
     {{-- Inline script to detect system dark mode preference and apply it immediately --}}
