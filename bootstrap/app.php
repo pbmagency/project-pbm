@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         'payment/callback',
     ]);
         $middleware->web(append: [
+            \App\Http\Middleware\CacheLandingPage::class,
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,

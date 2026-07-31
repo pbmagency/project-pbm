@@ -51,12 +51,6 @@ export function Module() {
                         Dipelajari
                     </span>
                 </h2>
-
-                {/* <p className="mt-5 max-w-[60ch] text-lg text-lp-text-muted">
-                    Closing yang rendah selalu bisa dilacak ke salah satu dari
-                    tiga lapisan funnel. Ini yang kita bedah, satu per satu.
-                </p> */}
-
                 <div className="mt-12 grid gap-5 sm:grid-cols-3">
                     {MODULES.map((mod) => (
                         <div

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class ConfigController extends Controller
@@ -31,6 +32,9 @@ class ConfigController extends Controller
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
+
+        // Clear landing page cache so changes reflect immediately
+        Cache::flush();
 
         return back()->with('success', 'Configurations updated successfully.');
     }
