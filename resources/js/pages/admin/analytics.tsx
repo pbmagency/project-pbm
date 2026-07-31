@@ -147,14 +147,14 @@ export default function Analytics({
                                 description={`${stats.add_to_cart} add to cart clicks`}
                             />
                             <MetricCard
-                                title="Conversion Rate"
-                                value={`${stats.conversion_rate}%`}
+                                title="Lead Rate"
+                                value={`${stats.lead_rate}%`}
                                 icon={Target}
-                                description={`${stats.conversions} conversions`}
+                                description={`${stats.leads} leads`}
                             />
                             <MetricCard
-                                title="Conversion to Payment"
-                                value={`${stats.conversion_to_payment_rate}%`}
+                                title="Lead to Payment"
+                                value={`${stats.lead_to_payment_rate}%`}
                                 icon={CreditCard}
                                 description={`${stats.payments} successful payments`}
                             />

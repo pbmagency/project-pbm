@@ -72,7 +72,7 @@ export function CtaAnalysis({ data }: CtaAnalysisProps) {
                         Micro-Conversion Attribution
                     </CardTitle>
                     <CardDescription>
-                        Which button placements generate the most conversions?
+                        Which button placements generate the most leads?
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -87,7 +87,7 @@ export function CtaAnalysis({ data }: CtaAnalysisProps) {
                                         variant="secondary"
                                         className="text-xs"
                                     >
-                                        {lp.total_leads} conversions
+                                        {lp.total_leads} leads
                                     </Badge>
                                 </div>
                                 <div className="space-y-2 rounded-lg bg-muted/50 p-3">
@@ -128,7 +128,7 @@ export function CtaAnalysis({ data }: CtaAnalysisProps) {
                                                                 : 'text-foreground'
                                                         }
                                                     >
-                                                        {cta.leads ?? 0} conv.
+                                                        {cta.leads ?? 0} leads
                                                     </span>
                                                     <Badge
                                                         variant={

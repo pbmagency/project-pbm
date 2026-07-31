@@ -34,8 +34,8 @@ export function RevenueChart({ data, className }: RevenueChartProps) {
                 data.visit?.find((item) => item.date === date)?.total || 0;
             const engagements =
                 data.engagement?.find((item) => item.date === date)?.total || 0;
-            const conversions =
-                data.conversion?.find((item) => item.date === date)?.total || 0;
+            const leads =
+                data.leads?.find((item) => item.date === date)?.total || 0;
             const payments =
                 data.payment?.find((item) => item.date === date)?.total || 0;
             const revenue = payments * coursePrice;
@@ -47,7 +47,7 @@ export function RevenueChart({ data, className }: RevenueChartProps) {
                 }),
                 visits,
                 engagements,
-                conversions,
+                leads,
                 payments,
                 revenue: revenue / 1_000_000,
             };
@@ -70,7 +70,7 @@ export function RevenueChart({ data, className }: RevenueChartProps) {
                     Revenue Trends
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                    Daily revenue and conversion tracking
+                    Daily revenue and lead tracking
                 </p>
             </div>
 
@@ -129,7 +129,7 @@ export function RevenueChart({ data, className }: RevenueChartProps) {
                         />
                         <Line
                             type="monotone"
-                            dataKey="conversions"
+                            dataKey="leads"
                             stroke="var(--chart-3)"
                             strokeWidth={2}
                             dot={{ r: 3 }}

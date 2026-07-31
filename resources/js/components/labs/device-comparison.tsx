@@ -41,7 +41,7 @@ export function DeviceComparison({ data }: DeviceComparisonProps) {
                         Device Performance
                     </h2>
                     <p className="text-sm text-muted-foreground">
-                        Mobile vs Desktop conversion comparison
+                        Mobile vs Desktop lead rate comparison
                     </p>
                 </div>
             </div>
@@ -84,8 +84,8 @@ export function DeviceComparison({ data }: DeviceComparisonProps) {
                                 </div>
                                 <CardDescription>
                                     {isMobileUnderperforming
-                                        ? 'Mobile conversion is significantly lower'
-                                        : 'Device performance comparison'}
+                                        ? 'Mobile lead rate is significantly lower'
+                                        : 'Device lead rate comparison'}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">

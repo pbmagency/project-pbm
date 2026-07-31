@@ -11,6 +11,9 @@ export type AnalyticsEventType =
     | 'cta_click'
     | 'initiate_checkout'
     | 'conversion'
+    | 'conversions'
+    | 'lead'
+    | 'leads'
     | 'payment'
     | 'section_view';
 
@@ -25,9 +28,9 @@ export interface AnalyticsStats {
     cta_clicks: number;
     add_to_cart: number;
     add_to_cart_rate: number;
-    conversion_rate: number;
-    conversions: number;
-    conversion_to_payment_rate: number;
+    lead_rate: number;
+    leads: number;
+    lead_to_payment_rate: number;
     payment_rate: number;
     total_revenue: number;
     payments: number;
@@ -41,7 +44,12 @@ export interface ReferralDataItem {
 export interface FunnelStage {
     stage: string;
     count: number;
+    /** % of total visits — used for bar width (classic funnel shape). */
     percentage: number;
+    /** A→B retention rate: what % of the previous stage reached this stage. Null for Visits. */
+    transition_pct: number | null;
+    /** Label of the previous stage, used in the transition connector text. Null for Visits. */
+    from_stage: string | null;
 }
 
 // ── Performance Matrix ──────────────────────────────────────

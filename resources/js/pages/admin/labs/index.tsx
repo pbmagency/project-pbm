@@ -150,7 +150,7 @@ export default function LabsIndex({
     });
     // State
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [sortColumn, setSortColumn] = useState<keyof MatrixItem>('rpv');
+    const [sortColumn, setSortColumn] = useState<keyof MatrixItem>('lead_cr');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
     const [currentPage, setCurrentPage] = useState(1);
     const [showToast, setShowToast] = useState(false);
@@ -159,15 +159,17 @@ export default function LabsIndex({
 
     // Date range state for custom filter
     // AFTER
-    const [dateRange, setDateRange] = useState<SimpleDateRange | undefined>(() => {
-        if (filters.start_date && filters.end_date) {
-            return {
-                from: filters.start_date,
-                to: filters.end_date,
-            };
-        }
-        return undefined;
-    });
+    const [dateRange, setDateRange] = useState<SimpleDateRange | undefined>(
+        () => {
+            if (filters.start_date && filters.end_date) {
+                return {
+                    from: filters.start_date,
+                    to: filters.end_date,
+                };
+            }
+            return undefined;
+        },
+    );
 
     // ── Page Filter (localStorage persisted) ──────────────────
     // Normalize any landing_source to a clean pathname (strip protocol+domain if present)
@@ -185,7 +187,10 @@ export default function LabsIndex({
     };
 
     const availablePages = useMemo(
-        () => [...new Set(matrix.map((m) => normalizePath(m.landing_source)))].sort(),
+        () =>
+            [
+                ...new Set(matrix.map((m) => normalizePath(m.landing_source))),
+            ].sort(),
         [matrix],
     );
 
@@ -279,14 +284,14 @@ export default function LabsIndex({
 
     const itemsPerPage = 10;
 
-    // Find winner (highest RPV)
+    // Find winner (highest Lead CR)
     const winner = useMemo(() => {
         if (filteredMatrix.length === 0) {
             return null;
         }
 
         return filteredMatrix.reduce((prev, curr) =>
-            curr.rpv > prev.rpv ? curr : prev,
+            curr.lead_cr > prev.lead_cr ? curr : prev,
         );
     }, [filteredMatrix]);
 
@@ -537,7 +542,11 @@ export default function LabsIndex({
                             <div className="flex items-center gap-2">
                                 <Globe className="h-4 w-4 text-muted-foreground" />
                                 <Select
-                                    value={selectedPages.length === 1 ? selectedPages[0] : '__multi__'}
+                                    value={
+                                        selectedPages.length === 1
+                                            ? selectedPages[0]
+                                            : '__multi__'
+                                    }
                                     onValueChange={(val) => {
                                         if (val === '__all__') {
                                             clearPageFilter();
@@ -551,8 +560,8 @@ export default function LabsIndex({
                                             {selectedPages.length === 0
                                                 ? 'All Pages'
                                                 : selectedPages.length === 1
-                                                ? selectedPages[0]
-                                                : `${selectedPages.length} pages`}
+                                                  ? selectedPages[0]
+                                                  : `${selectedPages.length} pages`}
                                         </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
@@ -562,9 +571,15 @@ export default function LabsIndex({
                                         {availablePages.map((page) => (
                                             <SelectItem key={page} value={page}>
                                                 <span className="flex items-center gap-2">
-                                                    <span className={`inline-block h-2 w-2 rounded-full ${
-                                                        selectedPages.includes(page) ? 'bg-primary' : 'bg-muted-foreground/30'
-                                                    }`} />
+                                                    <span
+                                                        className={`inline-block h-2 w-2 rounded-full ${
+                                                            selectedPages.includes(
+                                                                page,
+                                                            )
+                                                                ? 'bg-primary'
+                                                                : 'bg-muted-foreground/30'
+                                                        }`}
+                                                    />
                                                     {page}
                                                 </span>
                                             </SelectItem>
@@ -652,7 +667,8 @@ export default function LabsIndex({
                     {isPageFiltered && (
                         <Badge variant="secondary" className="gap-1">
                             <Globe className="h-3 w-3" />
-                            {selectedPages.length} page{selectedPages.length > 1 ? 's' : ''} selected
+                            {selectedPages.length} page
+                            {selectedPages.length > 1 ? 's' : ''} selected
                         </Badge>
                     )}
                 </div>
@@ -809,7 +825,7 @@ export default function LabsIndex({
                                                         key={
                                                             item.landing_source
                                                         }
-                                                        className="border-b border-border transition hover:bg-muted/50"
+                                                        className={`border-b border-border transition hover:bg-muted/50 ${isWinner ? 'bg-chart-4/5' : ''}`}
                                                     >
                                                         <td className="p-4">
                                                             <div className="flex items-center gap-2">
@@ -864,7 +880,21 @@ export default function LabsIndex({
                                                             %
                                                         </td>
                                                         <td className="p-4">
-                                                            <Badge variant="secondary">
+                                                            <Badge
+                                                                variant={
+                                                                    isWinner
+                                                                        ? 'default'
+                                                                        : 'secondary'
+                                                                }
+                                                                className={
+                                                                    isWinner
+                                                                        ? 'gap-1 bg-chart-4 font-bold text-foreground'
+                                                                        : ''
+                                                                }
+                                                            >
+                                                                {isWinner && (
+                                                                    <Trophy className="h-3 w-3" />
+                                                                )}
                                                                 {formatPercent(
                                                                     item.lead_cr,
                                                                     2,
@@ -882,9 +912,7 @@ export default function LabsIndex({
                                                             </Badge>
                                                         </td>
                                                         <td className="p-4">
-                                                            <span
-                                                                className={`font-bold ${isWinner ? 'text-chart-4' : 'text-foreground'}`}
-                                                            >
+                                                            <span className="font-bold text-foreground">
                                                                 {formatCurrency(
                                                                     item.rpv,
                                                                 )}
@@ -1299,12 +1327,15 @@ export default function LabsIndex({
                         )}
 
                         {/* ==================== SECTION D: CTA ANALYSIS ==================== */}
-                        {filteredCta && filteredCta.length > 0 && <CtaAnalysis data={filteredCta} />}
+                        {filteredCta && filteredCta.length > 0 && (
+                            <CtaAnalysis data={filteredCta} />
+                        )}
 
                         {/* ==================== SECTION E: AUDIENCE SEGMENTATION ==================== */}
                         {((filteredReaders && filteredReaders.length > 0) ||
                             (filteredHeatmap && filteredHeatmap.length > 0) ||
-                            (filteredSectionHeatmap && filteredSectionHeatmap.length > 0)) && (
+                            (filteredSectionHeatmap &&
+                                filteredSectionHeatmap.length > 0)) && (
                             <AudienceSegmentation
                                 readers={filteredReaders || []}
                                 heatmap={filteredHeatmap || []}
