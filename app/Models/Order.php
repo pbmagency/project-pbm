@@ -14,6 +14,7 @@ class Order extends Model
         'name',
         'email',
         'phone',
+        'distinct_id',
         'amount',
         'payment_method',
         'duitku_reference',

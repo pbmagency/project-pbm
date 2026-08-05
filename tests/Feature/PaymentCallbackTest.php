@@ -2,13 +2,13 @@
 
 use App\Mail\OrderConfirmationMail;
 use App\Models\Order;
-use App\Models\UserAnalytic;
 use App\Services\MetaConversionService;
+use App\Services\PostHogService;
 use Illuminate\Support\Facades\Mail;
 
 function duitkuSignature(string $merchantCode, string $amount, string $orderId, string $serverKey): string
 {
-    return md5($merchantCode . $amount . $orderId . $serverKey);
+    return md5($merchantCode.$amount.$orderId.$serverKey);
 }
 
 beforeEach(function () {
@@ -117,5 +117,89 @@ it('marks order as failed for failed payment', function () {
     $this->assertDatabaseHas('orders', [
         'order_number' => $order->order_number,
         'status' => 'failed',
+    ]);
+});
+
+it('fires a single payment event with status success under the order distinct_id', function () {
+    Mail::fake();
+
+    config(['services.duitku.server_key' => 'test-server-key', 'services.duitku.merchant_code' => 'TEST123']);
+
+    $order = Order::factory()->create(['amount' => 129000, 'distinct_id' => 'ph-visitor-123']);
+
+    $merchantCode = 'TEST123';
+    $amount = '129000';
+    $signature = duitkuSignature($merchantCode, $amount, $order->order_number, 'test-server-key');
+
+    $this->partialMock(PostHogService::class, function ($mock) {
+        $mock->shouldReceive('captureWithContext')
+            ->once()
+            ->withArgs(fn (string $distinctId, string $event, array $properties) => $distinctId === 'ph-visitor-123'
+                && $event === 'payment'
+                && $properties['status'] === 'success');
+    });
+
+    $this->post('/payment/callback', [
+        'merchantCode' => $merchantCode,
+        'amount' => $amount,
+        'merchantOrderId' => $order->order_number,
+        'signature' => $signature,
+        'resultCode' => '00',
+        'reference' => 'REF-123',
+        'paymentCode' => 'BC',
+    ]);
+});
+
+it('fires a payment event with status failed under the order distinct_id', function () {
+    config(['services.duitku.server_key' => 'test-server-key', 'services.duitku.merchant_code' => 'TEST123']);
+
+    $order = Order::factory()->create(['amount' => 129000, 'distinct_id' => 'ph-visitor-456']);
+
+    $merchantCode = 'TEST123';
+    $amount = '129000';
+    $signature = duitkuSignature($merchantCode, $amount, $order->order_number, 'test-server-key');
+
+    $this->partialMock(PostHogService::class, function ($mock) {
+        $mock->shouldReceive('captureWithContext')
+            ->once()
+            ->withArgs(fn (string $distinctId, string $event, array $properties) => $distinctId === 'ph-visitor-456'
+                && $event === 'payment'
+                && $properties['status'] === 'failed');
+    });
+
+    $this->post('/payment/callback', [
+        'merchantCode' => $merchantCode,
+        'amount' => $amount,
+        'merchantOrderId' => $order->order_number,
+        'signature' => $signature,
+        'resultCode' => '01',
+    ]);
+});
+
+it('falls back to an order-scoped identity when payment succeeds without a stored distinct_id', function () {
+    Mail::fake();
+
+    config(['services.duitku.server_key' => 'test-server-key', 'services.duitku.merchant_code' => 'TEST123']);
+
+    $order = Order::factory()->create(['amount' => 129000, 'distinct_id' => null]);
+
+    $merchantCode = 'TEST123';
+    $amount = '129000';
+    $signature = duitkuSignature($merchantCode, $amount, $order->order_number, 'test-server-key');
+
+    $this->partialMock(PostHogService::class, function ($mock) use ($order) {
+        $mock->shouldReceive('captureWithContext')
+            ->once()
+            ->withArgs(fn (string $distinctId, string $event) => $distinctId === 'order:'.$order->order_number && $event === 'payment');
+    });
+
+    $this->post('/payment/callback', [
+        'merchantCode' => $merchantCode,
+        'amount' => $amount,
+        'merchantOrderId' => $order->order_number,
+        'signature' => $signature,
+        'resultCode' => '00',
+        'reference' => 'REF-999',
+        'paymentCode' => 'BC',
     ]);
 });

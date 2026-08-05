@@ -2,8 +2,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Setting;
+use App\Services\PostHogService;
+use Closure;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Symfony\Component\HttpFoundation\Response;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -26,6 +30,14 @@ class HandleInertiaRequests extends Middleware
         return parent::version($request);
     }
 
+    public function handle(Request $request, Closure $next): Response
+    {
+        return app(PostHogService::class)->withRequestContext(
+            $request,
+            fn (): Response => parent::handle($request, $next),
+        );
+    }
+
     /**
      * Define the props that are shared by default.
      *
@@ -36,7 +48,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         try {
-            $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
+            $settings = Setting::pluck('value', 'key')->toArray();
         } catch (\Exception $e) {
             $settings = [];
         }

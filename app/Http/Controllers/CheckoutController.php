@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\UserAnalytic;
 use App\Services\DuitkuService;
 use App\Services\MetaConversionService;
+use App\Services\PostHogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -27,16 +28,17 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function store(CheckoutRequest $request, DuitkuService $duitku, MetaConversionService $meta): \Symfony\Component\HttpFoundation\Response
+    public function store(CheckoutRequest $request, DuitkuService $duitku, MetaConversionService $meta, PostHogService $posthog): \Symfony\Component\HttpFoundation\Response
     {
         $price = (int) config('services.meta.course_price', 129000);
 
         $order = DB::transaction(function () use ($request, $price) {
             return Order::create([
-                'order_number' => 'PBM-' . strtoupper(Str::random(8)),
+                'order_number' => 'PBM-'.strtoupper(Str::random(8)),
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
+                'distinct_id' => $request->input('distinct_id'),
                 'amount' => $price,
                 'status' => 'pending',
             ]);
@@ -59,6 +61,25 @@ class CheckoutController extends Controller
         $utmMedium = $request->input('utm_medium') ?? $visitEvent?->utm_medium;
         $utmCampaign = $request->input('utm_campaign') ?? $visitEvent?->utm_campaign;
 
+        // Uses the browser's PostHog distinct_id (sent as a hidden field) so this
+        // "lead" event joins the same person timeline as their earlier visit/engaged/
+        // intent events, instead of starting a new, disconnected identity.
+        $leadProperties = [
+            'lead_type' => 'form_submit',
+            'amount' => $price,
+            'currency' => 'IDR',
+            'landing_source' => $landingSource,
+            'utm_source' => $utmSource,
+            'utm_medium' => $utmMedium,
+            'utm_campaign' => $utmCampaign,
+        ];
+
+        if ($order->distinct_id) {
+            $posthog->captureWithContext($order->distinct_id, 'lead', $leadProperties);
+        } else {
+            $posthog->capture('lead', $leadProperties);
+        }
+
         // NOTE: this response ends in Inertia::location() below, which the
         // Inertia client intercepts via a raw window.location redirect —
         // it never resolves as a normal Inertia "success" visit. Any
@@ -74,7 +95,7 @@ class CheckoutController extends Controller
             // CAPI InitiateCheckout and the browser pixel share the same ID and
             // Meta can deduplicate them into a single "Browser & Server" event.
             // Fall back to a deterministic ID if the browser didn't send one.
-            $eventId = $request->input('meta_event_id') ?: ('conversion-' . $order->order_number);
+            $eventId = $request->input('meta_event_id') ?: ('conversion-'.$order->order_number);
 
             // Parse first/last name for CAPI — split on first whitespace
             $nameParts = preg_split('/\s+/', trim($order->name ?? ''), 2);
@@ -102,7 +123,7 @@ class CheckoutController extends Controller
                 'created_at' => now(),
             ]);
         } catch (\Throwable $e) {
-            Log::error('Checkout conversion tracking failed (order still proceeds): ' . $e->getMessage(), [
+            Log::error('Checkout conversion tracking failed (order still proceeds): '.$e->getMessage(), [
                 'order_number' => $order->order_number,
             ]);
         }

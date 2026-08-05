@@ -3,8 +3,13 @@ import { AlertCircle, Check, Lock } from 'lucide-react';
 import { useRef } from 'react';
 import { CountdownTimer } from '@/components/landing/countdown-timer';
 import { Eyebrow } from '@/components/landing/eyebrow';
-import { generateEventId, getLandingSource, useAnalytics } from '@/hooks/use-analytics';
+import {
+    generateEventId,
+    getLandingSource,
+    useAnalytics,
+} from '@/hooks/use-analytics';
 import { useSectionView } from '@/hooks/use-section-view';
+import posthog from '@/lib/posthog';
 
 const INCLUDES = [
     'Live Session & Rekaman Webinar "The Silent Conversion Leak"',
@@ -54,12 +59,14 @@ export function Pricing() {
             ...data,
             landing_source: getLandingSource(),
             meta_event_id: checkoutEventId.current,
+            distinct_id: posthog.get_distinct_id(),
         }));
         post('/checkout', {
             preserveScroll: true,
             onSuccess: (page) => {
                 const redirectUrl = (page.props as { redirect_url?: string })
                     .redirect_url;
+
                 if (redirectUrl) {
                     window.location.href = redirectUrl;
                 }
@@ -158,6 +165,7 @@ export function Pricing() {
                                 <form
                                     onSubmit={handleSubmit}
                                     className="mt-7 space-y-3"
+                                    data-lp-form
                                 >
                                     <div>
                                         <input
@@ -231,6 +239,7 @@ export function Pricing() {
                                     <button
                                         type="submit"
                                         disabled={processing}
+                                        data-cta-zone="pricing_submit"
                                         className="mt-1 w-full rounded-2xl bg-white px-8 py-4 text-base font-bold text-lp-primary-2 shadow-[0_16px_40px_-14px_rgba(255,255,255,0.55)] transition hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:opacity-70"
                                     >
                                         {processing

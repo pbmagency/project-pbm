@@ -63,6 +63,7 @@ export function CtaButton({
                     href={checkout() as any}
                     onClick={handleClick}
                     className={buttonClass}
+                    data-cta-zone={location}
                 >
                     {children}
                 </Link>
@@ -71,6 +72,7 @@ export function CtaButton({
                     href="#pricing"
                     onClick={handleClick}
                     className={buttonClass}
+                    data-cta-zone={location}
                 >
                     {children}
                 </a>

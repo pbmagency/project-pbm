@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\UserAnalytic;
 use App\Services\DuitkuService;
 use App\Services\MetaConversionService;
+use App\Services\PostHogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +20,7 @@ class PaymentCallbackController extends Controller
         Request $request,
         DuitkuService $duitku,
         MetaConversionService $meta,
+        PostHogService $posthog,
     ): JsonResponse {
         try {
             $result = $duitku->verifyCallback($request);
@@ -47,22 +49,28 @@ class PaymentCallbackController extends Controller
 
                 Mail::to($order->email)->send(new OrderConfirmationMail($order));
 
-                $this->fireAnalytics($request, $order, $meta);
+                $this->fireAnalytics($request, $order, $meta, $posthog);
             } elseif ($result['status'] === 'failed') {
                 $order->update(['status' => 'failed']);
+
+                $posthog->captureWithContext($this->distinctIdFor($order), 'payment', [
+                    'status' => 'failed',
+                    'amount' => $order->amount,
+                    'currency' => 'IDR',
+                ]);
             }
 
             return response()->json(['message' => 'OK'], 200);
         } catch (\Throwable $e) {
-            Log::error('Duitku callback error: ' . $e->getMessage(), $request->all());
+            Log::error('Duitku callback error: '.$e->getMessage(), $request->all());
 
             return response()->json(['message' => 'Error'], 500);
         }
     }
 
-    private function fireAnalytics(Request $request, Order $order, MetaConversionService $meta): void
+    private function fireAnalytics(Request $request, Order $order, MetaConversionService $meta, PostHogService $posthog): void
     {
-        $eventId = 'purchase-' . $order->order_number;
+        $eventId = 'purchase-'.$order->order_number;
 
         // Server-side Meta CAPI Purchase event — include all PII for EMQ score
         $meta->sendPurchase($request, $eventId, $order->amount, $order->email, $order->phone, $order->name);
@@ -80,8 +88,16 @@ class PaymentCallbackController extends Controller
 
         $landingSource = $conversionEvent?->event_data['landing_source'] ?? 'server-callback';
 
+        $posthog->captureWithContext($this->distinctIdFor($order), 'payment', [
+            'status' => 'success',
+            'amount' => $order->amount,
+            'currency' => 'IDR',
+            'payment_method' => $order->payment_method,
+            'landing_source' => $landingSource,
+        ]);
+
         UserAnalytic::create([
-            'session_id' => 'server-callback-' . $order->order_number,
+            'session_id' => 'server-callback-'.$order->order_number,
             'event_type' => 'payment',
             'event_data' => [
                 'status' => 'success',
@@ -94,5 +110,13 @@ class PaymentCallbackController extends Controller
             ],
             'created_at' => now(),
         ]);
+    }
+
+    // Falls back to an order-scoped identity when the browser never sent a
+    // distinct_id (e.g. blocked script), so payment is still captured under
+    // its own identity rather than silently dropped.
+    private function distinctIdFor(Order $order): string
+    {
+        return $order->distinct_id ?: 'order:'.$order->order_number;
     }
 }
