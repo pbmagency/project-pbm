@@ -13,6 +13,7 @@ interface Benefit {
     title: string;
     points: string[];
     amber?: boolean;
+    image: string;
 }
 
 const BENEFITS: Benefit[] = [
@@ -24,6 +25,7 @@ const BENEFITS: Benefit[] = [
             'Rekaman webinar yang bisa kamu tonton ulang kapan aja.',
         ],
         amber: false,
+        image: '/images/benefits/live-session.webp',
     },
     {
         icon: BookOpen,
@@ -32,6 +34,7 @@ const BENEFITS: Benefit[] = [
             'Materi pelengkap: praktek memperbaiki konversi secara praktis',
         ],
         amber: false,
+        image: '/images/benefits/ebook.webp',
     },
     {
         icon: MessageCircleQuestion,
@@ -41,6 +44,7 @@ const BENEFITS: Benefit[] = [
             'Sesi tanya jawab interaktif di akhir webinar.',
         ],
         amber: false,
+        image: '/images/benefits/qna-session.webp',
     },
     {
         icon: Search,
@@ -50,6 +54,7 @@ const BENEFITS: Benefit[] = [
             'Dapatkan rekomendasi spesifik untuk kasus di bisnis kamu, bukan lagi saran umum.',
         ],
         amber: true,
+        image: '/images/benefits/audit-report.webp',
     },
 ];
 
@@ -65,22 +70,15 @@ export function Benefit() {
 
             <div className="relative mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24 lg:py-28">
                 <div className="text-center">
-                    {/* <Eyebrow className="mx-auto">Yang Lo Dapatkan</Eyebrow> */}
-
                     <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-lp-text sm:text-4xl lg:text-5xl">
                         Apa Saja Yang Kamu{' '}
                         <span className="bg-gradient-to-r from-lp-primary to-lp-primary-2 bg-clip-text text-transparent">
                             Dapatkan
                         </span>
                     </h2>
-                    {/* <p className="mx-auto mt-5 max-w-[56ch] text-[16.5px] font-normal">
-                        Satu sesi live 90 menit yang fokus bahas kenapa konversi
-                        lo masih boncos padahal iklan udah bagus, plus tiga
-                        hal lain yang menyertainya.
-                    </p> */}
                 </div>
 
-                <div className="mt-12 grid gap-2 sm:grid-cols-2">
+                <div className="mt-12 grid gap-6 sm:grid-cols-2">
                     {BENEFITS.map((benefit) => (
                         <div
                             key={benefit.title}
@@ -91,8 +89,20 @@ export function Benefit() {
                                     : 'bg-lp-bg/50 hover:lp-glow',
                             )}
                         >
+                            {/* The Image */}
+                            <img
+                                src={benefit.image}
+                                alt={benefit.title}
+                                className={cn(
+                                    'mb-6 aspect-[16/9] w-full rounded-xl object-cover ring-1',
+                                    benefit.amber
+                                        ? 'ring-lp-amber/30'
+                                        : 'ring-white/10',
+                                )}
+                            />
+
                             {/* Icon + Title — 1 row */}
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-start gap-3 sm:items-center">
                                 <div
                                     className={cn(
                                         'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl',
@@ -110,7 +120,7 @@ export function Benefit() {
                                         )}
                                     />
                                 </div>
-                                <h3 className="font-display text-[16px] leading-snug font-bold text-lp-text">
+                                <h3 className="font-display text-[16px] font-bold leading-snug text-lp-text">
                                     {benefit.title}
                                 </h3>
                             </div>
@@ -121,11 +131,11 @@ export function Benefit() {
                                     {benefit.points.map((point) => (
                                         <li
                                             key={point}
-                                            className="flex items-start gap-2 text-sm leading-snug font-medium text-lp-text-muted"
+                                            className="flex items-start gap-2 text-sm font-medium leading-snug text-lp-text-muted"
                                         >
                                             <span
                                                 className={cn(
-                                                    'mt-[3px] h-1.5 w-1.5 shrink-0 rounded-full',
+                                                    'mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full',
                                                     benefit.amber
                                                         ? 'bg-lp-amber-ink'
                                                         : 'bg-lp-primary-ink',

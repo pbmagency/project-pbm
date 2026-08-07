@@ -8,15 +8,15 @@ import { useDwellTime } from '@/hooks/use-dwell-time';
 import { useScrollTracking } from '@/hooks/use-scroll-tracking';
 
 // Lazy load everything below the fold!
-const Problem = lazy(() => import('@/components/landing/problem').then(m => ({ default: m.Problem })));
-const Solution = lazy(() => import('@/components/landing/solution').then(m => ({ default: m.Solution })));
+const Problem = lazy(() => import('@/components/landing/cycle1/problem-1').then(m => ({ default: m.Problem })));
+const Solution = lazy(() => import('@/components/landing/cycle1/solution-1').then(m => ({ default: m.Solution })));
 const Benefit = lazy(() => import('@/components/landing/benefit').then(m => ({ default: m.Benefit })));
 const Proof = lazy(() => import('@/components/landing/proof').then(m => ({ default: m.Proof })));
 const Mentor = lazy(() => import('@/components/landing/mentor').then(m => ({ default: m.Mentor })));
 const Curriculum = lazy(() => import('@/components/landing/curriculum').then(m => ({ default: m.Curriculum })));
 const Pricing = lazy(() => import('@/components/landing/pricing').then(m => ({ default: m.Pricing })));
 const Garansi = lazy(() => import('@/components/landing/garansi').then(m => ({ default: m.Garansi })));
-const Faq = lazy(() => import('@/components/landing/faq').then(m => ({ default: m.Faq })));
+const Faq = lazy(() => import('@/components/landing/cycle1/faq-1').then(m => ({ default: m.Faq })));
 const Footer = lazy(() => import('@/components/landing/footer').then(m => ({ default: m.Footer })));
 const FloatingWhatsApp = lazy(() => import('@/components/landing/floating-whatsapp').then(m => ({ default: m.FloatingWhatsApp })));
 

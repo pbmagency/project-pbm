@@ -52,12 +52,6 @@ export function Mentor() {
                         {/* Credential tags */}
                         <div className="mt-3 flex flex-wrap justify-center gap-1 sm:justify-start">
                             <div className="flex items-center gap-1.5 rounded-full border border-lp-border bg-lp-bg/60 px-3 py-1.5 backdrop-blur-sm">
-                                <User className="h-3.5 w-3.5 shrink-0 text-lp-primary-ink" />
-                                <span className="text-[12.5px] font-semibold text-lp-text">
-                                    19 y.o Entrepreneur
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-1.5 rounded-full border border-lp-border bg-lp-bg/60 px-3 py-1.5 backdrop-blur-sm">
                                 <Zap className="h-3.5 w-3.5 shrink-0 text-lp-primary-ink" />
                                 <span className="text-[12.5px] font-semibold text-lp-text">
                                     5 Year Experience

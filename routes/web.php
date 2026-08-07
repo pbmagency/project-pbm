@@ -9,6 +9,9 @@ use App\Http\Controllers\PaymentCallbackController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'landing')->name('home');
+Route::inertia('/c1-angle-1', 'cycle1/c1-angle-1')->name('home1');
+Route::inertia('/c1-angle-2', 'cycle1/c1-angle-2')->name('home2');
+Route::inertia('/c1-angle-3', 'cycle1/c1-angle-3')->name('home3');
 
 // mini-audit
 Route::get('/mini-audit', [MiniAuditController::class, 'create'])->name('mini-audit');
