@@ -230,15 +230,11 @@ class AbTestingService
                 $depth = $scrollDepths[$sessionId] ?? 0;
                 $dwell = $dwellTimes[$sessionId] ?? 0;
 
-                // Bouncer definition is kept in exact parity with batchBouncedCounts():
-                // A session is a Bouncer only when ALL THREE conditions are true:
-                //   1. No dwell_ping ever fired  ($dwell == 0, i.e. left before 15 s)
-                //   2. Scroll depth stayed below 25%
-                //   3. No funnel action at all (cta_click / initiate_checkout /
-                //      conversion / payment) — guarded by $progressedSessions.
-                // Previously the check used OR for scroll/dwell which misclassified
-                // fast converters (paid in < 15 s without scrolling) as Bouncers.
-                if (! isset($progressedSessions[$sessionId]) && $dwell == 0 && $depth < 25) {
+                // Bouncer definition must stay in exact parity with batchBouncedCounts().
+                // New rule: Engaged = (dwell_ping AND scroll ≥ 25%) OR funnel action.
+                //           Bouncer = NOT Engaged = (NOT dwell OR NOT scroll≥25%) AND NOT funnel.
+                // In PHP terms: no funnel action AND (dwell == 0 OR depth < 25).
+                if (! isset($progressedSessions[$sessionId]) && ($dwell == 0 || $depth < 25)) {
                     $personas['bouncers']++;
                 } elseif ($dwell > 120) {
                     $personas['deep_readers']++;
@@ -254,7 +250,7 @@ class AbTestingService
                 'landing_source' => $src,
                 'total_sessions' => $total,
                 'personas' => [
-                    ['name' => 'Bouncers', 'description' => 'No dwell ping (<15s) AND scroll <25% AND no funnel action (matches Performance Matrix bounce logic)', 'count' => $personas['bouncers'], 'percentage' => round($this->safeDiv($personas['bouncers'], $total) * 100, 1)],
+                    ['name' => 'Bouncers', 'description' => 'No funnel action AND (dwell < 15s OR scroll < 25%) — mirrors Performance Matrix bounce logic', 'count' => $personas['bouncers'], 'percentage' => round($this->safeDiv($personas['bouncers'], $total) * 100, 1)],
                     ['name' => 'Skimmers', 'description' => 'High scroll (>75%) but quick read (<60s)', 'count' => $personas['skimmers'], 'percentage' => round($this->safeDiv($personas['skimmers'], $total) * 100, 1)],
                     ['name' => 'Deep Readers', 'description' => 'Extended engagement (>120s)', 'count' => $personas['deep_readers'], 'percentage' => round($this->safeDiv($personas['deep_readers'], $total) * 100, 1)],
                     ['name' => 'Casuals', 'description' => 'Moderate engagement', 'count' => $personas['casuals'], 'percentage' => round($this->safeDiv($personas['casuals'], $total) * 100, 1)],
@@ -484,34 +480,35 @@ class AbTestingService
             ->whereRaw("json_extract(v.event_data, '$.landing_source') IS NOT NULL")
             ->whereRaw("json_extract(v.event_data, '$.landing_source') NOT IN ('', 'unknown')")
             ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('v.referral_source', $sourceFilter))
-            // Bounced = did NOTHING after landing: no dwell engagement, no
-            // meaningful scroll, and no funnel progression of any kind.
-            // Previously this required BOTH a dwell ping AND 25%+ scroll
-            // simultaneously to avoid being counted as bounced (an OR of
-            // NOT-EXISTS is, by De Morgan's law, an AND-required condition).
-            // That misclassified fast converters — anyone who filled the
-            // form and paid before the ~30s dwell-ping interval fired — as
-            // bounced, despite having just paid. Now a session only counts
-            // as bounced if it truly did nothing at all.
-            ->whereNotExists(function ($sub) use ($startDate, $endDate) {
-                $sub->from('user_analytics as e')
-                    ->whereColumn('e.session_id', 'v.session_id')
-                    ->where('e.event_type', 'engagement')
-                    ->whereRaw("json_extract(e.event_data, '$.type') = 'dwell_ping'")
-                    ->whereBetween('e.created_at', [$startDate, $endDate]);
-            })
-            ->whereNotExists(function ($sub) use ($startDate, $endDate) {
-                $sub->from('user_analytics as s')
-                    ->whereColumn('s.session_id', 'v.session_id')
-                    ->where('s.event_type', 'scroll')
-                    ->whereRaw("CAST(json_extract(s.event_data, '$.depth') AS DECIMAL(10,2)) >= 25")
-                    ->whereBetween('s.created_at', [$startDate, $endDate]);
-            })
+            // Bounced = truly did nothing meaningful:
+            //   A session is Engaged if it had (dwell_ping AND scroll ≥ 25%) OR any funnel action.
+            //   Therefore Bounced = NOT [(dwell AND scroll) OR funnel]
+            //                     = (NOT dwell OR NOT scroll) AND NOT funnel
+            //
+            // Step 1: exclude sessions with any funnel action.
             ->whereNotExists(function ($sub) use ($startDate, $endDate) {
                 $sub->from('user_analytics as f')
                     ->whereColumn('f.session_id', 'v.session_id')
                     ->whereIn('f.event_type', array_merge(['cta_click', 'initiate_checkout', 'payment'], self::LEAD_EVENT_TYPES))
                     ->whereBetween('f.created_at', [$startDate, $endDate]);
+            })
+            // Step 2: exclude sessions that had BOTH dwell_ping AND scroll ≥ 25%.
+            // Keeping sessions where at least one of the two is absent (NOT dwell OR NOT scroll).
+            ->where(function ($q) use ($startDate, $endDate) {
+                $q->whereNotExists(function ($sub) use ($startDate, $endDate) {
+                    $sub->from('user_analytics as e')
+                        ->whereColumn('e.session_id', 'v.session_id')
+                        ->where('e.event_type', 'engagement')
+                        ->whereRaw("json_extract(e.event_data, '$.type') = 'dwell_ping'")
+                        ->whereBetween('e.created_at', [$startDate, $endDate]);
+                })
+                    ->orWhereNotExists(function ($sub) use ($startDate, $endDate) {
+                        $sub->from('user_analytics as s')
+                            ->whereColumn('s.session_id', 'v.session_id')
+                            ->where('s.event_type', 'scroll')
+                            ->whereRaw("CAST(json_extract(s.event_data, '$.depth') AS DECIMAL(10,2)) >= 25")
+                            ->whereBetween('s.created_at', [$startDate, $endDate]);
+                    });
             })
             ->groupBy(DB::raw("json_extract(v.event_data, '$.landing_source')"))
             ->get();
@@ -543,11 +540,17 @@ class AbTestingService
 
     private function batchAllSessions(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
     {
+        // Filter to visit events only so the session population matches
+        // batchBouncedCounts() and getPerformanceMatrix() — both anchor to
+        // event_type = 'visit'. Without this filter, any event that stores
+        // landing_source in event_data (scroll, engagement, cta_click …)
+        // would inflate the denominator and deflate the Bouncer %.
         $rows = DB::table('user_analytics')
             ->select([
                 DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
                 'session_id',
             ])
+            ->where('event_type', 'visit')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
             ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
@@ -652,12 +655,16 @@ class AbTestingService
 
     private function batchTotalDwellTime(Carbon $startDate, Carbon $endDate, ?string $sourceFilter): array
     {
+        // Filter to dwell_ping events specifically so that $dwell > 0 means
+        // "a dwell_ping fired", mirroring the NOT EXISTS dwell_ping check in
+        // batchBouncedCounts() and the getReaderSegmentation() $dwell == 0 check.
         $rows = DB::table('user_analytics')
             ->select([
                 'session_id',
                 DB::raw("SUM(CAST(json_extract(event_data, '$.duration') AS SIGNED)) as total_ms"),
             ])
             ->where('event_type', 'engagement')
+            ->whereRaw("json_extract(event_data, '$.type') = 'dwell_ping'")
             ->whereBetween('created_at', [$startDate, $endDate])
             ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('referral_source', $sourceFilter))
             ->groupBy('session_id')
