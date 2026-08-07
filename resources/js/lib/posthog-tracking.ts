@@ -5,7 +5,7 @@
 import posthog from '@/lib/posthog';
 
 const CLIENT_ID = import.meta.env.VITE_POSTHOG_CLIENT_ID;
-const CLIENT_TYPE = 'form_with_payment';
+const CLIENT_TYPE = import.meta.env.VITE_POSTHOG_CLIENT_TYPE || 'form_with_payment';
 
 posthog.register({ client_id: CLIENT_ID, client_type: CLIENT_TYPE });
 

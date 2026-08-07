@@ -10,5 +10,5 @@ return [
     // this project's funnel (form checkout + payment), unlike client_id which
     // changes per client deployment of this codebase.
     'client_id' => env('POSTHOG_CLIENT_ID', 'pbm-webinar'),
-    'client_type' => 'form_with_payment',
+    'client_type' => env('POSTHOG_CLIENT_TYPE', 'form_with_payment'),
 ];
