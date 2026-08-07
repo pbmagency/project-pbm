@@ -12,8 +12,8 @@ import { cn } from '@/lib/utils';
 const FAQS = [
     {
         question:
-            'Saya lagi mikir mau naikin budget iklan, ini relevan buat saya?',
-        answer: 'Sangat relevan. Webinar ini bahas kenapa naikin budget belum tentu jadi langkah paling tepat kalau ROAS dari budget sekarang aja belum maksimal. Kamu bakal tahu dulu di mana ruang buat naikin profitnya sebelum keluar uang lebih banyak.',
+            'Saya udah ganti kreatif, angle, sampai harga tapi closing tetap stuck, ini relevan buat saya?',
+        answer: 'Sangat relevan. Webinar ini dibuat khusus buat kamu yang udah coba banyak cara tapi belum ketemu jawabannya. Kamu bakal diajarin cara baca data landing page kamu sendiri, biar ketahuan titik bocornya bukan cuma nebak nebak lagi.',
     },
     {
         question: 'Traffic saya udah ramai, kenapa closing masih rendah?',

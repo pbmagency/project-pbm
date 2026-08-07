@@ -150,7 +150,7 @@ export function Pricing() {
                                     Harga Early Bird
                                 </p>
                                 <p className="mt-2 text-center font-display text-6xl font-extrabold tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
-                                    Rp129.000
+                                    Rp79.000
                                 </p>
 
                                 <div className="mt-6 border-t border-white/25 pt-5">
