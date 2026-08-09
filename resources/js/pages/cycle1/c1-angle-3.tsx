@@ -6,6 +6,7 @@ import { SocialProofBar } from '@/components/landing/social-proof-bar';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { useDwellTime } from '@/hooks/use-dwell-time';
 import { useScrollTracking } from '@/hooks/use-scroll-tracking';
+import { useSectionTracking } from '@/hooks/use-section-tracking';
 
 // Lazy load everything below the fold!
 const Problem = lazy(() => import('@/components/landing/cycle1/problem-2').then(m => ({ default: m.Problem })));
@@ -24,6 +25,7 @@ export default function Landing() {
     const { trackVisit } = useAnalytics();
     useScrollTracking();
     useDwellTime();
+    useSectionTracking();
 
     useEffect(() => {
         trackVisit();

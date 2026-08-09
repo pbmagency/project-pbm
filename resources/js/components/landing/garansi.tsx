@@ -1,12 +1,8 @@
 import { ShieldCheck } from 'lucide-react';
-import { useSectionView } from '@/hooks/use-section-view';
-
 export function Garansi() {
-    const ref = useSectionView<HTMLElement>('garansi');
-
     return (
         <section
-            ref={ref}
+            id="garansi"
             className="relative overflow-hidden border-b border-lp-border-soft bg-lp-bg pb-16 sm:pb-24"
         >
             {/* Ambient glow — sama dengan pricing */}
