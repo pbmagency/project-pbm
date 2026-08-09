@@ -104,7 +104,7 @@ jobs:
             composer install --no-dev --optimize-autoloader --no-interaction
 
             php artisan optimize:clear
-            php artisan migrate --force
+            # php artisan migrate --force
 
             # Safely kill the old SSR process so the server restarts it with new files
             pkill -f "node.*ssr" || true
