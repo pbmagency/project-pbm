@@ -86,7 +86,7 @@ const transformFunnelData = (
         'Visits',
         'Engaged',
         'Intent',
-        'Initiate Checkout',
+        'Form Start',
         'Leads',
         'Sales',
     ];
@@ -757,13 +757,13 @@ export default function LabsIndex({
                                                     <button
                                                         onClick={() =>
                                                             handleSort(
-                                                                'initiate_checkout_rate',
+                                                                'form_start_rate',
                                                             )
                                                         }
                                                         className="flex items-center gap-1 hover:text-foreground"
                                                     >
                                                         <ShoppingCart className="h-4 w-4" />{' '}
-                                                        Initiate Checkout
+                                                        Form Start
                                                         <ArrowUpDown className="h-3 w-3" />
                                                     </button>
                                                 </th>
@@ -874,7 +874,7 @@ export default function LabsIndex({
                                                         </td>
                                                         <td className="p-4 text-foreground">
                                                             {formatPercent(
-                                                                item.initiate_checkout_rate,
+                                                                item.form_start_rate,
                                                                 2,
                                                             )}
                                                             %
@@ -997,7 +997,7 @@ export default function LabsIndex({
                                                             </span>{' '}
                                                             <span className="text-foreground">
                                                                 {formatPercent(
-                                                                    item.initiate_checkout_rate,
+                                                                    item.form_start_rate,
                                                                     2,
                                                                 )}
                                                                 %
@@ -1255,7 +1255,7 @@ export default function LabsIndex({
                                                     'Visits',
                                                     'Engaged',
                                                     'Intent',
-                                                    'Initiate Checkout',
+                                                    'Form Start',
                                                     'Leads',
                                                     'Sales',
                                                 ].map((stage) => (

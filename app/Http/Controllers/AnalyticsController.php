@@ -38,7 +38,7 @@ class AnalyticsController extends Controller
 public function track(Request $request, MetaConversionService $metaService): JsonResponse
 {
     $validated = $request->validate([
-        'event_type' => 'required|string|in:visit,scroll,engagement,cta_click,initiate_checkout,conversion,payment,section_view',
+        'event_type' => 'required|string|in:visit,scroll,engagement,cta_click,form_start,initiate_checkout,conversion,payment,section_view',
         'event_data' => 'nullable|array',
         'referral_source' => 'nullable|string|max:255',
         'utm_source' => 'nullable|string|max:255',
@@ -90,7 +90,7 @@ public function track(Request $request, MetaConversionService $metaService): Jso
             $metaService->sendPageView($request, $eventId);
         }
 
-        if ($validated['event_type'] === 'initiate_checkout') {
+        if ($validated['event_type'] === 'form_start' || $validated['event_type'] === 'initiate_checkout') {
             $metaService->sendAddToCart($request, $eventId);
         }
 
@@ -191,35 +191,30 @@ public function track(Request $request, MetaConversionService $metaService): Jso
             ->count('session_id');
 
         // Engaged = exact inverse of Bounced.
-        // A session is Engaged if it had (dwell_ping AND scroll ≥ 25%) OR any funnel action.
-        // Therefore Bounced = NOT [(dwell AND scroll) OR funnel]
-        //                   = (NOT dwell OR NOT scroll) AND NOT funnel
+        // Engaged = scroll ≥ 25% OR dwell ≥ 15s OR any funnel action.
+        // Bounce  = NOT Engaged = NOT scroll AND NOT dwell AND NOT funnel.
         $bouncedSessions = DB::table('user_analytics as v')
             ->where('v.event_type', 'visit')
             ->where('v.created_at', '>=', $startDate)
-            // Step 1: must have no funnel action.
+            ->whereNotExists(function ($sub) use ($startDate) {
+                $sub->from('user_analytics as e')
+                    ->whereColumn('e.session_id', 'v.session_id')
+                    ->where('e.event_type', 'engagement')
+                    ->whereRaw("json_extract(e.event_data, '$.type') = 'dwell_ping'")
+                    ->where('e.created_at', '>=', $startDate);
+            })
+            ->whereNotExists(function ($sub) use ($startDate) {
+                $sub->from('user_analytics as s')
+                    ->whereColumn('s.session_id', 'v.session_id')
+                    ->where('s.event_type', 'scroll')
+                    ->whereRaw($this->jsonDecimal('s.event_data', '$.depth').' >= 25')
+                    ->where('s.created_at', '>=', $startDate);
+            })
             ->whereNotExists(function ($sub) use ($startDate) {
                 $sub->from('user_analytics as f')
                     ->whereColumn('f.session_id', 'v.session_id')
-                    ->whereIn('f.event_type', array_merge(['cta_click', 'initiate_checkout', 'payment'], self::LEAD_EVENT_TYPES))
+                    ->whereIn('f.event_type', array_merge(['cta_click', 'form_start', 'initiate_checkout', 'payment'], self::LEAD_EVENT_TYPES))
                     ->where('f.created_at', '>=', $startDate);
-            })
-            // Step 2: must be missing dwell_ping OR scroll ≥ 25% (i.e. not both present).
-            ->where(function ($q) use ($startDate) {
-                $q->whereNotExists(function ($sub) use ($startDate) {
-                    $sub->from('user_analytics as e')
-                        ->whereColumn('e.session_id', 'v.session_id')
-                        ->where('e.event_type', 'engagement')
-                        ->whereRaw("json_extract(e.event_data, '$.type') = 'dwell_ping'")
-                        ->where('e.created_at', '>=', $startDate);
-                })
-                ->orWhereNotExists(function ($sub) use ($startDate) {
-                    $sub->from('user_analytics as s')
-                        ->whereColumn('s.session_id', 'v.session_id')
-                        ->where('s.event_type', 'scroll')
-                        ->whereRaw("CAST(json_extract(s.event_data, '$.depth') AS DECIMAL(10,2)) >= 25")
-                        ->where('s.created_at', '>=', $startDate);
-                });
             })
             ->distinct('v.session_id')
             ->count('v.session_id');
@@ -231,7 +226,7 @@ public function track(Request $request, MetaConversionService $metaService): Jso
             ->distinct('session_id')
             ->count('session_id');
 
-        $addToCart = UserAnalytic::where('event_type', 'initiate_checkout')
+        $formStarts = UserAnalytic::whereIn('event_type', ['form_start', 'initiate_checkout'])
             ->where('created_at', '>=', $startDate)
             ->distinct('session_id')
             ->count('session_id');
@@ -256,8 +251,8 @@ public function track(Request $request, MetaConversionService $metaService): Jso
             'engaged_users' => $engagedUsers,
             'intent_rate' => $uniqueVisitors > 0 ? round(($ctaClicks / $uniqueVisitors) * 100, 2) : 0,
             'cta_clicks' => $ctaClicks,
-            'add_to_cart' => $addToCart,
-            'add_to_cart_rate' => $uniqueVisitors > 0 ? round(($addToCart / $uniqueVisitors) * 100, 2) : 0,
+            'form_start' => $formStarts,
+            'form_start_rate' => $uniqueVisitors > 0 ? round(($formStarts / $uniqueVisitors) * 100, 2) : 0,
             'lead_rate' => $uniqueVisitors > 0 ? round(($leads / $uniqueVisitors) * 100, 2) : 0,
             'leads' => $leads,
             'lead_to_payment_rate' => $leads > 0 ? round(($payments / $leads) * 100, 2) : 0,
@@ -275,17 +270,15 @@ public function track(Request $request, MetaConversionService $metaService): Jso
             'event_type'
         )
             ->where('created_at', '>=', $startDate)
-            ->whereIn('event_type', ['visit', 'cta_click', 'initiate_checkout', 'payment'])
+            ->whereIn('event_type', ['visit', 'cta_click', 'form_start', 'initiate_checkout', 'payment'])
             ->groupBy(['date', 'event_type'])
             ->orderBy('date')
             ->get()
             ->groupBy('event_type');
 
         // Per-day engaged sessions.
-        // Engaged = (dwell_ping AND scroll ≥ 25%) OR any funnel action.
+        // Engaged = scroll ≥ 25% OR dwell ≥ 15s OR any funnel action.
         // Anchored to 'visit' events so each session appears on its visit date.
-        // EXISTS subqueries check whether the session has the required signals anywhere
-        // in the date range (no per-event-row date partitioning needed).
         $engagedPerDay = DB::table('user_analytics as v')
             ->select(
                 DB::raw('DATE(v.created_at) as date'),
@@ -294,28 +287,27 @@ public function track(Request $request, MetaConversionService $metaService): Jso
             ->where('v.event_type', 'visit')
             ->where('v.created_at', '>=', $startDate)
             ->where(function ($q) use ($startDate) {
-                // Condition A: session had BOTH dwell_ping AND scroll ≥ 25%
-                $q->where(function ($inner) use ($startDate) {
-                    $inner->whereExists(function ($sub) use ($startDate) {
-                        $sub->from('user_analytics as e')
-                            ->whereColumn('e.session_id', 'v.session_id')
-                            ->where('e.event_type', 'engagement')
-                            ->whereRaw("json_extract(e.event_data, '$.type') = 'dwell_ping'")
-                            ->where('e.created_at', '>=', $startDate);
-                    })
-                    ->whereExists(function ($sub) use ($startDate) {
-                        $sub->from('user_analytics as s')
-                            ->whereColumn('s.session_id', 'v.session_id')
-                            ->where('s.event_type', 'scroll')
-                            ->whereRaw("CAST(json_extract(s.event_data, '$.depth') AS DECIMAL(10,2)) >= 25")
-                            ->where('s.created_at', '>=', $startDate);
-                    });
+                // Condition A: session had a dwell_ping
+                $q->whereExists(function ($sub) use ($startDate) {
+                    $sub->from('user_analytics as e')
+                        ->whereColumn('e.session_id', 'v.session_id')
+                        ->where('e.event_type', 'engagement')
+                        ->whereRaw("json_extract(e.event_data, '$.type') = 'dwell_ping'")
+                        ->where('e.created_at', '>=', $startDate);
                 })
-                // Condition B: OR session had any funnel action
+                // Condition B: OR session had scroll ≥ 25%
+                ->orWhereExists(function ($sub) use ($startDate) {
+                    $sub->from('user_analytics as s')
+                        ->whereColumn('s.session_id', 'v.session_id')
+                        ->where('s.event_type', 'scroll')
+                        ->whereRaw($this->jsonDecimal('s.event_data', '$.depth').' >= 25')
+                        ->where('s.created_at', '>=', $startDate);
+                })
+                // Condition C: OR session had any funnel action
                 ->orWhereExists(function ($sub) use ($startDate) {
                     $sub->from('user_analytics as f')
                         ->whereColumn('f.session_id', 'v.session_id')
-                        ->whereIn('f.event_type', array_merge(['cta_click', 'initiate_checkout', 'payment'], self::LEAD_EVENT_TYPES))
+                        ->whereIn('f.event_type', array_merge(['cta_click', 'form_start', 'initiate_checkout', 'payment'], self::LEAD_EVENT_TYPES))
                         ->where('f.created_at', '>=', $startDate);
                 });
             })
@@ -361,39 +353,37 @@ public function track(Request $request, MetaConversionService $metaService): Jso
     {
         $visits = UserAnalytic::where('event_type', 'visit')->where('created_at', '>=', $startDate)->distinct('session_id')->count('session_id');
 
-        // Engaged = visits - bounced (same AND-based logic as getAnalyticsStats)
-        // Bounced = (NOT dwell OR NOT scroll) AND NOT funnel
+        // Engaged = visits - bounced (same OR-based logic as getAnalyticsStats)
+        // Bounced = NOT scroll AND NOT dwell AND NOT funnel
         $bouncedCount = DB::table('user_analytics as v')
             ->where('v.event_type', 'visit')
             ->where('v.created_at', '>=', $startDate)
             ->whereNotExists(function ($sub) use ($startDate) {
+                $sub->from('user_analytics as e')
+                    ->whereColumn('e.session_id', 'v.session_id')
+                    ->where('e.event_type', 'engagement')
+                    ->whereRaw("json_extract(e.event_data, '$.type') = 'dwell_ping'")
+                    ->where('e.created_at', '>=', $startDate);
+            })
+            ->whereNotExists(function ($sub) use ($startDate) {
+                $sub->from('user_analytics as s')
+                    ->whereColumn('s.session_id', 'v.session_id')
+                    ->where('s.event_type', 'scroll')
+                    ->whereRaw($this->jsonDecimal('s.event_data', '$.depth').' >= 25')
+                    ->where('s.created_at', '>=', $startDate);
+            })
+            ->whereNotExists(function ($sub) use ($startDate) {
                 $sub->from('user_analytics as f')
                     ->whereColumn('f.session_id', 'v.session_id')
-                    ->whereIn('f.event_type', array_merge(['cta_click', 'initiate_checkout', 'payment'], self::LEAD_EVENT_TYPES))
+                    ->whereIn('f.event_type', array_merge(['cta_click', 'form_start', 'initiate_checkout', 'payment'], self::LEAD_EVENT_TYPES))
                     ->where('f.created_at', '>=', $startDate);
-            })
-            ->where(function ($q) use ($startDate) {
-                $q->whereNotExists(function ($sub) use ($startDate) {
-                    $sub->from('user_analytics as e')
-                        ->whereColumn('e.session_id', 'v.session_id')
-                        ->where('e.event_type', 'engagement')
-                        ->whereRaw("json_extract(e.event_data, '$.type') = 'dwell_ping'")
-                        ->where('e.created_at', '>=', $startDate);
-                })
-                ->orWhereNotExists(function ($sub) use ($startDate) {
-                    $sub->from('user_analytics as s')
-                        ->whereColumn('s.session_id', 'v.session_id')
-                        ->where('s.event_type', 'scroll')
-                        ->whereRaw("CAST(json_extract(s.event_data, '$.depth') AS DECIMAL(10,2)) >= 25")
-                        ->where('s.created_at', '>=', $startDate);
-                });
             })
             ->distinct('v.session_id')
             ->count('v.session_id');
 
         $engaged   = max(0, $visits - $bouncedCount);
         $intent    = UserAnalytic::where('event_type', 'cta_click')->where('created_at', '>=', $startDate)->distinct('session_id')->count('session_id');
-        $addToCart = UserAnalytic::where('event_type', 'initiate_checkout')->where('created_at', '>=', $startDate)->distinct('session_id')->count('session_id');
+        $formStarts = UserAnalytic::whereIn('event_type', ['form_start', 'initiate_checkout'])->where('created_at', '>=', $startDate)->distinct('session_id')->count('session_id');
         $leads     = UserAnalytic::whereIn('event_type', self::LEAD_EVENT_TYPES)->where('created_at', '>=', $startDate)->distinct('session_id')->count('session_id');
         $payments  = UserAnalytic::where('event_type', 'payment')->where('created_at', '>=', $startDate)->whereRaw("json_extract(event_data, '$.status') = 'success'")->distinct('session_id')->count('session_id');
 
@@ -406,9 +396,22 @@ public function track(Request $request, MetaConversionService $metaService): Jso
             ['stage' => 'Visits',      'count' => $visits,    'percentage' => 100.0,                 'transition_pct' => null,                            'from_stage' => null],
             ['stage' => 'Engaged',     'count' => $engaged,   'percentage' => $ofVisits($engaged),   'transition_pct' => $transition($engaged, $visits),  'from_stage' => 'Visits'],
             ['stage' => 'Intent',      'count' => $intent,    'percentage' => $ofVisits($intent),    'transition_pct' => $transition($intent, $engaged),  'from_stage' => 'Engaged'],
-            ['stage' => 'Add to Cart', 'count' => $addToCart, 'percentage' => $ofVisits($addToCart), 'transition_pct' => $transition($addToCart, $intent), 'from_stage' => 'Intent'],
-            ['stage' => 'Leads',       'count' => $leads,     'percentage' => $ofVisits($leads),     'transition_pct' => $transition($leads, $addToCart), 'from_stage' => 'Add to Cart'],
+            ['stage' => 'Form Start', 'count' => $formStarts, 'percentage' => $ofVisits($formStarts), 'transition_pct' => $transition($formStarts, $intent), 'from_stage' => 'Intent'],
+            ['stage' => 'Leads',       'count' => $leads,     'percentage' => $ofVisits($leads),     'transition_pct' => $transition($leads, $formStarts), 'from_stage' => 'Form Start'],
             ['stage' => 'Payments',    'count' => $payments,  'percentage' => $ofVisits($payments),  'transition_pct' => $transition($payments, $leads),  'from_stage' => 'Leads'],
         ];
+    }
+
+    /**
+     * Generate a cross-DB compatible CAST expression for a JSON numeric value.
+     * MariaDB requires JSON_UNQUOTE before CAST; SQLite handles it natively.
+     */
+    private function jsonDecimal(string $column, string $path, string $precision = '10,2'): string
+    {
+        if (config('database.default') === 'sqlite') {
+            return "CAST(json_extract({$column}, '{$path}') AS DECIMAL({$precision}))";
+        }
+
+        return "CAST(JSON_UNQUOTE(JSON_EXTRACT({$column}, '{$path}')) AS DECIMAL({$precision}))";
     }
 }

@@ -190,8 +190,8 @@ export function useAnalytics() {
     );
 
     /** Pricing CTA click → AddToCart pixel + cta_click event in DB */
-/** Pricing CTA click: fires AddToCart Meta + tracks initiate_checkout backend event */
-const trackInitiateCheckout = useCallback(
+/** Pricing CTA click: fires AddToCart Meta + tracks form_start backend event */
+const trackFormStart = useCallback(
     (location: string) => {
         const eventId = generateEventId();
 
@@ -205,7 +205,7 @@ const trackInitiateCheckout = useCallback(
         }
 
         track({
-            event_type: 'initiate_checkout',
+            event_type: 'form_start',
             event_data: {
                 location,
                 page: window.location.pathname,
@@ -302,7 +302,7 @@ const trackLeadConversion = useCallback(
         trackEngagement,
         trackCTA,
         trackLeadConversion,
-        trackInitiateCheckout,
+        trackFormStart,
         trackPayment,
         trackSectionView,
     };

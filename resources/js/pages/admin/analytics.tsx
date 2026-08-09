@@ -141,10 +141,10 @@ export default function Analytics({
                                 description={`${stats.cta_clicks} CTA clicks`}
                             />
                             <MetricCard
-                                title="Add to Cart Rate"
-                                value={`${stats.add_to_cart_rate}%`}
+                                title="Form Start Rate"
+                                value={`${stats.form_start_rate}%`}
                                 icon={ShoppingCart}
-                                description={`${stats.add_to_cart} add to cart clicks`}
+                                description={`${stats.form_start} form starts`}
                             />
                             <MetricCard
                                 title="Lead Rate"

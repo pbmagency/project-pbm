@@ -15,6 +15,12 @@ class AbTestingService
      */
     private const LEAD_EVENT_TYPES = ['conversion', 'conversions', 'lead', 'leads'];
 
+    /**
+     * Event types that represent a form start (previously initiate_checkout / add_to_cart).
+     * Includes the legacy name for backward compatibility with existing data.
+     */
+    private const FORM_START_EVENT_TYPES = ['form_start', 'initiate_checkout'];
+
     // ── Public API ────────────────────────────────────────────────────────────
 
     public function getPerformanceMatrix(Carbon $startDate, Carbon $endDate, ?string $sourceFilter = null): array
@@ -23,7 +29,7 @@ class AbTestingService
             $startDate,
             $endDate,
             $sourceFilter,
-            ['visit', 'engagement', 'initiate_checkout', 'conversion', 'conversions', 'lead', 'leads', 'payment', 'cta_click']
+            array_merge(['visit', 'engagement', 'payment', 'cta_click'], self::FORM_START_EVENT_TYPES, self::LEAD_EVENT_TYPES)
         );
 
         if (empty($counts)) {
@@ -36,7 +42,7 @@ class AbTestingService
         $matrix = [];
         foreach ($counts as $source => $typeCounts) {
             $visits = $typeCounts['visit'] ?? 0;
-            $initiateCheckouts = $typeCounts['initiate_checkout'] ?? 0;
+            $formStarts = ($typeCounts['form_start'] ?? 0) + ($typeCounts['initiate_checkout'] ?? 0);
             // Aggregate all lead event type variants into a single count.
             $leads = ($typeCounts['conversion'] ?? 0)
                 + ($typeCounts['conversions'] ?? 0)
@@ -53,12 +59,12 @@ class AbTestingService
                 'visits' => $visits,
                 'bounce_rate' => round($this->safePct($bounced, $visits), 2),
                 'intent_rate' => round($this->safePct($ctaClicks, $visits), 2),
-                'initiate_checkout_rate' => round($this->safePct($initiateCheckouts, $visits), 2),
+                'form_start_rate' => round($this->safePct($formStarts, $visits), 2),
                 'lead_cr' => round($this->safePct($leads, $visits), 2),
                 'strict_cr' => round($this->safePct($payments, $visits), 2),
                 'rpv' => $visits > 0 ? round($revenue / $visits, 2) : 0,
                 'revenue' => $revenue,
-                'initiate_checkouts' => $initiateCheckouts,
+                'form_starts' => $formStarts,
                 'leads' => $leads,
                 'conversions' => $leads,
                 'payments' => $payments,
@@ -77,7 +83,7 @@ class AbTestingService
             $startDate,
             $endDate,
             $sourceFilter,
-            ['visit', 'cta_click', 'initiate_checkout', 'conversion', 'conversions', 'lead', 'leads', 'payment']
+            array_merge(['visit', 'cta_click', 'payment'], self::FORM_START_EVENT_TYPES, self::LEAD_EVENT_TYPES)
         );
 
         if (empty($counts)) {
@@ -88,9 +94,9 @@ class AbTestingService
         // NOT EXISTS query from getPerformanceMatrix(), guaranteeing that:
         //   bounce_rate% + (engaged / visits * 100)% = 100%
         // A session is Engaged if it satisfied AT LEAST ONE of:
-        //   • had a dwell_ping (stayed ≥ 15 s active)
         //   • scrolled ≥ 25 %
-        //   • performed any funnel action (cta_click / initiate_checkout / conversion / payment)
+        //   • had a dwell_ping (stayed ≥ 15 s active)
+        //   • performed any funnel action (cta_click / form_start / conversion / payment)
         $bouncedBySource = $this->batchBouncedCounts($startDate, $endDate, $sourceFilter);
 
         $funnel = [];
@@ -99,7 +105,7 @@ class AbTestingService
             $bounced = $bouncedBySource[$source] ?? 0;
             $engaged = max(0, $visits - $bounced);
             $intent = $typeCounts['cta_click'] ?? 0;
-            $initiateCheckouts = $typeCounts['initiate_checkout'] ?? 0;
+            $formStarts = ($typeCounts['form_start'] ?? 0) + ($typeCounts['initiate_checkout'] ?? 0);
             $leads = ($typeCounts['conversion'] ?? 0)
                 + ($typeCounts['conversions'] ?? 0)
                 + ($typeCounts['lead'] ?? 0)
@@ -112,7 +118,7 @@ class AbTestingService
                     ['stage' => 'Visits', 'count' => $visits, 'percentage' => 100],
                     ['stage' => 'Engaged', 'count' => $engaged, 'percentage' => round($this->safePct($engaged, $visits), 1)],
                     ['stage' => 'Intent', 'count' => $intent, 'percentage' => round($this->safePct($intent, $visits), 1)],
-                    ['stage' => 'Initiate Checkout', 'count' => $initiateCheckouts, 'percentage' => round($this->safePct($initiateCheckouts, $visits), 1)],
+                    ['stage' => 'Form Start', 'count' => $formStarts, 'percentage' => round($this->safePct($formStarts, $visits), 1)],
                     ['stage' => 'Leads', 'count' => $leads, 'percentage' => round($this->safePct($leads, $visits), 1)],
                     ['stage' => 'Sales', 'count' => $sales, 'percentage' => round($this->safePct($sales, $visits), 1)],
                 ],
@@ -231,10 +237,9 @@ class AbTestingService
                 $dwell = $dwellTimes[$sessionId] ?? 0;
 
                 // Bouncer definition must stay in exact parity with batchBouncedCounts().
-                // New rule: Engaged = (dwell_ping AND scroll ≥ 25%) OR funnel action.
-                //           Bouncer = NOT Engaged = (NOT dwell OR NOT scroll≥25%) AND NOT funnel.
-                // In PHP terms: no funnel action AND (dwell == 0 OR depth < 25).
-                if (! isset($progressedSessions[$sessionId]) && ($dwell == 0 || $depth < 25)) {
+                // Engaged = scroll ≥ 25% OR dwell > 0 (≥ 15s) OR funnel action.
+                // Bouncer = NOT Engaged = scroll < 25% AND no dwell AND no funnel.
+                if (! isset($progressedSessions[$sessionId]) && $dwell == 0 && $depth < 25) {
                     $personas['bouncers']++;
                 } elseif ($dwell > 120) {
                     $personas['deep_readers']++;
@@ -250,7 +255,7 @@ class AbTestingService
                 'landing_source' => $src,
                 'total_sessions' => $total,
                 'personas' => [
-                    ['name' => 'Bouncers', 'description' => 'No funnel action AND (dwell < 15s OR scroll < 25%) — mirrors Performance Matrix bounce logic', 'count' => $personas['bouncers'], 'percentage' => round($this->safeDiv($personas['bouncers'], $total) * 100, 1)],
+                    ['name' => 'Bouncers', 'description' => 'No dwell ping (<15s) AND scroll <25% AND no funnel action', 'count' => $personas['bouncers'], 'percentage' => round($this->safeDiv($personas['bouncers'], $total) * 100, 1)],
                     ['name' => 'Skimmers', 'description' => 'High scroll (>75%) but quick read (<60s)', 'count' => $personas['skimmers'], 'percentage' => round($this->safeDiv($personas['skimmers'], $total) * 100, 1)],
                     ['name' => 'Deep Readers', 'description' => 'Extended engagement (>120s)', 'count' => $personas['deep_readers'], 'percentage' => round($this->safeDiv($personas['deep_readers'], $total) * 100, 1)],
                     ['name' => 'Casuals', 'description' => 'Moderate engagement', 'count' => $personas['casuals'], 'percentage' => round($this->safeDiv($personas['casuals'], $total) * 100, 1)],
@@ -270,15 +275,15 @@ class AbTestingService
 
         $depthsBySource = DB::table('user_analytics')
             ->select([
-                DB::raw("JSON_UNQUOTE(json_extract(event_data, '$.landing_source')) as landing_source"),
+                DB::raw($this->jsonString('event_data', '$.landing_source').' as landing_source'),
                 'session_id',
-                DB::raw("MAX(CAST(json_extract(event_data, '$.depth') AS DECIMAL(10,2))) as max_depth"),
+                DB::raw('MAX('.$this->jsonDecimal('event_data', '$.depth').') as max_depth'),
             ])
             ->where('event_type', 'scroll')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
             ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('referral_source', $sourceFilter))
-            ->groupBy(DB::raw("JSON_UNQUOTE(json_extract(event_data, '$.landing_source'))"), 'session_id')
+            ->groupBy(DB::raw($this->jsonString('event_data', '$.landing_source')), 'session_id')
             ->get()
             ->groupBy(fn($row) => $this->normalizeLandingSource($row->landing_source));
 
@@ -480,35 +485,29 @@ class AbTestingService
             ->whereRaw("json_extract(v.event_data, '$.landing_source') IS NOT NULL")
             ->whereRaw("json_extract(v.event_data, '$.landing_source') NOT IN ('', 'unknown')")
             ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('v.referral_source', $sourceFilter))
-            // Bounced = truly did nothing meaningful:
-            //   A session is Engaged if it had (dwell_ping AND scroll ≥ 25%) OR any funnel action.
-            //   Therefore Bounced = NOT [(dwell AND scroll) OR funnel]
-            //                     = (NOT dwell OR NOT scroll) AND NOT funnel
-            //
-            // Step 1: exclude sessions with any funnel action.
+            // Bounced = truly did nothing meaningful.
+            // Engaged = scroll ≥ 25% OR dwell ≥ 15s OR any funnel action.
+            // Bounce  = NOT Engaged = NOT scroll AND NOT dwell AND NOT funnel.
+            // Three independent NOT EXISTS conditions (all must be true for bounce).
+            ->whereNotExists(function ($sub) use ($startDate, $endDate) {
+                $sub->from('user_analytics as e')
+                    ->whereColumn('e.session_id', 'v.session_id')
+                    ->where('e.event_type', 'engagement')
+                    ->whereRaw("json_extract(e.event_data, '$.type') = 'dwell_ping'")
+                    ->whereBetween('e.created_at', [$startDate, $endDate]);
+            })
+            ->whereNotExists(function ($sub) use ($startDate, $endDate) {
+                $sub->from('user_analytics as s')
+                    ->whereColumn('s.session_id', 'v.session_id')
+                    ->where('s.event_type', 'scroll')
+                    ->whereRaw($this->jsonDecimal('s.event_data', '$.depth').' >= 25')
+                    ->whereBetween('s.created_at', [$startDate, $endDate]);
+            })
             ->whereNotExists(function ($sub) use ($startDate, $endDate) {
                 $sub->from('user_analytics as f')
                     ->whereColumn('f.session_id', 'v.session_id')
-                    ->whereIn('f.event_type', array_merge(['cta_click', 'initiate_checkout', 'payment'], self::LEAD_EVENT_TYPES))
+                    ->whereIn('f.event_type', array_merge(['cta_click', 'payment'], self::FORM_START_EVENT_TYPES, self::LEAD_EVENT_TYPES))
                     ->whereBetween('f.created_at', [$startDate, $endDate]);
-            })
-            // Step 2: exclude sessions that had BOTH dwell_ping AND scroll ≥ 25%.
-            // Keeping sessions where at least one of the two is absent (NOT dwell OR NOT scroll).
-            ->where(function ($q) use ($startDate, $endDate) {
-                $q->whereNotExists(function ($sub) use ($startDate, $endDate) {
-                    $sub->from('user_analytics as e')
-                        ->whereColumn('e.session_id', 'v.session_id')
-                        ->where('e.event_type', 'engagement')
-                        ->whereRaw("json_extract(e.event_data, '$.type') = 'dwell_ping'")
-                        ->whereBetween('e.created_at', [$startDate, $endDate]);
-                })
-                    ->orWhereNotExists(function ($sub) use ($startDate, $endDate) {
-                        $sub->from('user_analytics as s')
-                            ->whereColumn('s.session_id', 'v.session_id')
-                            ->where('s.event_type', 'scroll')
-                            ->whereRaw("CAST(json_extract(s.event_data, '$.depth') AS DECIMAL(10,2)) >= 25")
-                            ->whereBetween('s.created_at', [$startDate, $endDate]);
-                    });
             })
             ->groupBy(DB::raw("json_extract(v.event_data, '$.landing_source')"))
             ->get();
@@ -642,7 +641,7 @@ class AbTestingService
         $rows = DB::table('user_analytics')
             ->select([
                 'session_id',
-                DB::raw("MAX(CAST(json_extract(event_data, '$.depth') AS DECIMAL(10,2))) as max_depth"),
+                DB::raw('MAX('.$this->jsonDecimal('event_data', '$.depth').') as max_depth'),
             ])
             ->where('event_type', 'scroll')
             ->whereBetween('created_at', [$startDate, $endDate])
@@ -683,7 +682,7 @@ class AbTestingService
     {
         $sessionIds = DB::table('user_analytics')
             ->select('session_id')
-            ->whereIn('event_type', array_merge(['cta_click', 'initiate_checkout', 'payment'], self::LEAD_EVENT_TYPES))
+            ->whereIn('event_type', array_merge(['cta_click', 'payment'], self::FORM_START_EVENT_TYPES, self::LEAD_EVENT_TYPES))
             ->whereBetween('created_at', [$startDate, $endDate])
             ->when($sourceFilter && $sourceFilter !== 'all', fn($q) => $q->where('referral_source', $sourceFilter))
             ->distinct()
@@ -758,6 +757,33 @@ class AbTestingService
         }
 
         return $clean;
+    }
+
+    /**
+     * Generate a cross-DB compatible CAST expression for a JSON numeric value.
+     * MariaDB requires JSON_UNQUOTE before CAST; SQLite handles it natively.
+     */
+    private function jsonDecimal(string $column, string $path, string $precision = '10,2'): string
+    {
+        if (config('database.default') === 'sqlite') {
+            return "CAST(json_extract({$column}, '{$path}') AS DECIMAL({$precision}))";
+        }
+
+        return "CAST(JSON_UNQUOTE(JSON_EXTRACT({$column}, '{$path}')) AS DECIMAL({$precision}))";
+    }
+
+    /**
+     * Generate a cross-DB compatible expression to extract a JSON string value.
+     * MariaDB wraps values in quotes; JSON_UNQUOTE strips them.
+     * SQLite's json_extract already returns the unquoted scalar.
+     */
+    private function jsonString(string $column, string $path): string
+    {
+        if (config('database.default') === 'sqlite') {
+            return "json_extract({$column}, '{$path}')";
+        }
+
+        return "JSON_UNQUOTE(JSON_EXTRACT({$column}, '{$path}'))";
     }
 
     private function safeDiv(float $numerator, float $denominator): float

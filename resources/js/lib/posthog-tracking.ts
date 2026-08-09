@@ -1,5 +1,5 @@
 // Ported from posthog-tracking.js (PBM Agency LP template).
-// Covers the browser side of the funnel: engaged, intent, add_to_cart.
+// Covers the browser side of the funnel: engaged, intent, form_start.
 // 'lead' and 'payment' are captured server-side only (see CheckoutController /
 // PaymentCallbackController) so they can't be spoofed or double-fired.
 import posthog from '@/lib/posthog';
@@ -54,7 +54,7 @@ document.addEventListener('click', (e) => {
     });
 });
 
-// ==== 3. ADD TO CART dari Formulir checkout ====
+// ==== 3. FORM START dari Formulir checkout ====
 // Elemen <form> checkout dikasih attribute data-lp-form.
 // Delegated on document (not queried once at load) because the form is
 // rendered by a lazy-loaded React component that may not exist in the DOM yet
@@ -70,5 +70,5 @@ document.addEventListener('input', (e) => {
     }
 
     atcFired = true;
-    posthog.capture('add_to_cart');
+    posthog.capture('form_start');
 });
