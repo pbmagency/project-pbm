@@ -62,7 +62,7 @@ export function useAnalytics() {
         }
     }, []);
 
-    const track = useCallback(async (event: AnalyticsEvent) => {
+    const track = useCallback(async (event: AnalyticsEvent): Promise<boolean> => {
         try {
             const landingSource = getLandingSource();
             const urlParams = new URLSearchParams(window.location.search);
@@ -108,9 +108,15 @@ export function useAnalytics() {
                     `Analytics tracking rejected (${response.status}) for event_type "${event.event_type}":`,
                     body,
                 );
+
+                return false;
             }
+
+            return true;
         } catch (error) {
             console.debug('Analytics tracking failed:', error);
+
+            return false;
         }
     }, []);
 
@@ -258,7 +264,7 @@ const trackLeadConversion = useCallback(
 
     const trackSectionView = useCallback(
         (sectionId: string) => {
-            track({
+            return track({
                 event_type: 'section_view',
                 event_data: {
                     section: sectionId,

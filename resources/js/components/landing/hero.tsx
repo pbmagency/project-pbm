@@ -1,16 +1,12 @@
 import { PlayCircle, Shield, Sparkles, TrendingUp, Users } from 'lucide-react';
 import { CtaButton } from '@/components/landing/cta-button';
 import { Eyebrow } from '@/components/landing/eyebrow';
-import { useSectionView } from '@/hooks/use-section-view';
-
 const CHART_BARS = [38, 52, 44, 68, 58, 82, 72, 96, 88, 108];
 
 export function Hero() {
-    const ref = useSectionView<HTMLElement>('hero');
-
     return (
         <section
-            ref={ref}
+            id="hero"
             className="relative overflow-hidden border-lp-border-soft"
         >
             {/* Atmospheric backdrop */}

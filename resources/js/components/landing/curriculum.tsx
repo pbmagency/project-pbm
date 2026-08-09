@@ -1,5 +1,4 @@
 import { CtaButton } from '@/components/landing/cta-button';
-import { useSectionView } from '@/hooks/use-section-view';
 import { cn } from '@/lib/utils';
 
 const MODULES = [
@@ -60,11 +59,9 @@ const MODULES = [
 ];
 
 export function Curriculum() {
-    const ref = useSectionView<HTMLElement>('curriculum');
-
     return (
         <section
-            ref={ref}
+            id="curriculum"
             className="relative overflow-hidden border-b border-lp-border-soft bg-lp-bg-elevated"
         >
             {/* Background Effects */}

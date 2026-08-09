@@ -2,8 +2,6 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Expand, Info, MessageCircle, TrendingUp, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useState } from 'react';
-import { useSectionView } from '@/hooks/use-section-view';
-
 interface ProofCard {
     id: string;
     label: string;
@@ -52,13 +50,12 @@ function ImageFrame({ card }: { card: ProofCard; large?: boolean }) {
 }
 
 export function QuickProof() {
-    const ref = useSectionView<HTMLElement>('trust');
     const [openId, setOpenId] = useState<string | null>(null);
     const activeCard = CARDS.find((c) => c.id === openId) ?? null;
 
     return (
         <section
-            ref={ref}
+            id="trust"
             className="relative overflow-hidden border-b border-lp-border-soft bg-lp-bg"
         >
             <div className="pointer-events-none absolute top-0 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-lp-primary/10 blur-[130px]" />
