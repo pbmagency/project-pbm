@@ -1,13 +1,9 @@
 import { Instagram, User, Zap } from 'lucide-react';
 import { Eyebrow } from '@/components/landing/eyebrow';
-import { useSectionView } from '@/hooks/use-section-view';
-
 export function Mentor() {
-    const ref = useSectionView<HTMLElement>('mentor');
-
     return (
         <section
-            ref={ref}
+            id="mentor"
             className="relative overflow-hidden border-b border-lp-border-soft bg-lp-bg-elevated"
         >
             <div className="pointer-events-none absolute top-1/2 left-0 h-96 w-96 -translate-y-1/2 rounded-full bg-lp-amber/12 blur-[130px]" />

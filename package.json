@@ -59,7 +59,7 @@
         "globals": "^15.14.0",
         "laravel-vite-plugin": "^3.0.0",
         "lucide-react": "^0.475.0",
-        "posthog-js": "^1.413.3",
+        "posthog-js": "^1.414.0",
         "react": "^19.2.0",
         "react-day-picker": "^10.0.1",
         "react-dom": "^19.2.0",

@@ -1,6 +1,5 @@
 import { Eye, Wrench, FileText } from 'lucide-react';
 import { Eyebrow } from '@/components/landing/eyebrow';
-import { useSectionView } from '@/hooks/use-section-view';
 import { cn } from '@/lib/utils';
 import { CtaButton } from '@/components/landing/cta-button';
 
@@ -32,12 +31,9 @@ const MODULES = [
 ];
 
 export function Module() {
-    const ref = useSectionView<HTMLElement>('module');
-
     return (
         <section
             id="module"
-            ref={ref}
             className="relative overflow-hidden border-b border-lp-border-soft bg-lp-bg"
         >
             <div className="pointer-events-none absolute inset-0 bg-lp-grid opacity-30" />

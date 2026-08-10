@@ -5,7 +5,6 @@ import {
     Search,
 } from 'lucide-react';
 import { CtaButton } from '@/components/landing/cta-button';
-import { useSectionView } from '@/hooks/use-section-view';
 import { cn } from '@/lib/utils';
 
 interface Benefit {
@@ -59,11 +58,9 @@ const BENEFITS: Benefit[] = [
 ];
 
 export function Benefit() {
-    const ref = useSectionView<HTMLElement>('benefit');
-
     return (
         <section
-            ref={ref}
+            id="benefit"
             className="relative overflow-hidden border-b border-lp-border-soft bg-lp-bg-elevated"
         >
             <div className="pointer-events-none absolute inset-0 bg-lp-grid opacity-40" />

@@ -1,8 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import { Check } from 'lucide-react';
 import { CtaButton } from '@/components/landing/cta-button';
-import { useSectionView } from '@/hooks/use-section-view';
-
 const AFTER_SESSION: React.ReactNode[] = [
     'Lihat dari data di bagian mana orang paling banyak keluar sebelum beli.',
     <>
@@ -39,12 +37,11 @@ function ChecklistRow({
 }
 
 export function Solution() {
-    const ref = useSectionView<HTMLElement>('solution');
     const { settings } = usePage<any>().props;
 
     return (
         <section
-            ref={ref}
+            id="solution"
             className="relative overflow-hidden border-b border-lp-border-soft bg-lp-bg"
         >
             <div className="pointer-events-none absolute inset-0">

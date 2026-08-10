@@ -33,7 +33,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
 
       - name: Install NPM & Build Inertia React
         run: |
@@ -123,6 +123,12 @@ jobs:
 
             php artisan optimize:clear
             php artisan migrate --force
+
+            # Safely kill the old SSR process so the server restarts it with new files
+            pkill -f "node.*ssr" || true
+
+            # Restart LiteSpeed Web Server to instantly clear HTML caches
+            systemctl restart lsws || true
 
             chown -R ${{ env.DOMAIN_USERNAME }}:${{ env.DOMAIN_USERNAME }} ${{ env.TARGET_DIR_LARAVEL }}
             chown -R ${{ env.DOMAIN_USERNAME }}:${{ env.DOMAIN_USERNAME }} ${{ env.TARGET_DIR_PUBLIC }}

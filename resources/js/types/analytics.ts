@@ -9,6 +9,7 @@ export type AnalyticsEventType =
     | 'scroll'
     | 'engagement'
     | 'cta_click'
+    | 'form_start'
     | 'initiate_checkout'
     | 'conversion'
     | 'conversions'
@@ -26,8 +27,8 @@ export interface AnalyticsStats {
     engaged_users: number;
     intent_rate: number;
     cta_clicks: number;
-    add_to_cart: number;
-    add_to_cart_rate: number;
+    form_start: number;
+    form_start_rate: number;
     lead_rate: number;
     leads: number;
     lead_to_payment_rate: number;
@@ -61,7 +62,7 @@ export interface MatrixItem {
     intent_rate: number;
     lead_cr: number;
     strict_cr: number;
-    initiate_checkout_rate: number;
+    form_start_rate: number;
     rpv: number;
     revenue: number;
     conversions: number;

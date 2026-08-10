@@ -6,7 +6,6 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { useSectionView } from '@/hooks/use-section-view';
 import { cn } from '@/lib/utils';
 
 const FAQS = [
@@ -40,11 +39,9 @@ const FAQS = [
 
 export function Faq() {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
-    const ref = useSectionView<HTMLElement>('faq');
-
     return (
         <section
-            ref={ref}
+            id="faq"
             className="relative overflow-hidden border-b border-lp-border-soft bg-lp-bg-elevated"
         >
             <div className="pointer-events-none absolute inset-0 bg-lp-grid opacity-30" />

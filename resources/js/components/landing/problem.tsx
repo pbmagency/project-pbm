@@ -1,7 +1,5 @@
 import { X } from 'lucide-react';
 import { Eyebrow } from '@/components/landing/eyebrow';
-import { useSectionView } from '@/hooks/use-section-view';
-
 const PAIN_POINTS = [
     {
         lead: 'Kamu udah coba ganti semuanya,',
@@ -37,11 +35,9 @@ const CAUSES = [
 ];
 
 export function Problem() {
-    const ref = useSectionView<HTMLElement>('problem');
-
     return (
         <section
-            ref={ref}
+            id="problem"
             className="relative overflow-hidden border-b border-lp-border-soft bg-lp-bg-elevated"
         >
             <div className="pointer-events-none absolute top-0 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-lp-danger/20 blur-[120px]" />

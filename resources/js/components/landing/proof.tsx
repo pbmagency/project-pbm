@@ -1,7 +1,6 @@
 import { ArrowDown, ArrowRight, Expand, X, ZoomIn } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Eyebrow } from '@/components/landing/eyebrow';
-import { useSectionView } from '@/hooks/use-section-view';
 import { CtaButton } from '@/components/landing/cta-button';
 
 const STATS = [
@@ -68,7 +67,6 @@ function ImageCard({
 }
 
 export function Proof() {
-    const ref = useSectionView<HTMLElement>('proof');
     const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
     const [lightboxAlt, setLightboxAlt] = useState<string>('');
 
@@ -94,7 +92,7 @@ export function Proof() {
     return (
         <>
             <section
-                ref={ref}
+                id="proof"
                 className="relative overflow-hidden border-b border-lp-border-soft bg-lp-bg"
             >
                 <div className="pointer-events-none absolute top-1/2 right-0 h-96 w-96 -translate-y-1/2 rounded-full bg-lp-primary-2/15 blur-[140px]" />

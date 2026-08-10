@@ -8,7 +8,6 @@ import {
     getLandingSource,
     useAnalytics,
 } from '@/hooks/use-analytics';
-import { useSectionView } from '@/hooks/use-section-view';
 import posthog from '@/lib/posthog';
 
 const INCLUDES = [
@@ -19,10 +18,9 @@ const INCLUDES = [
 ];
 
 export function Pricing() {
-    const ref = useSectionView<HTMLElement>('pricing');
     const { settings } = usePage<any>().props;
     const coursePrice = Number(import.meta.env.VITE_COURSE_PRICE ?? 129000);
-    const { trackInitiateCheckout } = useAnalytics();
+    const { trackFormStart } = useAnalytics();
     const hasTrackedIntent = useRef(false);
     // Generated once on first intent, shared with CAPI via meta_event_id for deduplication
     const checkoutEventId = useRef<string>(generateEventId());
@@ -36,7 +34,7 @@ export function Pricing() {
     const handleFirstTyping = (value: string) => {
         if (!hasTrackedIntent.current && value.trim() !== '') {
             hasTrackedIntent.current = true;
-            trackInitiateCheckout('pricing_form');
+            trackFormStart('pricing_form');
         }
     };
 
@@ -76,7 +74,6 @@ export function Pricing() {
 
     return (
         <section
-            ref={ref}
             id="pricing"
             className="relative overflow-hidden bg-lp-bg"
         >
