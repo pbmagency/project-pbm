@@ -24,7 +24,7 @@ const BENEFITS: Benefit[] = [
             'Rekaman webinar yang bisa kamu tonton ulang kapan aja.',
         ],
         amber: false,
-        image: '/images/benefits/live-session.webp',
+        image: '/images/benefits/live-session1.webp',
     },
     {
         icon: BookOpen,
@@ -33,7 +33,7 @@ const BENEFITS: Benefit[] = [
             'Materi pelengkap: praktek memperbaiki konversi secara praktis',
         ],
         amber: false,
-        image: '/images/benefits/ebook.webp',
+        image: '/images/benefits/ebook1.webp',
     },
     {
         icon: MessageCircleQuestion,
@@ -43,7 +43,7 @@ const BENEFITS: Benefit[] = [
             'Sesi tanya jawab interaktif di akhir webinar.',
         ],
         amber: false,
-        image: '/images/benefits/qna-session.webp',
+        image: '/images/benefits/qna-session1.webp',
     },
     {
         icon: Search,
@@ -53,7 +53,7 @@ const BENEFITS: Benefit[] = [
             'Dapatkan rekomendasi spesifik untuk kasus di bisnis kamu, bukan lagi saran umum.',
         ],
         amber: true,
-        image: '/images/benefits/audit-report.webp',
+        image: '/images/benefits/audit-report1.webp',
     },
 ];
 
