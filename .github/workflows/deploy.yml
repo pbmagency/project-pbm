@@ -124,7 +124,7 @@ jobs:
             php artisan migrate --force
 
             # Safely kill the old SSR process so the server restarts it with new files
-            pkill -f "node.*ssr" || true
+            pkill -f "[n]ode.*ssr" || true
 
             # Restart LiteSpeed Web Server to instantly clear HTML caches
             systemctl restart lsws || true
