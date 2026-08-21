@@ -6,9 +6,21 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\LabsController;
 use App\Http\Controllers\MiniAuditController;
 use App\Http\Controllers\PaymentCallbackController;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
-Route::inertia('/', 'landing')->name('home');
+$welcomeController = function () {
+    return Inertia::render('welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
+};
+Route::get('/', $welcomeController)->name('home');
+Route::get('/c2-design-1', $welcomeController)->name('c2-design-1');
+Route::inertia('/c2-design-2', 'landing')->name('landing');
 Route::inertia('/c1-angle-1', 'cycle1/c1-angle-1')->name('home1');
 Route::inertia('/c1-angle-2', 'cycle1/c1-angle-2')->name('home2');
 Route::inertia('/c1-angle-3', 'cycle1/c1-angle-3')->name('home3');
