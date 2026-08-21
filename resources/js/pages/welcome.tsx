@@ -1,16 +1,17 @@
-import { Head, router, useForm, Link } from '@inertiajs/react';
-import { useEffect, useRef, useState } from 'react';
-import { useAnalytics, generateEventId, getLandingSource } from '@/hooks/use-analytics';
+import { Head } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+import { useAnalytics } from '@/hooks/use-analytics';
 import { useScrollTracking } from '@/hooks/use-scroll-tracking';
 import { useDwellTime } from '@/hooks/use-dwell-time';
 import { useSectionTracking } from '@/hooks/use-section-tracking';
 
 // UI
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { CheckCircle2, Zap, TrendingDown, TrendingUp, BarChart3, Star, Play, ArrowRight, ShieldCheck, Users, AlertCircle, Calendar, Clock, Search, Check, X } from 'lucide-react';
+import { CheckCircle2, Zap, TrendingDown, TrendingUp, BarChart3, Star, ArrowRight, ShieldCheck, Users, AlertCircle, Calendar, Clock, Search, Check, X } from 'lucide-react';
+
+const WA_NUMBER = '6285931018333';
+const WA_MESSAGE = encodeURIComponent('Halo, saya mau daftar Webinar The Silent Conversion Leak seharga Rp79.000. Bagaimana cara daftarnya?');
+const WA_LINK = `https://wa.me/${WA_NUMBER}?text=${WA_MESSAGE}`;
 
 export default function Welcome() {
     // 1. Core Tracking Hooks
@@ -36,39 +37,6 @@ export default function Welcome() {
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
-
-    // 2. Checkout Form State & Tracking
-    const checkoutEventId = useRef<string>(generateEventId());
-    const hasTrackedIntent = useRef(false);
-
-    const { data, setData, post, processing, errors } = useForm({
-        name: '',
-        email: '',
-        phone: '',
-    });
-
-    const handleFirstTyping = (value: string) => {
-        if (!hasTrackedIntent.current && value.trim() !== '') {
-            hasTrackedIntent.current = true;
-            trackFormStart('pricing_form');
-        }
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        // Tahap B - Submit form event (FB Pixel)
-        if (typeof window !== 'undefined' && window.fbq) {
-            window.fbq('track', 'InitiateCheckout', { value: 79000, currency: 'IDR' }, { eventID: checkoutEventId.current });
-        }
-        
-        // Submit data via Inertia to our checkout controller
-        router.post('/checkout', {
-            ...data,
-            landing_source: getLandingSource(),
-            meta_event_id: checkoutEventId.current,
-        }, { preserveScroll: true });
-    };
 
     return (
         <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900" style={{ zoom: 0.75 }}>
@@ -98,14 +66,14 @@ export default function Welcome() {
                             <span className="text-slate-900 font-extrabold text-2xl tracking-tight">PBM Agency</span>
                         </div>
                         <div>
-                            <Link href="/checkout" onClick={() => trackCTA('nav_cta', 'Daftar Sekarang', '/checkout')} data-cta-zone="nav_cta" className="cursor-pointer">
+                            <a href={WA_LINK} onClick={() => trackCTA('nav_cta', 'Daftar Sekarang', WA_LINK)} data-cta-zone="nav_cta" target="_blank" rel="noopener noreferrer" className="cursor-pointer">
                                 <Button className="h-auto bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-5 py-2 font-semibold shadow-md shadow-indigo-600/20 hidden sm:flex flex-col items-center justify-center cursor-pointer">
                                     <span>Amankan Seat — Rp79.000</span>
                                     <span className="text-[10px] text-yellow-300 font-extrabold tracking-widest uppercase mt-0.5">
                                         Diskon 73%
                                     </span>
                                 </Button>
-                            </Link>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -158,7 +126,7 @@ export default function Welcome() {
                                 </p>
                                 
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 pt-2">
-                                    <a href="#pricing" onClick={() => trackCTA('hero_cta', 'Amankan Seat Webinar', '#pricing')} data-cta-zone="hero_cta" className="cursor-pointer">
+                                    <a href={WA_LINK} onClick={() => trackCTA('hero_cta', 'Amankan Seat Webinar', WA_LINK)} data-cta-zone="hero_cta" target="_blank" rel="noopener noreferrer" className="cursor-pointer">
                                         <Button size="lg" className="h-14 px-8 text-base rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:shadow-xl hover:-translate-y-0.5 transition-all bg-indigo-600 hover:bg-indigo-700 text-white group cursor-pointer">
                                             Amankan Seat Webinar — Rp79.000
                                             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -788,13 +756,15 @@ export default function Welcome() {
                                     </div>
                                 </div>
 
-                                <Link
-                                    href="/checkout"
+                                <a
+                                    href={WA_LINK}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="inline-flex w-full sm:w-auto items-center justify-center px-8 py-4 text-base font-bold text-white transition-all bg-indigo-600 border border-transparent rounded-full shadow-lg shadow-indigo-600/30 hover:bg-indigo-700 hover:shadow-indigo-600/50 hover:-translate-y-0.5"
                                 >
                                     Amankan Kursi Anda Sekarang
                                     <ArrowRight className="w-5 h-5 ml-2" />
-                                </Link>
+                                </a>
                             </div>
 
                             {/* Right Side: Visual/Ebook */}
@@ -898,10 +868,12 @@ export default function Welcome() {
                             </div>
                             
                             {/* CTA */}
-                            <Link 
-                                href="/checkout"
-                                onClick={() => trackCTA('pricing_submit', 'Daftar Sekarang', '/checkout')}
+                            <a 
+                                href={WA_LINK}
+                                onClick={() => trackCTA('pricing_submit', 'Daftar Sekarang', WA_LINK)}
                                 data-cta-zone="pricing_submit"
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="block"
                             >
                                 <Button 
@@ -910,7 +882,7 @@ export default function Welcome() {
                                     Daftar Sekarang (Rp79.000)
                                     <ArrowRight className="w-6 h-6 ml-2" />
                                 </Button>
-                            </Link>
+                            </a>
                             
                             <div className="mt-5 flex justify-center items-center gap-2 text-xs font-semibold text-slate-500">
                                 <ShieldCheck className="w-4 h-4 text-emerald-500" />
