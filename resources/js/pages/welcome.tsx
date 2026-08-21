@@ -68,10 +68,7 @@ export default function Welcome() {
                         <div>
                             <a href={WA_LINK} onClick={() => trackCTA('nav_cta', 'Daftar Sekarang', WA_LINK)} data-cta-zone="nav_cta" target="_blank" rel="noopener noreferrer" className="cursor-pointer">
                                 <Button className="h-auto bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-5 py-2 font-semibold shadow-md shadow-indigo-600/20 hidden sm:flex flex-col items-center justify-center cursor-pointer">
-                                    <span>Amankan Seat — Rp79.000</span>
-                                    <span className="text-[10px] text-yellow-300 font-extrabold tracking-widest uppercase mt-0.5">
-                                        Diskon 73%
-                                    </span>
+                                    <span>Amankan Seat</span>
                                 </Button>
                             </a>
                         </div>
@@ -125,21 +122,16 @@ export default function Welcome() {
                                   Hentikan 4 "kebocoran siluman" di landing page yang bikin CPA Anda mahal. Dalam Live 90 Menit, pelajari cara mendiagnosa data yang sukses membantu klien menaikkan omset dari Rp20 juta menjadi Rp30 juta per bulan.
                                 </p>
                                 
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 pt-2">
+                                <div className="flex flex-col items-start gap-3 pt-2">
                                     <a href={WA_LINK} onClick={() => trackCTA('hero_cta', 'Amankan Seat Webinar', WA_LINK)} data-cta-zone="hero_cta" target="_blank" rel="noopener noreferrer" className="cursor-pointer">
                                         <Button size="lg" className="h-14 px-8 text-base rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:shadow-xl hover:-translate-y-0.5 transition-all bg-indigo-600 hover:bg-indigo-700 text-white group cursor-pointer">
-                                            Amankan Seat Webinar — Rp79.000
+                                            Amankan Seat Webinar
                                             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                                         </Button>
                                     </a>
-                                    <div className="flex flex-col mt-1">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-slate-500 font-medium text-sm">Harga Normal <span className="line-through">Rp299.000</span></span>
-                                            <span className="text-xs font-bold text-white bg-red-500 px-2 py-0.5 rounded-full shadow-sm animate-pulse">Hemat 73%</span>
-                                        </div>
-                                        <span className="text-indigo-600 text-sm font-bold flex items-center gap-1 mt-1">
-                                            <Zap className="w-4 h-4 fill-indigo-600" /> Kuota Sangat Terbatas
-                                        </span>
+                                    <div className="flex items-center gap-2">
+                                        <Zap className="w-4 h-4 fill-indigo-600 text-indigo-600" />
+                                        <span className="text-indigo-600 text-sm font-bold">Kuota Sangat Terbatas</span>
                                     </div>
                                 </div>
 
@@ -249,7 +241,7 @@ export default function Welcome() {
                             
                             {/* Item 4 */}
                             <div className="flex flex-col items-center justify-center">
-                                <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">Rp 30 Juta</span>
+                                <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">Rp 200 Juta++</span>
                                 <span className="text-[11px] sm:text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest text-center">Omset Skala Klien</span>
                             </div>
                         </div>
@@ -594,98 +586,100 @@ export default function Welcome() {
                         </h2>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-                        
-                        {/* Case Study 1: Tsania Latheefa */}
-                        <div className="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-sm hover:shadow-xl transition-shadow flex flex-col justify-between">
-                            <div>
-                                <div className="flex items-center gap-4 mb-8">
-                                    <img 
-                                        src="/assets/tsan-thumb.webp" 
-                                        alt="Tsania Latheefa" 
-                                        loading="lazy"
-                                        className="w-16 h-16 rounded-full object-cover border-2 border-slate-100 shadow-sm"
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=Tsania+Latheefa&background=e0e7ff&color=4f46e5';
-                                        }}
-                                    />
-                                    <div>
-                                        <h3 className="text-lg font-bold text-slate-900">Tsania Latheefa</h3>
-                                        <p className="text-sm text-slate-500 font-medium">Content Creator • 52.8K Followers</p>
-                                    </div>
-                                </div>
-                                
-                                <blockquote className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug mb-6">
-                                    <span className="text-slate-400">"</span>
-                                    Omset Naik dari Rp20 Juta → <span className="text-emerald-500">Rp30 Juta</span> per bulan.
-                                    <span className="text-slate-400">"</span>
-                                </blockquote>
-                                
-                                <p className="text-slate-600 text-lg leading-relaxed">
-                                    Peningkatan omset ini langsung terlihat konsisten setelah proses optimasi dan bedah tuntas *landing page*.
-                                </p>
-                            </div>
-                        </div>
+                    <div className="flex flex-col gap-6 max-w-5xl mx-auto">
 
-                        {/* Case Study 2: Mas Ardi */}
-                        <div className="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-sm hover:shadow-xl transition-shadow flex flex-col lg:flex-row gap-8 items-center lg:items-start">
-                            
-                            <div className="flex-1 w-full order-2 lg:order-1">
-                                <h3 className="text-lg font-bold text-slate-900 mb-1">Mas Ardi</h3>
-                                <p className="text-sm text-slate-500 font-medium mb-6">Klien PBM Agency</p>
-                                
-                                <blockquote className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug mb-6">
-                                    <span className="text-slate-400">"</span>
-                                    ROAS Iklan Naik Drastis Menjadi <span className="text-indigo-600">5.0x</span>
-                                    <span className="text-slate-400">"</span>
-                                </blockquote>
-                                
-                                <p className="text-slate-600 leading-relaxed">
-                                    Volume purchase meningkat tajam yang langsung terlihat dari metrik *checkout landing page*. Dikonfirmasi langsung oleh klien bahwa kenaikan ini jauh melebihi rata-rata pola musiman *(seasonal)* biasa.
-                                </p>
-                            </div>
-
-                            {/* Chat Mockup */}
-                            <div className="w-full sm:w-64 flex-shrink-0 order-1 lg:order-2 bg-slate-100 rounded-2xl p-3 border border-slate-200 shadow-inner">
+                        {/* Row 1: Tsania Latheefa — Video Testimoni (full width) */}
+                        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-shadow">
+                            <div className="flex items-center gap-4 mb-4">
                                 <img 
-                                    src="/assets/fullbright.webp" 
-                                    alt="Bukti Chat Mas Ardi" 
+                                    src="/assets/tsan-thumb.webp" 
+                                    alt="Tsania Latheefa" 
                                     loading="lazy"
-                                    className="w-full rounded-xl shadow-sm object-cover"
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).src = 'https://placehold.co/400x600/f8fafc/94a3b8?text=Screenshot+Chat';
-                                    }}
+                                    className="w-12 h-12 rounded-full object-cover border-2 border-slate-100 shadow-sm"
                                 />
-                            </div>
-                            
-                        </div>
-
-                        {/* Case Study 3: Dashboard Analytics (Full Width) */}
-                        <div className="mt-8 bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-sm hover:shadow-xl transition-shadow w-full lg:col-span-2">
-                            <div className="mb-8 border-b border-slate-100 pb-4">
-                                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">
-                                    Data Real dari Salah Satu Project Kami
-                                </h3>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-2">
-                                        <span className="w-3 h-3 rounded-full bg-slate-300"></span>
-                                        <h4 className="font-bold text-slate-700 uppercase tracking-widest text-sm">Before Optimization</h4>
-                                    </div>
-                                    <img src="/assets/before.webp" alt="Dashboard Before" className="w-full rounded-2xl border border-slate-200 shadow-sm" loading="lazy" />
-                                </div>
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-2">
-                                        <span className="w-3 h-3 rounded-full bg-indigo-500"></span>
-                                        <h4 className="font-bold text-indigo-700 uppercase tracking-widest text-sm">After Optimization</h4>
-                                    </div>
-                                    <img src="/assets/after.webp" alt="Dashboard After" className="w-full rounded-2xl border border-slate-200 shadow-md ring-4 ring-indigo-50" loading="lazy" />
+                                <div>
+                                    <h3 className="text-lg font-bold text-slate-900">Tsania Latheefa</h3>
+                                    <p className="text-sm text-slate-500 font-medium">Content Creator • 52.8K Followers</p>
                                 </div>
                             </div>
+                            <blockquote className="text-xl font-bold text-slate-900 leading-snug mb-4">
+                                <span className="text-slate-400">"</span>
+                                Omset Naik dari Rp20 Juta → <span className="text-emerald-500">Rp30 Juta</span> per bulan.
+                                <span className="text-slate-400">"</span>
+                            </blockquote>
+                            <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-inner">
+                                <div style={{ position: 'relative', paddingTop: '56.25%' }}>
+                                    <iframe
+                                        src="https://player.mediadelivery.net/embed/701292/623975dd-1d66-41c8-8aac-07a07c141d21?autoplay=false&loop=false&muted=false&preload=true&responsive=true"
+                                        allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen;"
+                                        allowFullScreen
+                                        style={{ border: 0, position: 'absolute', top: 0, height: '100%', width: '100%' }}
+                                    />
+                                </div>
+                            </div>
+                            <p className="mt-2 text-sm text-slate-500 font-medium text-center">
+                                Video testimoni setelah optimasi landing page
+                            </p>
                         </div>
 
+                        {/* Row 2: 2 columns — Mas Ardi (left) + Testimoni Baru (right) */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                            {/* Card: Mas Ardi */}
+                            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-shadow flex flex-col">
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-bold text-slate-900 mb-1">Mas Ardi</h3>
+                                    <p className="text-sm text-slate-500 font-medium mb-4">Klien PBM Agency</p>
+                                    <blockquote className="text-xl font-bold text-slate-900 leading-snug mb-4">
+                                        <span className="text-slate-400">"</span>
+                                        ROAS Iklan Naik Drastis Menjadi <span className="text-indigo-600">5.0x</span>
+                                        <span className="text-slate-400">"</span>
+                                    </blockquote>
+                                    <p className="text-slate-600 leading-relaxed text-sm">
+                                        Volume purchase meningkat tajam yang langsung terlihat dari metrik checkout landing page. Dikonfirmasi langsung oleh klien bahwa kenaikan ini jauh melebihi rata-rata pola musiman (seasonal) biasa.
+                                    </p>
+                                </div>
+                                <div className="mt-5 bg-slate-100 rounded-2xl p-3 border border-slate-200 shadow-inner">
+                                    <img 
+                                        src="/assets/fullbright.webp" 
+                                        alt="Bukti Chat Mas Ardi" 
+                                        loading="lazy"
+                                        className="w-full rounded-xl shadow-sm object-cover"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Card: Testimoni WA + Bukti (digabung) */}
+                            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-shadow flex flex-col">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center">
+                                        <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                    </div>
+                                    <h3 className="text-base font-bold text-slate-900">Testimoni Klien via WhatsApp</h3>
+                                </div>
+                                <div className="flex justify-center mb-4">
+                                    <img 
+                                        src="/assets/newtestimoni.jpeg" 
+                                        alt="Screenshot testimoni WhatsApp klien" 
+                                        loading="lazy"
+                                        className="w-full max-w-[280px] rounded-2xl border border-slate-200 shadow-md object-contain"
+                                    />
+                                </div>
+                                <div className="border-t border-slate-100 pt-4 mt-auto">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <TrendingUp className="w-4 h-4 text-indigo-600" />
+                                        <span className="text-sm font-bold text-slate-900">Bukti Hasil Kenaikan</span>
+                                    </div>
+                                    <img 
+                                        src="/assets/buktinew.jpeg" 
+                                        alt="Bukti hasil kenaikan performa" 
+                                        loading="lazy"
+                                        className="w-full rounded-xl border border-slate-200 shadow-sm object-contain"
+                                    />
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </section>
@@ -702,110 +696,103 @@ export default function Welcome() {
                         </h2>
                     </div>
 
-                    {/* The Big Offer Card */}
-                    <div className="max-w-5xl mx-auto bg-white rounded-[2.5rem] shadow-xl border border-white overflow-hidden">
-                        <div className="grid lg:grid-cols-2">
-                            {/* Left Side: Items */}
-                            <div className="p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
-                                <div className="space-y-8 mb-10">
-                                    {/* Item 1 */}
-                                    <div className="flex gap-5 items-start group">
-                                        <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-50 flex items-center justify-center border border-indigo-100 group-hover:bg-indigo-600 group-hover:border-indigo-600 transition-colors mt-1">
-                                            <Check className="w-5 h-5 text-indigo-600 group-hover:text-white transition-colors" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xl font-bold text-slate-900 mb-2">Live Session 90 Menit via Zoom</h3>
-                                            <p className="text-slate-600 leading-relaxed text-lg">Membahas tuntas cara membaca letak masalah, *framework* memperbaiki kebocoran, serta studi kasus & tools diagnosis yang teruji.</p>
-                                        </div>
+                    {/* Benefit Cards Grid */}
+                    <div className="grid gap-6 sm:grid-cols-2 max-w-5xl mx-auto">
+                        {/* Card 1: Live Session */}
+                        <div className="group bg-white rounded-[20px] overflow-hidden border border-slate-200 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                            <img src="/images/benefits/live-session1.webp" alt="Live Session Webinar" className="w-full aspect-[16/9] object-cover" loading="lazy" />
+                            <div className="p-6">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center border border-indigo-100 group-hover:bg-indigo-600 group-hover:border-indigo-600 transition-colors">
+                                        <Check className="w-5 h-5 text-indigo-600 group-hover:text-white transition-colors" />
                                     </div>
-                                    
-                                    {/* Item 2 */}
-                                    <div className="flex gap-5 items-start group">
-                                        <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-50 flex items-center justify-center border border-indigo-100 group-hover:bg-indigo-600 group-hover:border-indigo-600 transition-colors mt-1">
-                                            <Check className="w-5 h-5 text-indigo-600 group-hover:text-white transition-colors" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xl font-bold text-slate-900 mb-2">Rekaman Penuh Webinar</h3>
-                                            <p className="text-slate-600 leading-relaxed text-lg">Bebas ditonton ulang kapan saja. Anda tidak perlu khawatir tertinggal materi jika tidak bisa hadir full saat *live*.</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Item 3 */}
-                                    <div className="flex gap-5 items-start group">
-                                        <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-50 flex items-center justify-center border border-indigo-100 group-hover:bg-indigo-600 group-hover:border-indigo-600 transition-colors mt-1">
-                                            <Check className="w-5 h-5 text-indigo-600 group-hover:text-white transition-colors" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xl font-bold text-slate-900 mb-2">Akses Tanya Jawab Langsung (Q&A)</h3>
-                                            <p className="text-slate-600 leading-relaxed text-lg">Kesempatan untuk membawa kondisi *funnel* atau bisnis Anda sendiri dan menanyakannya langsung pada mentor.</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Item 4 - Bonus */}
-                                    <div className="flex gap-5 items-start group p-6 -mx-6 bg-amber-50/50 rounded-2xl border border-amber-100 transition-colors">
-                                        <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-100 flex items-center justify-center border border-amber-200 mt-1">
-                                            <Star className="w-5 h-5 text-amber-600" />
-                                        </div>
-                                        <div>
-                                            <div className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800 mb-2">
-                                                BONUS SPESIAL
-                                            </div>
-                                            <h3 className="text-xl font-bold text-slate-900 mb-2">Sesi Landing Page Audit Personal</h3>
-                                            <p className="text-slate-600 leading-relaxed text-lg">Kesempatan untuk mem-booking sesi audit landing page gratis (1-on-1) setelah webinar untuk mendapatkan rekomendasi super spesifik.</p>
-                                        </div>
-                                    </div>
+                                    <h3 className="text-lg font-bold text-slate-900">Live Session & Rekaman Webinar</h3>
                                 </div>
-
-                                <a
-                                    href={WA_LINK}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex w-full sm:w-auto items-center justify-center px-8 py-4 text-base font-bold text-white transition-all bg-indigo-600 border border-transparent rounded-full shadow-lg shadow-indigo-600/30 hover:bg-indigo-700 hover:shadow-indigo-600/50 hover:-translate-y-0.5"
-                                >
-                                    Amankan Kursi Anda Sekarang
-                                    <ArrowRight className="w-5 h-5 ml-2" />
-                                </a>
-                            </div>
-
-                            {/* Right Side: Visual/Ebook */}
-                            <div className="relative flex flex-col items-center justify-center p-8 sm:p-12 bg-gradient-to-br from-indigo-50 to-purple-50/50 lg:border-l border-slate-100">
-                                {/* Decorative elements */}
-                                <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                                    <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
-                                    <div className="absolute bottom-[-10%] left-[-10%] w-64 h-64 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
-                                </div>
-
-                                <div className="relative z-10 w-full max-w-sm mx-auto group">
-                                    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-                                    <div className="relative bg-white p-2 rounded-2xl shadow-2xl transform transition-transform duration-500 group-hover:-translate-y-2 group-hover:rotate-1">
-                                        <img 
-                                            src="/assets/checklist.webp" 
-                                            alt="Ebook Iklan Sudah Jalan Tapi Kok Boncos" 
-                                            className="w-full h-auto rounded-xl border border-slate-100"
-                                            loading="lazy"
-                                        />
-                                        
-                                        {/* Floating Badge */}
-                                        <div className="absolute -bottom-4 -left-4 bg-white px-4 py-3 rounded-xl shadow-lg border border-slate-100 flex items-center gap-3 animate-bounce-slow">
-                                            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                                                <Check className="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <p className="text-xs font-semibold text-slate-500 uppercase">Termasuk E-Book</p>
-                                                <p className="text-sm font-bold text-slate-900">Panduan Praktik</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="relative z-10 mt-12 text-center">
-                                    <h4 className="text-lg font-bold text-slate-900 mb-2">Ebook Modul Esensial</h4>
-                                    <p className="text-slate-600 text-sm leading-relaxed max-w-[280px] mx-auto">
-                                        Materi praktik esensial untuk membantu Anda mengimplementasikan perbaikan konversi langkah demi langkah.
-                                    </p>
-                                </div>
+                                <ul className="space-y-2 ml-[52px]">
+                                    <li className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                                        <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400"></span>
+                                        Sesi webinar live via zoom yang bahas strategi meningkatkan konversi landing page.</li>
+                                    <li className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                                        <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400"></span>
+                                        Rekaman webinar yang bisa kamu tonton ulang kapan aja.</li>
+                                </ul>
                             </div>
                         </div>
+
+                        {/* Card 2: Ebook */}
+                        <div className="group bg-white rounded-[20px] overflow-hidden border border-slate-200 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                            <img src="/images/benefits/ebook1.webp" alt="Ebook Iklan Sudah Jalan Tapi Kok Boncos" className="w-full aspect-[16/9] object-cover" loading="lazy" />
+                            <div className="p-6">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center border border-indigo-100 group-hover:bg-indigo-600 group-hover:border-indigo-600 transition-colors">
+                                        <Check className="w-5 h-5 text-indigo-600 group-hover:text-white transition-colors" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-slate-900">Ebook: Iklan Jalan, Tapi Kok Boncos?</h3>
+                                </div>
+                                <ul className="space-y-2 ml-[52px]">
+                                    <li className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                                        <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400"></span>
+                                        Materi pelengkap: praktek memperbaiki konversi secara praktis.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        {/* Card 3: Q&A */}
+                        <div className="group bg-white rounded-[20px] overflow-hidden border border-slate-200 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                            <img src="/images/benefits/qna-session1.webp" alt="Sesi Tanya Jawab" className="w-full aspect-[16/9] object-cover" loading="lazy" />
+                            <div className="p-6">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center border border-indigo-100 group-hover:bg-indigo-600 group-hover:border-indigo-600 transition-colors">
+                                        <Check className="w-5 h-5 text-indigo-600 group-hover:text-white transition-colors" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-slate-900">Akses Tanya Jawab Langsung</h3>
+                                </div>
+                                <ul className="space-y-2 ml-[52px]">
+                                    <li className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                                        <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400"></span>
+                                        Ajukan kondisi funnel kamu sendiri langsung ke mentor.</li>
+                                    <li className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                                        <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400"></span>
+                                        Sesi tanya jawab interaktif di akhir webinar.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        {/* Card 4: Audit (Bonus) */}
+                        <div className="group bg-gradient-to-br from-amber-50 to-orange-50 rounded-[20px] overflow-hidden border border-amber-200 hover:border-amber-300 hover:shadow-xl hover:shadow-amber-100 transition-all duration-300 hover:-translate-y-1">
+                            <img src="/images/benefits/audit-report1.webp" alt="Landing Page Audit" className="w-full aspect-[16/9] object-cover" loading="lazy" />
+                            <div className="p-6">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center border border-amber-200">
+                                        <Star className="w-5 h-5 text-amber-600" />
+                                    </div>
+                                    <div>
+                                        <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 mb-1">BONUS SPESIAL</span>
+                                        <h3 className="text-lg font-bold text-slate-900">Landing Page Audit Gratis</h3>
+                                    </div>
+                                </div>
+                                <ul className="space-y-2 ml-[52px]">
+                                    <li className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                                        <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400"></span>
+                                        Setelah webinar, kamu bisa booking sesi audit personal ke landing page bisnis kamu.</li>
+                                    <li className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                                        <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400"></span>
+                                        Dapatkan rekomendasi spesifik untuk kasus di bisnis kamu, bukan lagi saran umum.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-12 flex justify-center">
+                        <a
+                            href={WA_LINK}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex w-full sm:w-auto items-center justify-center px-8 py-4 text-base font-bold text-white transition-all bg-indigo-600 border border-transparent rounded-full shadow-lg shadow-indigo-600/30 hover:bg-indigo-700 hover:shadow-indigo-600/50 hover:-translate-y-0.5"
+                        >
+                            Amankan Kursi Anda Sekarang
+                            <ArrowRight className="w-5 h-5 ml-2" />
+                        </a>
                     </div>
                 </div>
             </section>
@@ -905,57 +892,50 @@ export default function Welcome() {
                         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Pertanyaan yang Sering Diajukan</h2>
                     </div>
 
-                    <div className="space-y-6">
-                        <details className="group bg-white rounded-2xl border border-slate-200 shadow-sm [&_summary::-webkit-details-marker]:hidden">
-                            <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-6 sm:p-8 font-bold text-lg text-slate-900">
-                                Apakah ada rekaman jika saya berhalangan hadir?
-                                <span className="relative size-6 shrink-0 bg-slate-100 rounded-full flex items-center justify-center group-open:bg-indigo-50 group-open:text-indigo-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="absolute size-4 opacity-100 group-open:opacity-0 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="absolute size-4 opacity-0 group-open:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
-                                    </svg>
-                                </span>
-                            </summary>
-                            <div className="px-6 sm:px-8 pb-6 sm:pb-8 text-slate-600 text-lg leading-relaxed border-t border-slate-100 pt-6 mt-2">
-                                Ya, Anda akan mendapatkan akses ke rekaman penuh webinar ini beserta materi Ebook pelengkap yang bisa ditonton ulang kapan saja melalui member area kami.
-                            </div>
-                        </details>
-
-                        <details className="group bg-white rounded-2xl border border-slate-200 shadow-sm [&_summary::-webkit-details-marker]:hidden">
-                            <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-6 sm:p-8 font-bold text-lg text-slate-900">
-                                Apakah materi ini cocok untuk pemula?
-                                <span className="relative size-6 shrink-0 bg-slate-100 rounded-full flex items-center justify-center group-open:bg-indigo-50 group-open:text-indigo-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="absolute size-4 opacity-100 group-open:opacity-0 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="absolute size-4 opacity-0 group-open:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
-                                    </svg>
-                                </span>
-                            </summary>
-                            <div className="px-6 sm:px-8 pb-6 sm:pb-8 text-slate-600 text-lg leading-relaxed border-t border-slate-100 pt-6 mt-2">
-                                Materi dirancang terstruktur mulai dari konsep hingga studi kasus nyata. Jadi, baik Anda pemula maupun praktisi yang sudah sering menjalankan iklan, akan tetap mendapatkan insight berharga yang aplikatif.
-                            </div>
-                        </details>
-
-                        <details className="group bg-white rounded-2xl border border-slate-200 shadow-sm [&_summary::-webkit-details-marker]:hidden">
-                            <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-6 sm:p-8 font-bold text-lg text-slate-900">
-                                Kapan webinar ini dilaksanakan?
-                                <span className="relative size-6 shrink-0 bg-slate-100 rounded-full flex items-center justify-center group-open:bg-indigo-50 group-open:text-indigo-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="absolute size-4 opacity-100 group-open:opacity-0 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="absolute size-4 opacity-0 group-open:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
-                                    </svg>
-                                </span>
-                            </summary>
-                            <div className="px-6 sm:px-8 pb-6 sm:pb-8 text-slate-600 text-lg leading-relaxed border-t border-slate-100 pt-6 mt-2">
-                                Acara akan diselenggarakan secara live via Zoom pada tanggal 6 September 2026 pukul 19:00 WIB. Link Zoom akan dikirimkan H-1 acara.
-                            </div>
-                        </details>
+                    <div className="space-y-4">
+                        {[
+                            {
+                                q: 'Iklan saya udah jalan bagus, CTR tinggi, CPC rendah, ini relevan buat saya?',
+                                a: 'Sangat cocok. Webinar ini dibuat khusus untuk kamu yang iklannya sudah jalan dengan baik, tapi closingnya masih tertahan. Kalau kamu ngerasa masalahnya ada di iklan itu sendiri, ini mungkin bukan tempat yang tepat.',
+                            },
+                            {
+                                q: 'Traffic saya udah ramai, kenapa closing masih rendah?',
+                                a: 'Karena ramai dan closing itu dua hal berbeda. Traffic ramai cuma menunjukkan iklan kamu berhasil menarik perhatian. Yang menentukan closing ada di langkah setelahnya, dari halaman sampai penawaran, yang kita bedah tuntas di webinar ini.',
+                            },
+                            {
+                                q: 'Apa saja yang saya dapat kalau daftar?',
+                                a: 'Akses penuh webinar live bareng Justin Wijaya, bonus ebook yang otomatis dikirim setelah daftar, dan kesempatan audit personal gratis setelah webinar selesai.',
+                            },
+                            {
+                                q: 'Webinarnya kapan, dan platformnya apa?',
+                                a: 'Kami menggunakan platform zoom, untuk Jadwal lengkap dikirim lewat email setelah kamu daftar. Pastikan email yang kamu masukkan aktif.',
+                            },
+                            {
+                                q: 'Audit personal setelah webinar itu ngapain aja?',
+                                a: 'Landing page dan funnel kamu akan ditinjau langsung, dicari titik titik yang berpotensi bocor. Ini juga jadi kesempatan buat kami mengenal bisnis kamu lebih jauh, kalau ke depannya kamu butuh bantuan lebih lanjut.',
+                            },
+                            {
+                                q: 'Saya baru mulai jalanin iklan dan belum yakin iklannya sendiri bagus, cocok gak?',
+                                a: 'Belum tentu. Webinar ini fokus untuk kamu yang iklannya sudah menunjukkan hasil baik, CTR dan CPC sehat, tapi closingnya belum ikut naik. Kalau iklan kamu sendiri yang masih dicari formulanya, ini bukan prioritas pertama kamu.',
+                            },
+                        ].map((faq) => (
+                            <details key={faq.q} className="group bg-white rounded-2xl border border-slate-200 shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                                <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-6 sm:p-8 font-bold text-lg text-slate-900">
+                                    {faq.q}
+                                    <span className="relative size-6 shrink-0 bg-slate-100 rounded-full flex items-center justify-center group-open:bg-indigo-50 group-open:text-indigo-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="absolute size-4 opacity-100 group-open:opacity-0 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="absolute size-4 opacity-0 group-open:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
+                                        </svg>
+                                    </span>
+                                </summary>
+                                <div className="px-6 sm:px-8 pb-6 sm:pb-8 text-slate-600 text-lg leading-relaxed border-t border-slate-100 pt-6 mt-2">
+                                    {faq.a}
+                                </div>
+                            </details>
+                        ))}
                     </div>
                 </div>
             </section>
