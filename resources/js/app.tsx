@@ -3,8 +3,12 @@ import { lazy, Suspense } from 'react';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
-import '@/lib/posthog';
-import '@/lib/posthog-tracking';
+
+// PostHog: only load when API key is configured (skip when POSTHOG_DISABLED=true)
+const apiKey = import.meta.env.VITE_POSTHOG_KEY;
+if (apiKey) {
+    import('@/lib/posthog').then(() => import('@/lib/posthog-tracking'));
+}
 
 // We use lazy() here so the heavy dashboard NEVER loads on the landing page!
 const AppLayout = lazy(() => import('@/layouts/app-layout'));

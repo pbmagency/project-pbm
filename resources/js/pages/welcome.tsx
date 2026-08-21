@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { useScrollTracking } from '@/hooks/use-scroll-tracking';
 import { useDwellTime } from '@/hooks/use-dwell-time';
@@ -12,6 +12,44 @@ import { CheckCircle2, Zap, TrendingDown, TrendingUp, BarChart3, Star, ArrowRigh
 const WA_NUMBER = '6285931018333';
 const WA_MESSAGE = encodeURIComponent('Halo, saya mau daftar Webinar The Silent Conversion Leak seharga Rp79.000. Bagaimana cara daftarnya?');
 const WA_LINK = `https://wa.me/${WA_NUMBER}?text=${WA_MESSAGE}`;
+
+// Lazy video embed — only loads iframe when user scrolls near it
+function VideoEmbed({ src }: { src: string }) {
+    const ref = useRef<HTMLDivElement>(null);
+    const [load, setLoad] = useState(false);
+
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const obs = new IntersectionObserver(
+            ([entry]) => { if (entry.isIntersecting) { setLoad(true); obs.disconnect(); } },
+            { rootMargin: '200px' },
+        );
+        obs.observe(el);
+        return () => obs.disconnect();
+    }, []);
+
+    return (
+        <div ref={ref} className="rounded-2xl overflow-hidden border border-slate-200 shadow-inner bg-slate-100">
+            <div style={{ position: 'relative', paddingTop: '56.25%' }}>
+                {load ? (
+                    <iframe
+                        src={src}
+                        allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen;"
+                        allowFullScreen
+                        style={{ border: 0, position: 'absolute', top: 0, height: '100%', width: '100%' }}
+                    />
+                ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
+                            <svg className="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
 
 export default function Welcome() {
     // 1. Core Tracking Hooks
@@ -133,23 +171,21 @@ export default function Welcome() {
                                         <Zap className="w-4 h-4 fill-indigo-600 text-indigo-600" />
                                         <span className="text-indigo-600 text-sm font-bold">Kuota Sangat Terbatas</span>
                                     </div>
-                                </div>
-
-                                <div className="pt-8 flex items-center gap-4">
-                                    <div className="flex -space-x-3">
-                                        <div className="w-10 h-10 rounded-full border-2 border-[#f8f6fc] bg-slate-200 overflow-hidden shadow-sm">
-                                            <img src="https://i.pravatar.cc/100?img=33" className="w-full h-full object-cover" alt="User" loading="lazy" />
+                                </div>                                    <div className="pt-8 flex items-center gap-4">
+                                        <div className="flex -space-x-3">
+                                            <div className="w-10 h-10 rounded-full border-2 border-[#f8f6fc] bg-indigo-500 flex items-center justify-center shadow-sm text-white text-xs font-bold">
+                                                AW
+                                            </div>
+                                            <div className="w-10 h-10 rounded-full border-2 border-[#f8f6fc] bg-violet-500 flex items-center justify-center shadow-sm text-white text-xs font-bold">
+                                                SR
+                                            </div>
+                                            <div className="w-10 h-10 rounded-full border-2 border-[#f8f6fc] bg-rose-500 flex items-center justify-center shadow-sm text-white text-xs font-bold">
+                                                DK
+                                            </div>
+                                            <div className="w-10 h-10 rounded-full border-2 border-[#f8f6fc] bg-indigo-100 flex items-center justify-center shadow-sm text-indigo-600 font-bold text-xs">
+                                                99+
+                                            </div>
                                         </div>
-                                        <div className="w-10 h-10 rounded-full border-2 border-[#f8f6fc] bg-slate-300 overflow-hidden shadow-sm">
-                                            <img src="https://i.pravatar.cc/100?img=47" className="w-full h-full object-cover" alt="User" loading="lazy" />
-                                        </div>
-                                        <div className="w-10 h-10 rounded-full border-2 border-[#f8f6fc] bg-slate-400 overflow-hidden shadow-sm">
-                                            <img src="https://i.pravatar.cc/100?img=12" className="w-full h-full object-cover" alt="User" loading="lazy" />
-                                        </div>
-                                        <div className="w-10 h-10 rounded-full border-2 border-[#f8f6fc] bg-indigo-100 flex items-center justify-center shadow-sm text-indigo-600 font-bold text-xs">
-                                            99+
-                                        </div>
-                                    </div>
                                     <div className="flex flex-col">
                                         <div className="flex text-yellow-400">
                                             {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4" fill="currentColor" />)}
@@ -607,16 +643,7 @@ export default function Welcome() {
                                 Omset Naik dari Rp20 Juta → <span className="text-emerald-500">Rp30 Juta</span> per bulan.
                                 <span className="text-slate-400">"</span>
                             </blockquote>
-                            <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-inner">
-                                <div style={{ position: 'relative', paddingTop: '56.25%' }}>
-                                    <iframe
-                                        src="https://player.mediadelivery.net/embed/701292/623975dd-1d66-41c8-8aac-07a07c141d21?autoplay=false&loop=false&muted=false&preload=true&responsive=true"
-                                        allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen;"
-                                        allowFullScreen
-                                        style={{ border: 0, position: 'absolute', top: 0, height: '100%', width: '100%' }}
-                                    />
-                                </div>
-                            </div>
+                            <VideoEmbed src="https://player.mediadelivery.net/embed/701292/623975dd-1d66-41c8-8aac-07a07c141d21?autoplay=false&loop=false&muted=false&preload=true&responsive=true" />
                             <p className="mt-2 text-sm text-slate-500 font-medium text-center">
                                 Video testimoni setelah optimasi landing page
                             </p>
@@ -659,7 +686,7 @@ export default function Welcome() {
                                 </div>
                                 <div className="flex justify-center mb-4">
                                     <img 
-                                        src="/assets/newtestimoni.jpeg" 
+                                        src="/assets/newtestimoni.webp" 
                                         alt="Screenshot testimoni WhatsApp klien" 
                                         loading="lazy"
                                         className="w-full max-w-[280px] rounded-2xl border border-slate-200 shadow-md object-contain"
@@ -671,7 +698,7 @@ export default function Welcome() {
                                         <span className="text-sm font-bold text-slate-900">Bukti Hasil Kenaikan</span>
                                     </div>
                                     <img 
-                                        src="/assets/buktinew.jpeg" 
+                                        src="/assets/buktinew.webp" 
                                         alt="Bukti hasil kenaikan performa" 
                                         loading="lazy"
                                         className="w-full rounded-xl border border-slate-200 shadow-sm object-contain"
