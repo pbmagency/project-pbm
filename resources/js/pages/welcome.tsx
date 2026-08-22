@@ -260,25 +260,25 @@ export default function Welcome() {
                             {/* Item 1 */}
                             <div className="flex flex-col items-center justify-center">
                                 <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">1,5x - 2x</span>
-                                <span className="text-[11px] sm:text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest text-center">Kenaikan Konversi</span>
+                                <span className="text-base font-bold text-slate-500 mt-1 uppercase tracking-widest text-center">Kenaikan Konversi</span>
                             </div>
                             
                             {/* Item 2 */}
                             <div className="flex flex-col items-center justify-center">
                                 <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">ROAS 5</span>
-                                <span className="text-[11px] sm:text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest text-center">Pencapaian Klien</span>
+                                <span className="text-base font-bold text-slate-500 mt-1 uppercase tracking-widest text-center">Pencapaian Klien</span>
                             </div>
                             
                             {/* Item 3 */}
                             <div className="flex flex-col items-center justify-center">
                                 <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">20K+</span>
-                                <span className="text-[11px] sm:text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest text-center">Followers IG Justin</span>
+                                <span className="text-base font-bold text-slate-500 mt-1 uppercase tracking-widest text-center">Followers IG Justin</span>
                             </div>
                             
                             {/* Item 4 */}
                             <div className="flex flex-col items-center justify-center">
                                 <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">Rp 200 Juta++</span>
-                                <span className="text-[11px] sm:text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest text-center">Omset Skala Klien</span>
+                                <span className="text-base font-bold text-slate-500 mt-1 uppercase tracking-widest text-center">Omset Skala Klien</span>
                             </div>
                         </div>
                     </div>
