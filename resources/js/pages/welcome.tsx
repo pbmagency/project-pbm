@@ -84,7 +84,7 @@ export default function Welcome() {
             <div className="bg-indigo-600 text-white py-2.5 overflow-hidden relative z-30 flex whitespace-nowrap">
                 <div className="animate-marquee flex items-center w-max">
                     {[...Array(6)].map((_, i) => (
-                        <div key={i} className="flex items-center gap-6 sm:gap-12 pl-6 sm:pl-12 shrink-0 text-sm font-medium">
+                        <div key={i} className="flex items-center gap-6 sm:gap-12 pl-6 sm:pl-12 shrink-0 text-base font-medium">
                             <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-indigo-200" /> 6 September 2026</span>
                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 opacity-60"></span>
                             <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-indigo-200" /> 19:00 WIB - Selesai</span>
@@ -169,7 +169,7 @@ export default function Welcome() {
                                     </a>
                                     <div className="flex items-center gap-2">
                                         <Zap className="w-4 h-4 fill-indigo-600 text-indigo-600" />
-                                        <span className="text-indigo-600 text-sm font-bold">Kuota Sangat Terbatas</span>
+                                        <span className="text-indigo-600 text-base font-bold">Kuota Sangat Terbatas</span>
                                     </div>
                                 </div>                                    <div className="pt-8 flex items-center gap-4">
                                         <div className="flex -space-x-3">
@@ -312,7 +312,7 @@ export default function Welcome() {
                                 <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
                                     Iklan berjalan bagus secara metrik, tapi CPA tetap mahal
                                 </h3>
-                                <p className="mt-2 text-sm text-slate-500 leading-relaxed">
+                                <p className="mt-2 text-base text-slate-500 leading-relaxed">
                                     CTR dan CPC wajar, tapi biaya per pembelian tetap menggerus margin keuntungan Anda.
                                 </p>
                             </div>
@@ -327,7 +327,7 @@ export default function Welcome() {
                                 <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
                                     Landing page menahan calon pembeli, bukan mendorong mereka checkout
                                 </h3>
-                                <p className="mt-2 text-sm text-slate-500 leading-relaxed">
+                                <p className="mt-2 text-base text-slate-500 leading-relaxed">
                                     Pengunjung datang tapi bingung, ragu, atau tidak menemukan alasan kuat untuk beli sekarang.
                                 </p>
                             </div>
@@ -342,7 +342,7 @@ export default function Welcome() {
                                 <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
                                     Tidak tahu di titik mana funnel benar-benar bocor
                                 </h3>
-                                <p className="mt-2 text-sm text-slate-500 leading-relaxed">
+                                <p className="mt-2 text-base text-slate-500 leading-relaxed">
                                     Sudah ganti kreatif, angle, dan format — tapi tetap bingung harus mulai benahi dari mana.
                                 </p>
                             </div>
@@ -357,7 +357,7 @@ export default function Welcome() {
                                 <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
                                     Traffic makin banyak, tapi niat beli yang sesungguhnya makin menurun
                                 </h3>
-                                <p className="mt-2 text-sm text-slate-500 leading-relaxed">
+                                <p className="mt-2 text-base text-slate-500 leading-relaxed">
                                     Angka visitor naik terus, tapi konversi justru stagnan atau bahkan turun.
                                 </p>
                             </div>
@@ -466,7 +466,7 @@ export default function Welcome() {
 
                     {/* Micro CTA to scroll down */}
                     <div className="flex flex-col items-center justify-center space-y-3 animate-bounce">
-                        <span className="text-sm font-semibold text-slate-400 uppercase tracking-widest">
+                        <span className="text-base font-semibold text-slate-400 uppercase tracking-widest">
                             Lihat cara diagnosanya di bawah
                         </span>
                         <ArrowRight className="w-5 h-5 text-indigo-400 rotate-90" />
@@ -501,7 +501,7 @@ export default function Welcome() {
                                     <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center">
                                         <X className="w-4 h-4 text-rose-600" />
                                     </div>
-                                    <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Sebelumnya</span>
+                                    <span className="text-base font-bold text-slate-500 uppercase tracking-widest">Sebelumnya</span>
                                 </div>
                                 <p className="text-slate-500 text-lg font-medium leading-relaxed">
                                     Tebak-tebakan ganti-ganti materi kreatif, angle iklan, atau desain tanpa arah yang jelas.
@@ -515,7 +515,7 @@ export default function Welcome() {
                                     <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shadow-sm">
                                         <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                                     </div>
-                                    <span className="text-sm font-bold text-emerald-600 uppercase tracking-widest">Nanti</span>
+                                    <span className="text-base font-bold text-emerald-600 uppercase tracking-widest">Nanti</span>
                                 </div>
                                 <p className="text-xl sm:text-2xl font-extrabold text-slate-900 leading-snug">
                                     Tahu persis titik mana yang bocor dan komponen apa yang perlu segera dibenahi.
@@ -530,7 +530,7 @@ export default function Welcome() {
                                     <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center">
                                         <X className="w-4 h-4 text-rose-600" />
                                     </div>
-                                    <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Sebelumnya</span>
+                                    <span className="text-base font-bold text-slate-500 uppercase tracking-widest">Sebelumnya</span>
                                 </div>
                                 <p className="text-slate-500 text-lg font-medium leading-relaxed">
                                     Bingung mendapat masukan dan saran yang berbeda-beda dari berbagai "guru" atau sumber.
@@ -543,7 +543,7 @@ export default function Welcome() {
                                     <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shadow-sm">
                                         <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                                     </div>
-                                    <span className="text-sm font-bold text-emerald-600 uppercase tracking-widest">Nanti</span>
+                                    <span className="text-base font-bold text-emerald-600 uppercase tracking-widest">Nanti</span>
                                 </div>
                                 <p className="text-xl sm:text-2xl font-extrabold text-slate-900 leading-snug">
                                     Punya <span className="text-indigo-600">framework sendiri</span> untuk menilai dan memutuskan mana yang relevan untuk bisnis Anda.
@@ -558,7 +558,7 @@ export default function Welcome() {
                                     <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center">
                                         <X className="w-4 h-4 text-rose-600" />
                                     </div>
-                                    <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Sebelumnya</span>
+                                    <span className="text-base font-bold text-slate-500 uppercase tracking-widest">Sebelumnya</span>
                                 </div>
                                 <p className="text-slate-500 text-lg font-medium leading-relaxed">
                                     Khawatir dan cemas karena budget iklan terus terbakar tanpa ROI yang sepadan.
@@ -571,7 +571,7 @@ export default function Welcome() {
                                     <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shadow-sm">
                                         <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                                     </div>
-                                    <span className="text-sm font-bold text-emerald-600 uppercase tracking-widest">Nanti</span>
+                                    <span className="text-base font-bold text-emerald-600 uppercase tracking-widest">Nanti</span>
                                 </div>
                                 <p className="text-xl sm:text-2xl font-extrabold text-slate-900 leading-snug">
                                     Tenang karena bisa mengalokasikan effort dan budget ke titik yang <span className="text-indigo-600">benar-benar berdampak.</span>
@@ -586,7 +586,7 @@ export default function Welcome() {
                                     <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center">
                                         <X className="w-4 h-4 text-rose-600" />
                                     </div>
-                                    <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Sebelumnya</span>
+                                    <span className="text-base font-bold text-slate-500 uppercase tracking-widest">Sebelumnya</span>
                                 </div>
                                 <p className="text-slate-500 text-lg font-medium leading-relaxed">
                                     Landing page terasa seperti tebakan desain, tidak yakin bagian mana yang salah.
@@ -599,7 +599,7 @@ export default function Welcome() {
                                     <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shadow-sm">
                                         <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                                     </div>
-                                    <span className="text-sm font-bold text-emerald-600 uppercase tracking-widest">Nanti</span>
+                                    <span className="text-base font-bold text-emerald-600 uppercase tracking-widest">Nanti</span>
                                 </div>
                                 <p className="text-xl sm:text-2xl font-extrabold text-slate-900 leading-snug">
                                     Membangun dan mengoptimasi landing page sepenuhnya <span className="text-indigo-600">berdasarkan data audiens Anda, bukan asumsi.</span>
@@ -635,7 +635,7 @@ export default function Welcome() {
                                 />
                                 <div>
                                     <h3 className="text-lg font-bold text-slate-900">Tsania Latheefa</h3>
-                                    <p className="text-sm text-slate-500 font-medium">Content Creator • 52.8K Followers</p>
+                                    <p className="text-base text-slate-500 font-medium">Content Creator • 52.8K Followers</p>
                                 </div>
                             </div>
                             <blockquote className="text-xl font-bold text-slate-900 leading-snug mb-4">
@@ -644,7 +644,7 @@ export default function Welcome() {
                                 <span className="text-slate-400">"</span>
                             </blockquote>
                             <VideoEmbed src="https://player.mediadelivery.net/embed/701292/623975dd-1d66-41c8-8aac-07a07c141d21?autoplay=false&loop=false&muted=false&preload=true&responsive=true" />
-                            <p className="mt-2 text-sm text-slate-500 font-medium text-center">
+                            <p className="mt-2 text-base text-slate-500 font-medium text-center">
                                 Video testimoni setelah optimasi landing page
                             </p>
                         </div>
@@ -656,13 +656,13 @@ export default function Welcome() {
                             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-shadow flex flex-col">
                                 <div className="flex-1">
                                     <h3 className="text-lg font-bold text-slate-900 mb-1">Mas Ardi</h3>
-                                    <p className="text-sm text-slate-500 font-medium mb-4">Klien PBM Agency</p>
+                                    <p className="text-base text-slate-500 font-medium mb-4">Klien PBM Agency</p>
                                     <blockquote className="text-xl font-bold text-slate-900 leading-snug mb-4">
                                         <span className="text-slate-400">"</span>
                                         ROAS Iklan Naik Drastis Menjadi <span className="text-indigo-600">5.0x</span>
                                         <span className="text-slate-400">"</span>
                                     </blockquote>
-                                    <p className="text-slate-600 leading-relaxed text-sm">
+                                    <p className="text-slate-600 leading-relaxed text-base">
                                         Volume purchase meningkat tajam yang langsung terlihat dari metrik checkout landing page. Dikonfirmasi langsung oleh klien bahwa kenaikan ini jauh melebihi rata-rata pola musiman (seasonal) biasa.
                                     </p>
                                 </div>
@@ -695,7 +695,7 @@ export default function Welcome() {
                                 <div className="border-t border-slate-100 pt-4 mt-auto">
                                     <div className="flex items-center gap-2 mb-3">
                                         <TrendingUp className="w-4 h-4 text-indigo-600" />
-                                        <span className="text-sm font-bold text-slate-900">Bukti Hasil Kenaikan</span>
+                                        <span className="text-base font-bold text-slate-900">Bukti Hasil Kenaikan</span>
                                     </div>
                                     <img 
                                         src="/assets/buktinew.webp" 
@@ -736,10 +736,10 @@ export default function Welcome() {
                                     <h3 className="text-lg font-bold text-slate-900">Live Session & Rekaman Webinar</h3>
                                 </div>
                                 <ul className="space-y-2 ml-[52px]">
-                                    <li className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                                    <li className="flex items-start gap-2 text-base text-slate-600 leading-relaxed">
                                         <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400"></span>
                                         Sesi webinar live via zoom yang bahas strategi meningkatkan konversi landing page.</li>
-                                    <li className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                                    <li className="flex items-start gap-2 text-base text-slate-600 leading-relaxed">
                                         <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400"></span>
                                         Rekaman webinar yang bisa kamu tonton ulang kapan aja.</li>
                                 </ul>
@@ -757,7 +757,7 @@ export default function Welcome() {
                                     <h3 className="text-lg font-bold text-slate-900">Ebook: Iklan Jalan, Tapi Kok Boncos?</h3>
                                 </div>
                                 <ul className="space-y-2 ml-[52px]">
-                                    <li className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                                    <li className="flex items-start gap-2 text-base text-slate-600 leading-relaxed">
                                         <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400"></span>
                                         Materi pelengkap: praktek memperbaiki konversi secara praktis.</li>
                                 </ul>
@@ -775,10 +775,10 @@ export default function Welcome() {
                                     <h3 className="text-lg font-bold text-slate-900">Akses Tanya Jawab Langsung</h3>
                                 </div>
                                 <ul className="space-y-2 ml-[52px]">
-                                    <li className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                                    <li className="flex items-start gap-2 text-base text-slate-600 leading-relaxed">
                                         <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400"></span>
                                         Ajukan kondisi funnel kamu sendiri langsung ke mentor.</li>
-                                    <li className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                                    <li className="flex items-start gap-2 text-base text-slate-600 leading-relaxed">
                                         <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400"></span>
                                         Sesi tanya jawab interaktif di akhir webinar.</li>
                                 </ul>
@@ -799,10 +799,10 @@ export default function Welcome() {
                                     </div>
                                 </div>
                                 <ul className="space-y-2 ml-[52px]">
-                                    <li className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                                    <li className="flex items-start gap-2 text-base text-slate-600 leading-relaxed">
                                         <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400"></span>
                                         Setelah webinar, kamu bisa booking sesi audit personal ke landing page bisnis kamu.</li>
-                                    <li className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                                    <li className="flex items-start gap-2 text-base text-slate-600 leading-relaxed">
                                         <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400"></span>
                                         Dapatkan rekomendasi spesifik untuk kasus di bisnis kamu, bukan lagi saran umum.</li>
                                 </ul>
@@ -847,13 +847,13 @@ export default function Welcome() {
                             </div>
                             
                             <h3 className="text-6xl sm:text-7xl font-extrabold text-slate-900 mb-4 tracking-tight">Rp79.000</h3>
-                            <p className="text-slate-500 text-sm sm:text-base font-medium mb-10">
+                            <p className="text-slate-500 text-base sm:text-base font-medium mb-10">
                                 Sekali bayar • Akses rekaman selamanya • Tanpa biaya tersembunyi
                             </p>
 
                             {/* Feature List */}
                             <div className="bg-slate-50 rounded-2xl border border-slate-100 p-6 sm:p-8 text-left mb-10 shadow-sm">
-                                <ul className="space-y-5 text-sm sm:text-base font-medium text-slate-700">
+                                <ul className="space-y-5 text-base sm:text-base font-medium text-slate-700">
                                     <li className="flex gap-4 items-start">
                                         <CheckCircle2 className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
                                         <span>Live Session 90 Menit via Zoom (6 September 2026, 19:00 WIB)</span>
@@ -903,7 +903,7 @@ export default function Welcome() {
                                 <span>Pembayaran Aman • Garansi Kepuasan Sesi 100%</span>
                             </div>
 
-                            <div className="mt-4 pt-4 border-t border-slate-100 flex justify-center items-center gap-2 text-xs sm:text-sm font-medium text-slate-500 max-w-md mx-auto text-center">
+                            <div className="mt-4 pt-4 border-t border-slate-100 flex justify-center items-center gap-2 text-xs sm:text-base font-medium text-slate-500 max-w-md mx-auto text-center">
                                 <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
                                 <span>Garansi kepuasan 100% — materi praktis teruji dari pengalaman 100+ projek CRO</span>
                             </div>
@@ -1015,7 +1015,7 @@ export default function Welcome() {
                                 <span className="text-xs font-bold text-indigo-300">JW</span>
                             </div>
                         </div>
-                        <p className="text-sm font-medium text-slate-400 text-left">
+                        <p className="text-base font-medium text-slate-400 text-left">
                             Dibawakan langsung oleh <strong className="text-slate-200">Justin Wijaya</strong><br className="hidden sm:block" />
                             <span className="opacity-80">CRO Specialist, klien naik konversi 1,5–2x</span>
                         </p>
@@ -1024,7 +1024,7 @@ export default function Welcome() {
             </section>
 
             {/* FOOTER */}
-            <footer className="py-12 text-center border-t border-slate-200 bg-slate-50 text-slate-500 text-sm pb-28 sm:pb-12">
+            <footer className="py-12 text-center border-t border-slate-200 bg-slate-50 text-slate-500 text-base pb-28 sm:pb-12">
                 <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
                     <p className="font-medium">© 2026 PBM Agency. All rights reserved.</p>
                 </div>
