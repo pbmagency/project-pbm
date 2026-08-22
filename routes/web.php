@@ -20,10 +20,7 @@ $welcomeController = function () {
 };
 Route::get('/', $welcomeController)->name('home');
 Route::get('/c2-design-1', $welcomeController)->name('c2-design-1');
-Route::inertia('/c2-design-2', 'landing')->name('landing');
-Route::inertia('/c1-angle-1', 'cycle1/c1-angle-1')->name('home1');
-Route::inertia('/c1-angle-2', 'cycle1/c1-angle-2')->name('home2');
-Route::inertia('/c1-angle-3', 'cycle1/c1-angle-3')->name('home3');
+Route::inertia('/c2-design-2', 'cycle1/c1-angle-3')->name('landing');
 
 // mini-audit
 Route::get('/mini-audit', [MiniAuditController::class, 'create'])->name('mini-audit');
