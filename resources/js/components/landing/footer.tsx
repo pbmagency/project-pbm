@@ -24,8 +24,8 @@ export function Footer() {
                             <a href="mailto:agencypbm@gmail.com" className="transition-colors hover:text-lp-text">
                                 agencypbm@gmail.com
                             </a>
-                            <a href={`https://wa.me/${settings?.wa_support_number || '6285931018333'}`} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-lp-text">
-                                +{settings?.wa_support_number || '6285931018333'}
+                            <a href={`https://wa.me/${settings?.wa_support_number || '6285966688711'}`} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-lp-text">
+                                +{settings?.wa_support_number || '6285966688711'}
                             </a>
                         </div>
                     </div>

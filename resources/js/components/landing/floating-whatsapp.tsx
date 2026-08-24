@@ -2,7 +2,7 @@ import { usePage } from '@inertiajs/react';
 
 export function FloatingWhatsApp() {
     const { settings } = usePage<any>().props;
-    const waNumber = settings?.wa_support_number || '6285931018333';
+    const waNumber = settings?.wa_support_number || '6285966688711';
 
     // Default message when they click the WhatsApp button
     const WA_LINK = `https://wa.me/${waNumber}?text=${encodeURIComponent('Halo Tim PBM Agency, saya mau tanya tentang Webinar The Silent Conversion Leak.')}`;

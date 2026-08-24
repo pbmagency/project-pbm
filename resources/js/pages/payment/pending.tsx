@@ -8,7 +8,7 @@ interface PaymentPendingProps {
 
 export default function PaymentPending({ order_number }: PaymentPendingProps) {
     const { settings } = usePage<any>().props;
-    const waNumber = settings?.wa_support_number || '6285931018333';
+    const waNumber = settings?.wa_support_number || '6285966688711';
     
     const waText = encodeURIComponent(
         `Halo, saya sudah transfer untuk webinar The Silent Conversion Leak tapi status belum berubah. No. Order: ${order_number ?? '-'}`

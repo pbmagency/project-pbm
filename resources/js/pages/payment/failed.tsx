@@ -8,7 +8,7 @@ interface PaymentFailedProps {
 
 export default function PaymentFailed({ order_number }: PaymentFailedProps) {
     const { settings } = usePage<any>().props;
-    const waNumber = settings?.wa_support_number || '6285931018333';
+    const waNumber = settings?.wa_support_number || '6285966688711';
     const WA_SUPPORT = `https://wa.me/${waNumber}?text=` + encodeURIComponent('Halo, saya mengalami masalah pembayaran untuk webinar The Silent Conversion Leak.');
     
     return (

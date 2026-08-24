@@ -200,7 +200,7 @@ export default function Configs({ settings }: ConfigsProps) {
                                     type="text"
                                     value={data.wa_support_number}
                                     onChange={(e) => setData('wa_support_number', e.target.value)}
-                                    placeholder="6285931018333"
+                                    placeholder="6285966688711"
                                     className="w-full"
                                 />
                                 {errors.wa_support_number && (

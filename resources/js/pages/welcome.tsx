@@ -9,7 +9,7 @@ import { useSectionTracking } from '@/hooks/use-section-tracking';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, Zap, TrendingDown, TrendingUp, BarChart3, Star, ArrowRight, ShieldCheck, Users, AlertCircle, Calendar, Clock, Search, Check, X } from 'lucide-react';
 
-const WA_NUMBER = '6285931018333';
+const WA_NUMBER = '6285966688711';
 const WA_MESSAGE = encodeURIComponent('Halo, saya mau daftar Webinar The Silent Conversion Leak seharga Rp79.000. Bagaimana cara daftarnya?');
 const WA_LINK = `https://wa.me/${WA_NUMBER}?text=${WA_MESSAGE}`;
 
@@ -975,8 +975,8 @@ export default function Welcome() {
 
                 <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10">
                     <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl text-white leading-[1.2]">
-                        4 Titik Kebocoran Ini Nggak Akan <br className="hidden md:block" />
-                        Ketemu Sendiri Kalau Terus Ditebak-tebak
+                        Makin Lama Anda Menunda Memperbaikinya, <br className="hidden md:block" />
+                        Makin Banyak Peluang Closing yang Hilang.
                     </h2>
                     
                     <p className="mt-6 text-xl sm:text-2xl text-indigo-200/90 font-medium max-w-2xl mx-auto leading-relaxed mb-12">

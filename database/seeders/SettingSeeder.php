@@ -16,6 +16,6 @@ class SettingSeeder extends Seeder
         Setting::updateOrCreate(['key' => 'event_time'], ['value' => '19:00 - 20:30 WIB']);
         Setting::updateOrCreate(['key' => 'zoom_link'], ['value' => 'https://zoom.us/j/123456789']);
         Setting::updateOrCreate(['key' => 'wa_group_link'], ['value' => 'https://chat.whatsapp.com/PLACEHOLDER']);
-        Setting::updateOrCreate(['key' => 'wa_support_number'], ['value' => '6285931018333']);
+        Setting::updateOrCreate(['key' => 'wa_support_number'], ['value' => '6285966688711']);
     }
 }

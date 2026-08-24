@@ -34,7 +34,7 @@ class OrderConfirmationMail extends Mailable
                 'eventVenue' => 'Online via Zoom',
                 'zoomLink' => \App\Models\Setting::where('key', 'zoom_link')->value('value'),
                 'waGroupUrl' => \App\Models\Setting::where('key', 'wa_group_link')->value('value') ?? 'https://chat.whatsapp.com/PLACEHOLDER',
-                'waSupportNumber' => \App\Models\Setting::where('key', 'wa_support_number')->value('value') ?? '6285931018333',
+                'waSupportNumber' => \App\Models\Setting::where('key', 'wa_support_number')->value('value') ?? '6285966688711',
                 'ebookUrl' => config('app.url') . '/PBM_Ebook_Boncos.pdf',
                 'calendarUrl' => $this->buildCalendarUrl(),
             ],
