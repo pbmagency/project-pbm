@@ -256,7 +256,7 @@ export default function Welcome() {
                         <p className="text-[13px] font-semibold text-slate-500 mb-6 sm:mb-8">
                             Telah dipercaya oleh berbagai bisnis dan brand di Indonesia
                         </p>
-                        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 md:gap-12 lg:gap-16 xl:gap-20">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-12 place-items-center">
                             {/* Item 1 */}
                             <div className="flex flex-col items-center justify-center">
                                 <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">1,5x - 2x</span>

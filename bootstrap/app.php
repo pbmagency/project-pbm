@@ -36,12 +36,19 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->report(function (Throwable $exception): void {
-            $userId = auth()->id();
+            $userId = null;
+            try {
+                if (app()->has('auth') && app('auth')->check()) {
+                    $userId = app('auth')->id();
+                }
+            } catch (\Exception $e) {}
 
-            app(PostHogService::class)->captureException(
-                $exception,
-                $userId !== null ? (string) $userId : null,
-            );
+            try {
+                app(PostHogService::class)->captureException(
+                    $exception,
+                    $userId !== null ? (string) $userId : null,
+                );
+            } catch (\Exception $e) {}
         });
 
         $exceptions->shouldRenderJsonWhen(
