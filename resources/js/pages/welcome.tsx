@@ -85,7 +85,7 @@ export default function Welcome() {
                 <div className="animate-marquee flex items-center w-max">
                     {[...Array(6)].map((_, i) => (
                         <div key={i} className="flex items-center gap-6 sm:gap-12 pl-6 sm:pl-12 shrink-0 text-base font-medium">
-                            <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-indigo-200" /> 6 September 2026</span>
+                            <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-indigo-200" /> 20 September 2026</span>
                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 opacity-60"></span>
                             <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-indigo-200" /> 19:00 WIB - Selesai</span>
                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 opacity-60"></span>
@@ -152,12 +152,12 @@ export default function Welcome() {
                                 </div>
                                 
                                 <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-[4rem] text-slate-900 leading-[1.1] mb-6">
-                                    Iklan Udah Bagus, <br />
-                                    <span className="text-indigo-600">Kok Closing <br />Tetap Seret?</span>
+                                    Traffic Iklan Udah Banyak, <br />
+                                    <span className="text-indigo-600">Tapi Closing Tetap Sepi?<br />Ini yang Sering Kelewat</span>
                                 </h1>
                                 
                                 <p className="text-lg sm:text-xl leading-relaxed text-slate-600 max-w-xl font-medium">
-                                  Hentikan 4 "kebocoran siluman" di landing page yang bikin CPA Anda mahal. Dalam Live 90 Menit, pelajari cara mendiagnosa data yang sukses membantu klien menaikkan omset dari Rp20 juta menjadi Rp30 juta per bulan.
+                                  Live webinar: Bongkar kebocoran landing page yang diam-diam bikin Anda boncos, sebelum budget iklan makin terbuang
                                 </p>
                                 
                                 <div className="flex flex-col items-start gap-3 pt-2">
@@ -856,7 +856,7 @@ export default function Welcome() {
                                 <ul className="space-y-5 text-base sm:text-base font-medium text-slate-700">
                                     <li className="flex gap-4 items-start">
                                         <CheckCircle2 className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
-                                        <span>Live Session 90 Menit via Zoom (6 September 2026, 19:00 WIB)</span>
+                                        <span>Live Session 90 Menit via Zoom (20 September 2026, 19:00 WIB)</span>
                                     </li>
                                     <li className="flex gap-4 items-start">
                                         <CheckCircle2 className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
