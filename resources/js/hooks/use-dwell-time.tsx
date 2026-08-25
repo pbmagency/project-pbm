@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useAnalytics } from './use-analytics';
 
-const INITIAL_THRESHOLD = 15000; // 15 seconds for the first "engaged" ping
-const HEARTBEAT_INTERVAL = 30000; // every 30 seconds after that
-const TICK_INTERVAL = 1000;
+const INITIAL_THRESHOLD = 15000; // 15s → "engaged"
+const HEARTBEAT_INTERVAL = 30000; // 30s heartbeat
+const TICK_INTERVAL = 1000; // 1s ticker
 
 export function useDwellTime() {
     const { trackEngagement } = useAnalytics();
@@ -11,10 +11,9 @@ export function useDwellTime() {
     const timeActive = useRef(0);
     const lastPingTime = useRef(0);
     const hasInitialTracked = useRef(false);
-    
-    // FIX: Safely check if document exists before accessing it
-    const isVisible = useRef(typeof document !== 'undefined' ? !document.hidden : true);
-    
+    const isVisible = useRef(
+        typeof document !== 'undefined' ? !document.hidden : true,
+    );
     const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const sendPing = useCallback(
@@ -48,10 +47,9 @@ export function useDwellTime() {
             }
 
             if (hasInitialTracked.current) {
-                const timeSinceLastPing =
-                    timeActive.current - lastPingTime.current;
+                const timeSinceLast = timeActive.current - lastPingTime.current;
 
-                if (timeSinceLastPing >= HEARTBEAT_INTERVAL) {
+                if (timeSinceLast >= HEARTBEAT_INTERVAL) {
                     lastPingTime.current = timeActive.current;
                     sendPing(HEARTBEAT_INTERVAL, false);
                 }

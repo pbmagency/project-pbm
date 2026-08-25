@@ -8,37 +8,41 @@ import {
     XAxis,
     YAxis,
 } from 'recharts';
-import type {
-    NameType,
-    ValueType,
-} from 'recharts/types/component/DefaultTooltipContent';
 import { cn } from '@/lib/utils';
 
 interface RevenueChartProps {
-    data: Record<string, Array<{ date: string; total: number }>>;
+    data: Record<string, any[]>;
     className?: string;
 }
 
 export function RevenueChart({ data, className }: RevenueChartProps) {
     const chartData = useMemo(() => {
         const dates = new Set<string>();
-        Object.values(data).forEach((eventData) =>
-            eventData.forEach((item) => dates.add(item.date)),
-        );
 
+        // Collect all dates
+        Object.values(data).forEach((eventData) => {
+            eventData.forEach((item) => dates.add(item.date));
+        });
+
+        // Sort dates
         const sortedDates = Array.from(dates).sort();
-        const coursePrice = Number(import.meta.env.VITE_COURSE_PRICE ?? 129000);
 
+        // Create chart data
         return sortedDates.map((date) => {
             const visits =
                 data.visit?.find((item) => item.date === date)?.total || 0;
             const engagements =
                 data.engagement?.find((item) => item.date === date)?.total || 0;
-            const leads =
-                data.leads?.find((item) => item.date === date)?.total || 0;
-            const payments =
-                data.payment?.find((item) => item.date === date)?.total || 0;
-            const revenue = payments * coursePrice;
+            const intent =
+                data.cta_click?.find((item) => item.date === date)?.total || 0;
+            const directCheckouts =
+                data.direct_checkout?.find((item) => item.date === date)
+                    ?.total || 0;
+            const whatsAppLeads =
+                data.whatsapp_lead?.find((item) => item.date === date)?.total ||
+                0;
+            const totalLeads =
+                data.total_lead?.find((item) => item.date === date)?.total || 0;
 
             return {
                 date: new Date(date).toLocaleDateString('id-ID', {
@@ -47,15 +51,13 @@ export function RevenueChart({ data, className }: RevenueChartProps) {
                 }),
                 visits,
                 engagements,
-                leads,
-                payments,
-                revenue: revenue / 1_000_000,
+                intent,
+                directCheckouts,
+                whatsAppLeads,
+                totalLeads,
             };
         });
     }, [data]);
-
-    const formatCurrency = (value: number) =>
-        `Rp ${(value * 1_000_000).toLocaleString('id-ID')}`;
 
     return (
         <div
@@ -67,10 +69,10 @@ export function RevenueChart({ data, className }: RevenueChartProps) {
         >
             <div className="mb-4">
                 <h3 className="text-lg font-semibold text-foreground">
-                    Revenue Trends
+                    Funnel Trends
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                    Daily revenue and lead tracking
+                    Daily tracked sessions by funnel event
                 </p>
             </div>
 
@@ -79,67 +81,100 @@ export function RevenueChart({ data, className }: RevenueChartProps) {
                     <LineChart data={chartData}>
                         <CartesianGrid
                             strokeDasharray="3 3"
-                            className="stroke-border"
+                            stroke="oklch(0.15 0 0)"
                             opacity={0.3}
                         />
                         <XAxis
                             dataKey="date"
-                            className="fill-muted-foreground text-xs"
+                            stroke="oklch(0.65 0 0)"
+                            fontSize={12}
                         />
-                        <YAxis className="fill-muted-foreground text-xs" />
+                        <YAxis stroke="oklch(0.65 0 0)" fontSize={12} />
                         <Tooltip
                             contentStyle={{
-                                backgroundColor: 'var(--popover)',
-                                border: '1px solid var(--border)',
+                                backgroundColor: 'oklch(0.08 0 0)',
+                                border: '1px solid oklch(0.15 0 0)',
                                 borderRadius: '8px',
-                                color: 'var(--popover-foreground)',
+                                color: 'oklch(0.98 0 0)',
                             }}
-                            formatter={(
-                                value: ValueType | undefined,
-                                name: NameType | undefined,
-                            ) => {
-                                if (name === 'revenue') {
-                                    return [
-                                        formatCurrency(Number(value ?? 0)),
-                                        'Revenue',
-                                    ];
-                                }
-
-                                const n = String(name ?? '');
+                            formatter={(value, name) => {
+                                const label = String(name ?? '');
 
                                 return [
-                                    value,
-                                    n.charAt(0).toUpperCase() + n.slice(1),
+                                    Number(value ?? 0),
+                                    label.charAt(0).toUpperCase() +
+                                        label.slice(1),
                                 ];
                             }}
                         />
                         <Line
                             type="monotone"
                             dataKey="visits"
-                            stroke="var(--chart-1)"
+                            stroke="oklch(0.75 0.15 85)"
                             strokeWidth={2}
-                            dot={{ r: 3 }}
+                            dot={{
+                                fill: 'oklch(0.75 0.15 85)',
+                                strokeWidth: 2,
+                                r: 4,
+                            }}
                         />
                         <Line
                             type="monotone"
                             dataKey="engagements"
-                            stroke="var(--chart-2)"
+                            stroke="oklch(0.75 0.15 85)"
                             strokeWidth={2}
-                            dot={{ r: 3 }}
+                            dot={{
+                                fill: 'oklch(0.75 0.15 85)',
+                                strokeWidth: 2,
+                                r: 4,
+                            }}
                         />
                         <Line
                             type="monotone"
-                            dataKey="leads"
-                            stroke="var(--chart-3)"
+                            dataKey="intent"
+                            stroke="oklch(0.6 0.12 184)"
                             strokeWidth={2}
-                            dot={{ r: 3 }}
+                            dot={{
+                                fill: 'oklch(0.6 0.12 184)',
+                                strokeWidth: 2,
+                                r: 4,
+                            }}
                         />
                         <Line
                             type="monotone"
-                            dataKey="revenue"
-                            stroke="var(--chart-4)"
+                            dataKey="directCheckouts"
+                            name="Direct Checkout"
+                            stroke="oklch(0.77 0.19 70)"
                             strokeWidth={2}
-                            dot={{ r: 3 }}
+                            dot={{
+                                fill: 'oklch(0.77 0.19 70)',
+                                strokeWidth: 2,
+                                r: 4,
+                            }}
+                        />
+                        <Line
+                            type="monotone"
+                            dataKey="whatsAppLeads"
+                            name="WhatsApp Leads"
+                            stroke="oklch(0.65 0.18 145)"
+                            strokeWidth={2}
+                            dot={{
+                                fill: 'oklch(0.65 0.18 145)',
+                                strokeWidth: 2,
+                                r: 4,
+                            }}
+                        />
+                        <Line
+                            type="monotone"
+                            dataKey="totalLeads"
+                            name="Total Leads"
+                            stroke="oklch(0.65 0.2 300)"
+                            strokeWidth={2}
+                            dot={{
+                                fill: 'oklch(0.65 0.2 300)',
+                                strokeWidth: 2,
+                                r: 4,
+                            }}
                         />
                     </LineChart>
                 </ResponsiveContainer>

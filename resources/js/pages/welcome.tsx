@@ -53,7 +53,7 @@ function VideoEmbed({ src }: { src: string }) {
 
 export default function Welcome() {
     // 1. Core Tracking Hooks
-    const { trackVisit, trackCTA, trackFormStart } = useAnalytics();
+    const { trackVisit, trackCTA, trackFormStart, trackConversion } = useAnalytics();
     
     // Register scroll and dwell time trackers globally
     useScrollTracking();
@@ -883,7 +883,10 @@ export default function Welcome() {
                             {/* CTA */}
                             <a 
                                 href={WA_LINK}
-                                onClick={() => trackCTA('pricing_submit', 'Daftar Sekarang', WA_LINK)}
+                                onClick={() => {
+                                    trackCTA('pricing_submit', 'Daftar Sekarang', WA_LINK);
+                                    trackConversion('wa_registration', { location: 'pricing_submit', package: 'Webinar' });
+                                }}
                                 data-cta-zone="pricing_submit"
                                 target="_blank"
                                 rel="noopener noreferrer"

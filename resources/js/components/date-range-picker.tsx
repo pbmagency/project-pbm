@@ -1,48 +1,87 @@
-import { CalendarIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import * as React from "react"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { type DateRange } from "react-day-picker"
 
-export interface SimpleDateRange {
-    from?: string;
-    to?: string;
-}
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 interface DateRangePickerProps {
-    className?: string;
-    date: SimpleDateRange | undefined;
-    onUpdate: (date: SimpleDateRange | undefined) => void;
+  className?: string
+  date: DateRange | undefined
+  onUpdate: (date: DateRange | undefined) => void
 }
 
-/**
- * A shared, dependency-free date range picker: two native date inputs.
- * Used by the Labs "Custom Range" filter.
- */
 export function DateRangePicker({
-    className,
-    date,
-    onUpdate,
+  className,
+  date,
+  onUpdate,
 }: DateRangePickerProps) {
-    return (
-        <div className={cn('flex items-center gap-2', className)}>
-            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-            <input
-                type="date"
-                value={date?.from ?? ''}
-                max={date?.to}
-                onChange={(e) =>
-                    onUpdate({ from: e.target.value, to: date?.to })
-                }
-                className="h-9 rounded-md border border-input bg-transparent px-2 text-sm text-foreground"
-            />
-            <span className="text-sm text-muted-foreground">to</span>
-            <input
-                type="date"
-                value={date?.to ?? ''}
-                min={date?.from}
-                onChange={(e) =>
-                    onUpdate({ from: date?.from, to: e.target.value })
-                }
-                className="h-9 rounded-md border border-input bg-transparent px-2 text-sm text-foreground"
-            />
-        </div>
-    );
+  const [isOpen, setIsOpen] = React.useState(false)
+
+  const handleSelect = (selectedDate: DateRange | undefined) => {
+    onUpdate(selectedDate)
+    // Close popover when both dates are selected
+    if (selectedDate?.from && selectedDate?.to) {
+      setIsOpen(false)
+    }
+  }
+
+  return (
+    <div className={cn("grid gap-2", className)}>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            id="date"
+            variant="outline"
+            className={cn(
+              "w-full justify-start text-left font-normal sm:w-[280px]",
+              !date && "text-muted-foreground"
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {date?.from ? (
+              date.to ? (
+                <>
+                  {format(date.from, "LLL dd, y")} -{" "}
+                  {format(date.to, "LLL dd, y")}
+                </>
+              ) : (
+                format(date.from, "LLL dd, y")
+              )
+            ) : (
+              <span>Pick a date range</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="range"
+            defaultMonth={date?.from}
+            selected={date}
+            onSelect={handleSelect}
+            numberOfMonths={2}
+            disabled={(date) => date > new Date()}
+            className="hidden sm:block"
+          />
+          {/* Mobile: Single month view */}
+          <Calendar
+            mode="range"
+            defaultMonth={date?.from}
+            selected={date}
+            onSelect={handleSelect}
+            numberOfMonths={1}
+            disabled={(date) => date > new Date()}
+            className="block sm:hidden"
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  )
 }

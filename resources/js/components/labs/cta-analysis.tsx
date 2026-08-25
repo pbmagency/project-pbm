@@ -14,6 +14,7 @@ import type { CtaAnalysisProps, CtaLocation } from '@/types/analytics';
 export function CtaAnalysis({ data }: CtaAnalysisProps) {
     const safeData = toSafeArray(data);
 
+    // Sort landing pages and CTA locations by Total Leads.
     const sortedData = useMemo(() => {
         return [...safeData]
             .map((lp) => {
@@ -22,10 +23,14 @@ export function CtaAnalysis({ data }: CtaAnalysisProps) {
                 return {
                     ...lp,
                     cta_locations: [...locations].sort(
-                        (a, b) => (b.leads ?? 0) - (a.leads ?? 0),
+                        (a, b) => (b.total_leads ?? 0) - (a.total_leads ?? 0),
                     ),
                     total_leads: locations.reduce(
-                        (sum, cta) => sum + (cta.leads ?? 0),
+                        (sum, cta) => sum + (cta.total_leads ?? 0),
+                        0,
+                    ),
+                    total_clicks: locations.reduce(
+                        (sum, cta) => sum + (cta.click_count ?? 0),
                         0,
                     ),
                 };
@@ -46,11 +51,12 @@ export function CtaAnalysis({ data }: CtaAnalysisProps) {
         );
     }
 
-    const formatLocation = (location: string) =>
-        location
+    const formatLocation = (location: string) => {
+        return location
             .split('_')
             .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ');
+    };
 
     return (
         <div className="space-y-4">
@@ -61,7 +67,7 @@ export function CtaAnalysis({ data }: CtaAnalysisProps) {
                         CTA Performance
                     </h2>
                     <p className="text-sm text-muted-foreground">
-                        Button placement attribution sorted by leads
+                        Button placement attribution sorted by Total Leads
                     </p>
                 </div>
             </div>
@@ -72,11 +78,139 @@ export function CtaAnalysis({ data }: CtaAnalysisProps) {
                         Micro-Conversion Attribution
                     </CardTitle>
                     <CardDescription>
-                        Which button placements generate the most leads?
+                        Which button placements generate the most Total Leads?
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="space-y-4">
+                    {/* Desktop Table */}
+                    <div className="hidden overflow-x-auto lg:block">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="border-b border-border">
+                                    <th className="p-4 text-left font-medium text-muted-foreground">
+                                        Landing Page
+                                    </th>
+                                    <th className="p-4 text-left font-medium text-muted-foreground">
+                                        Button Location
+                                    </th>
+                                    <th className="p-4 text-right font-medium text-muted-foreground">
+                                        Clicks
+                                    </th>
+                                    <th className="p-4 text-right font-medium text-muted-foreground">
+                                        Total Leads
+                                    </th>
+                                    <th className="p-4 text-right font-medium text-muted-foreground">
+                                        Total Lead Rate
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {sortedData.map((lp) =>
+                                    lp.cta_locations.map((cta, ctaIndex) => {
+                                        const isTopCta =
+                                            ctaIndex === 0 &&
+                                            (cta.total_leads ?? 0) > 0;
+                                        const showLpName = ctaIndex === 0;
+
+                                        return (
+                                            <tr
+                                                key={`${lp.landing_source}-${cta.location}`}
+                                                className="border-b border-border transition hover:bg-muted/50"
+                                            >
+                                                <td className="p-4">
+                                                    {showLpName ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-mono font-medium text-foreground">
+                                                                {
+                                                                    lp.landing_source
+                                                                }
+                                                            </span>
+                                                            <Badge
+                                                                variant="secondary"
+                                                                className="text-xs"
+                                                            >
+                                                                {
+                                                                    lp
+                                                                        .cta_locations
+                                                                        .length
+                                                                }{' '}
+                                                                CTAs
+                                                            </Badge>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">
+                                                            ↳
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td className="p-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <span
+                                                            className={
+                                                                isTopCta
+                                                                    ? 'font-semibold text-primary'
+                                                                    : 'text-foreground'
+                                                            }
+                                                        >
+                                                            {formatLocation(
+                                                                cta.location,
+                                                            )}
+                                                        </span>
+                                                        {isTopCta && (
+                                                            <Badge
+                                                                variant="default"
+                                                                className="gap-1 bg-chart-4 text-xs text-foreground"
+                                                            >
+                                                                <TrendingUp className="h-3 w-3" />{' '}
+                                                                Top
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="p-4 text-right text-foreground">
+                                                    {(
+                                                        cta.click_count ?? 0
+                                                    ).toLocaleString()}
+                                                </td>
+                                                <td className="p-4 text-right">
+                                                    <span
+                                                        className={
+                                                            isTopCta
+                                                                ? 'font-bold text-chart-4'
+                                                                : 'text-foreground'
+                                                        }
+                                                    >
+                                                        {(
+                                                            cta.total_leads ?? 0
+                                                        ).toLocaleString()}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4 text-right">
+                                                    <Badge
+                                                        variant={
+                                                            (cta.total_lead_rate ??
+                                                                0) > 5
+                                                                ? 'default'
+                                                                : 'outline'
+                                                        }
+                                                    >
+                                                        {formatPercent(
+                                                            cta.total_lead_rate,
+                                                            2,
+                                                        )}
+                                                        %
+                                                    </Badge>
+                                                </td>
+                                            </tr>
+                                        );
+                                    }),
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Mobile Cards */}
+                    <div className="space-y-4 lg:hidden">
                         {sortedData.map((lp) => (
                             <div key={lp.landing_source} className="space-y-2">
                                 <div className="flex items-center justify-between">
@@ -87,13 +221,14 @@ export function CtaAnalysis({ data }: CtaAnalysisProps) {
                                         variant="secondary"
                                         className="text-xs"
                                     >
-                                        {lp.total_leads} leads
+                                        {lp.total_leads} total leads
                                     </Badge>
                                 </div>
                                 <div className="space-y-2 rounded-lg bg-muted/50 p-3">
                                     {lp.cta_locations.map((cta, index) => {
                                         const isTop =
-                                            index === 0 && (cta.leads ?? 0) > 0;
+                                            index === 0 &&
+                                            (cta.total_leads ?? 0) > 0;
 
                                         return (
                                             <div
@@ -128,22 +263,9 @@ export function CtaAnalysis({ data }: CtaAnalysisProps) {
                                                                 : 'text-foreground'
                                                         }
                                                     >
-                                                        {cta.leads ?? 0} leads
+                                                        {cta.total_leads ?? 0}{' '}
+                                                        total leads
                                                     </span>
-                                                    <Badge
-                                                        variant={
-                                                            (cta.lead_rate ??
-                                                                0) > 5
-                                                                ? 'default'
-                                                                : 'outline'
-                                                        }
-                                                    >
-                                                        {formatPercent(
-                                                            cta.lead_rate,
-                                                            2,
-                                                        )}
-                                                        %
-                                                    </Badge>
                                                 </div>
                                             </div>
                                         );

@@ -34,7 +34,7 @@ class LabsController extends Controller
 
         $sourceFilter = $request->get('source');
         $sourceKey = $sourceFilter ?? 'all';
-        $cacheKey = "ab_testing_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}";
+        $cacheKey = "ab_testing_v11_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}";
 
         // 30-minute cache for high-traffic tolerance
         $data = Cache::remember($cacheKey, 30 * 60, function () use ($startDate, $endDate, $sourceFilter) {
@@ -56,6 +56,8 @@ class LabsController extends Controller
             return response()->json([
                 ...$data,
                 'available_sources' => $availableSources,
+                'capabilities' => config('analytics.capabilities'),
+                'minimum_winner_visits' => config('analytics.minimum_winner_visits'),
                 'meta' => [
                     'start_date' => $startDate->toIso8601String(),
                     'end_date' => $endDate->toIso8601String(),
@@ -69,6 +71,8 @@ class LabsController extends Controller
         return Inertia::render('admin/labs/index', [
             ...$data,
             'availableSources' => $availableSources,
+            'capabilities' => config('analytics.capabilities'),
+            'minimumWinnerVisits' => config('analytics.minimum_winner_visits'),
             'filters' => [
                 'start_date' => $startDate->format('Y-m-d'),
                 'end_date' => $endDate->format('Y-m-d'),
@@ -93,7 +97,7 @@ class LabsController extends Controller
         }
 
         $sourceKey = $sourceFilter ?? 'all';
-        Cache::forget("ab_testing_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}");
+        Cache::forget("ab_testing_v11_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}");
 
         return response()->json(['success' => true, 'message' => 'Cache cleared successfully']);
     }

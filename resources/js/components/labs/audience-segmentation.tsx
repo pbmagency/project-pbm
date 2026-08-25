@@ -23,6 +23,7 @@ import type {
     AudienceSegmentationProps,
     DepthAnalysis,
     Persona,
+    SectionHeatmapItem,
     SectionViewData,
 } from '@/types/analytics';
 
@@ -51,14 +52,18 @@ export function AudienceSegmentation({
 
     const safeReaders = toSafeArray(readers);
     const safeHeatmap = toSafeArray(heatmap);
-    const safeSectionHeatmap = toSafeArray(sectionHeatmap);
+    const safeSectionHeatmap = toSafeArray<SectionHeatmapItem>(
+        sectionHeatmap ?? [],
+    );
 
+    // Transform readers data for stacked bar chart
     const personaChartData = useMemo(() => {
         return safeReaders.map((r) => {
             const dataPoint: Record<string, string | number> = {
                 name: r.landing_source,
             };
-            toSafeArray<Persona>(r.personas).forEach((p) => {
+            const personas = toSafeArray<Persona>(r.personas);
+            personas.forEach((p) => {
                 dataPoint[p.name] = safeNumber(p.percentage);
             });
 
@@ -66,6 +71,7 @@ export function AudienceSegmentation({
         });
     }, [safeReaders]);
 
+    // Transform heatmap data for bar chart
     const heatmapChartData = useMemo(() => {
         const depths = [25, 50, 75, 90];
 
@@ -75,9 +81,10 @@ export function AudienceSegmentation({
                 depth,
             };
             safeHeatmap.forEach((h) => {
-                const analysis = toSafeArray<DepthAnalysis>(
+                const depthAnalysis = toSafeArray<DepthAnalysis>(
                     h.depth_analysis,
-                ).find((d) => d.depth === depth);
+                );
+                const analysis = depthAnalysis.find((d) => d.depth === depth);
                 dataPoint[h.landing_source] = safeNumber(analysis?.percentage);
             });
 
@@ -90,7 +97,9 @@ export function AudienceSegmentation({
             return [];
         }
 
-        return toSafeArray<Persona>(safeReaders[0].personas).map((p) => p.name);
+        const personas = toSafeArray<Persona>(safeReaders[0].personas);
+
+        return personas.map((p) => p.name);
     }, [safeReaders]);
 
     const landingSources = safeHeatmap.map((h) => h.landing_source);
@@ -112,37 +121,20 @@ export function AudienceSegmentation({
         );
     }
 
+    // Helper: get color based on percentage (green → yellow → red)
     const getDropOffColor = (pct: number) => {
-        if (pct >= 80) {
-            return 'bg-emerald-500';
-        }
-
-        if (pct >= 60) {
-            return 'bg-emerald-400';
-        }
-
-        if (pct >= 40) {
-            return 'bg-amber-400';
-        }
-
-        if (pct >= 20) {
-            return 'bg-orange-400';
-        }
-
+        if (pct >= 80) return 'bg-emerald-500';
+        if (pct >= 60) return 'bg-emerald-400';
+        if (pct >= 40) return 'bg-amber-400';
+        if (pct >= 20) return 'bg-orange-400';
         return 'bg-red-400';
     };
 
     const getDropBadgeVariant = (
         drop: number,
     ): 'default' | 'destructive' | 'outline' | 'secondary' => {
-        if (drop > 30) {
-            return 'destructive';
-        }
-
-        if (drop > 15) {
-            return 'secondary';
-        }
-
+        if (drop > 30) return 'destructive';
+        if (drop > 15) return 'secondary';
         return 'outline';
     };
 
@@ -162,6 +154,7 @@ export function AudienceSegmentation({
 
             <Card>
                 <CardHeader>
+                    {/* Tab Buttons */}
                     <div className="flex flex-wrap gap-2">
                         <button
                             onClick={() => setActiveTab('personas')}
@@ -210,14 +203,20 @@ export function AudienceSegmentation({
                                 </CardDescription>
                             </div>
 
-                            {/* Legend + Descriptions */}
                             <div className="space-y-3 rounded-lg border border-border/50 bg-muted/20 p-4">
+                                {/* Persona Legend */}
                                 <div className="flex flex-wrap gap-4">
                                     {personaNames.map((name) => (
-                                        <div key={name} className="flex items-center gap-2">
+                                        <div
+                                            key={name}
+                                            className="flex items-center gap-2"
+                                        >
                                             <div
                                                 className="h-3 w-3 rounded-full"
-                                                style={{ backgroundColor: PERSONA_COLORS[name] }}
+                                                style={{
+                                                    backgroundColor:
+                                                        PERSONA_COLORS[name],
+                                                }}
                                             />
                                             <span className="text-sm text-muted-foreground">
                                                 {name}
@@ -226,34 +225,46 @@ export function AudienceSegmentation({
                                     ))}
                                 </div>
 
+                                {/* Persona Descriptions */}
                                 <div className="grid grid-cols-1 gap-x-4 gap-y-2 border-t border-border/50 pt-3 text-xs text-muted-foreground sm:grid-cols-2 lg:grid-cols-4">
                                     <div className="flex flex-col gap-1">
                                         <span className="flex items-center gap-1 font-semibold text-foreground">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[var(--destructive)]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[var(--destructive)]"></span>{' '}
                                             Bouncers
                                         </span>
-                                        <span>Scroll &lt; 25% &amp; Dwell &lt; 15s, no CTA/checkout/purchase (Immediate exit)</span>
+                                        <span>
+                                            No funnel action AND (Scroll ≤25% OR
+                                            Dwell &lt;15s)
+                                        </span>
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <span className="flex items-center gap-1 font-semibold text-foreground">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[var(--chart-3)]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[var(--chart-3)]"></span>{' '}
                                             Skimmers
                                         </span>
-                                        <span>Scroll &gt; 75% &amp; Dwell &lt; 60s (Scanning only)</span>
+                                        <span>
+                                            Scroll &gt; 75% & Dwell &lt; 60s
+                                            (Scanning only)
+                                        </span>
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <span className="flex items-center gap-1 font-semibold text-foreground">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[var(--chart-4)]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[var(--chart-4)]"></span>{' '}
                                             Deep Readers
                                         </span>
-                                        <span>Total Dwell Time &gt; 2 mins (Highly engaged)</span>
+                                        <span>
+                                            Total Dwell Time &gt; 2 mins (Highly
+                                            engaged)
+                                        </span>
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <span className="flex items-center gap-1 font-semibold text-foreground">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[var(--chart-2)]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[var(--chart-2)]"></span>{' '}
                                             Casuals
                                         </span>
-                                        <span>Moderate scroll &amp; dwell time</span>
+                                        <span>
+                                            Moderate scroll & dwell time
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -264,9 +275,17 @@ export function AudienceSegmentation({
                                     <BarChart
                                         data={personaChartData}
                                         layout="vertical"
-                                        margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
+                                        margin={{
+                                            top: 20,
+                                            right: 30,
+                                            left: 80,
+                                            bottom: 5,
+                                        }}
                                     >
-                                        <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                                        <CartesianGrid
+                                            strokeDasharray="3 3"
+                                            className="stroke-border"
+                                        />
                                         <XAxis
                                             type="number"
                                             domain={[0, 100]}
@@ -281,12 +300,15 @@ export function AudienceSegmentation({
                                         />
                                         <Tooltip
                                             contentStyle={{
-                                                backgroundColor: 'var(--popover)',
+                                                backgroundColor:
+                                                    'var(--popover)',
                                                 border: '1px solid var(--border)',
                                                 borderRadius: '8px',
                                                 color: 'var(--popover-foreground)',
                                             }}
-                                            formatter={(value) => [`${Number(value ?? 0).toFixed(1)}%`]}
+                                            formatter={(value) => [
+                                                `${Number(value ?? 0).toFixed(1)}%`,
+                                            ]}
                                         />
                                         {personaNames.map((name) => (
                                             <Bar
@@ -303,11 +325,20 @@ export function AudienceSegmentation({
                             {/* Insight Cards */}
                             <div className="grid gap-3 md:grid-cols-2">
                                 {safeReaders.map((r) => {
-                                    const rPersonas = toSafeArray<Persona>(r.personas);
-                                    const bouncers = rPersonas.find((p) => p.name === 'Bouncers');
-                                    const deepReaders = rPersonas.find((p) => p.name === 'Deep Readers');
-                                    const hasIssue = safeNumber(bouncers?.percentage) > 50;
-                                    const hasWin = safeNumber(deepReaders?.percentage) > 20;
+                                    const rPersonas = toSafeArray<Persona>(
+                                        r.personas,
+                                    );
+                                    const bouncers = rPersonas.find(
+                                        (p) => p.name === 'Bouncers',
+                                    );
+                                    const deepReaders = rPersonas.find(
+                                        (p) => p.name === 'Deep Readers',
+                                    );
+                                    const hasIssue =
+                                        safeNumber(bouncers?.percentage) > 50;
+                                    const hasWin =
+                                        safeNumber(deepReaders?.percentage) >
+                                        20;
 
                                     return (
                                         <div
@@ -325,7 +356,10 @@ export function AudienceSegmentation({
                                                     {r.landing_source}
                                                 </span>
                                                 {hasIssue && (
-                                                    <Badge variant="destructive" className="text-xs">
+                                                    <Badge
+                                                        variant="destructive"
+                                                        className="text-xs"
+                                                    >
                                                         High Bounce
                                                     </Badge>
                                                 )}
@@ -337,10 +371,19 @@ export function AudienceSegmentation({
                                             </div>
                                             <div className="grid grid-cols-2 gap-2 text-xs">
                                                 {rPersonas.map((p) => (
-                                                    <div key={p.name} className="flex justify-between">
-                                                        <span className="text-muted-foreground">{p.name}:</span>
+                                                    <div
+                                                        key={p.name}
+                                                        className="flex justify-between"
+                                                    >
+                                                        <span className="text-muted-foreground">
+                                                            {p.name}:
+                                                        </span>
                                                         <span className="font-medium text-foreground">
-                                                            {formatPercent(p.percentage, 1)}%
+                                                            {formatPercent(
+                                                                p.percentage,
+                                                                1,
+                                                            )}
+                                                            %
                                                         </span>
                                                     </div>
                                                 ))}
@@ -355,18 +398,34 @@ export function AudienceSegmentation({
                     {activeTab === 'heatmap' && safeHeatmap.length > 0 && (
                         <div className="space-y-6">
                             <div>
-                                <CardTitle className="text-base">Scroll Depth Heatmap</CardTitle>
-                                <CardDescription>Content consumption drop-off visualization</CardDescription>
+                                <CardTitle className="text-base">
+                                    Scroll Depth Heatmap
+                                </CardTitle>
+                                <CardDescription>
+                                    Content consumption drop-off visualization
+                                </CardDescription>
                             </div>
 
+                            {/* Grouped Bar Chart */}
                             <div className="h-[300px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
                                         data={heatmapChartData}
-                                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                        margin={{
+                                            top: 20,
+                                            right: 30,
+                                            left: 20,
+                                            bottom: 5,
+                                        }}
                                     >
-                                        <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                                        <XAxis dataKey="name" className="fill-muted-foreground text-xs" />
+                                        <CartesianGrid
+                                            strokeDasharray="3 3"
+                                            className="stroke-border"
+                                        />
+                                        <XAxis
+                                            dataKey="name"
+                                            className="fill-muted-foreground text-xs"
+                                        />
                                         <YAxis
                                             domain={[0, 100]}
                                             unit="%"
@@ -374,19 +433,27 @@ export function AudienceSegmentation({
                                         />
                                         <Tooltip
                                             contentStyle={{
-                                                backgroundColor: 'var(--popover)',
+                                                backgroundColor:
+                                                    'var(--popover)',
                                                 border: '1px solid var(--border)',
                                                 borderRadius: '8px',
                                                 color: 'var(--popover-foreground)',
                                             }}
-                                            formatter={(value) => [`${Number(value ?? 0).toFixed(1)}%`]}
+                                            formatter={(value) => [
+                                                `${Number(value ?? 0).toFixed(1)}%`,
+                                            ]}
                                         />
                                         <Legend />
                                         {landingSources.map((source, index) => (
                                             <Bar
                                                 key={source}
                                                 dataKey={source}
-                                                fill={DEPTH_COLORS[index % DEPTH_COLORS.length]}
+                                                fill={
+                                                    DEPTH_COLORS[
+                                                        index %
+                                                            DEPTH_COLORS.length
+                                                    ]
+                                                }
                                                 radius={[4, 4, 0, 0]}
                                             />
                                         ))}
@@ -404,7 +471,8 @@ export function AudienceSegmentation({
                                         h.depth_analysis,
                                     ).sort(
                                         (a, b) =>
-                                            safeNumber(a.depth) - safeNumber(b.depth),
+                                            safeNumber(a.depth) -
+                                            safeNumber(b.depth),
                                     );
                                     const hasCliff =
                                         depths.length >= 2 &&
@@ -422,14 +490,20 @@ export function AudienceSegmentation({
                                                     {h.landing_source}
                                                 </span>
                                                 {hasCliff && (
-                                                    <Badge variant="destructive" className="text-xs">
+                                                    <Badge
+                                                        variant="destructive"
+                                                        className="text-xs"
+                                                    >
                                                         Drop-off Cliff
                                                     </Badge>
                                                 )}
                                             </div>
                                             <div className="flex items-center gap-1">
                                                 {depths.map((d) => (
-                                                    <div key={d.depth} className="flex-1">
+                                                    <div
+                                                        key={d.depth}
+                                                        className="flex-1"
+                                                    >
                                                         <div className="mb-1 text-center text-xs">
                                                             <span className="text-muted-foreground">
                                                                 {d.depth}%
@@ -442,12 +516,20 @@ export function AudienceSegmentation({
                                                                     height: `${safeNumber(d.percentage)}%`,
                                                                     opacity:
                                                                         0.4 +
-                                                                        (safeNumber(d.percentage) / 100) * 0.6,
+                                                                        (safeNumber(
+                                                                            d.percentage,
+                                                                        ) /
+                                                                            100) *
+                                                                            0.6,
                                                                 }}
                                                             />
                                                         </div>
                                                         <div className="mt-1 text-center text-xs font-medium">
-                                                            {formatPercent(d.percentage, 0)}%
+                                                            {formatPercent(
+                                                                d.percentage,
+                                                                0,
+                                                            )}
+                                                            %
                                                         </div>
                                                     </div>
                                                 ))}
@@ -459,130 +541,204 @@ export function AudienceSegmentation({
                         </div>
                     )}
 
-                    {activeTab === 'sections' && safeSectionHeatmap.length > 0 && (
-                        <div className="space-y-6">
-                            <div>
-                                <CardTitle className="text-base">Section Visibility Funnel</CardTitle>
-                                <CardDescription>
-                                    Percentage of visitors who saw each section — identify where users drop off
-                                </CardDescription>
-                            </div>
+                    {/* ==================== SECTION VIEWS TAB ==================== */}
+                    {activeTab === 'sections' &&
+                        safeSectionHeatmap.length > 0 && (
+                            <div className="space-y-6">
+                                <div>
+                                    <CardTitle className="text-base">
+                                        Section Visibility Funnel
+                                    </CardTitle>
+                                    <CardDescription>
+                                        Percentage of visitors who saw each
+                                        section — identify where users drop off
+                                    </CardDescription>
+                                </div>
 
-                            {safeSectionHeatmap.map((item) => {
-                                const sections = toSafeArray<SectionViewData>(item.sections);
+                                {safeSectionHeatmap.map((item) => {
+                                    const sections =
+                                        toSafeArray<SectionViewData>(
+                                            item.sections,
+                                        );
+                                    if (sections.length === 0) return null;
 
-                                if (sections.length === 0) {
-                                    return null;
-                                }
+                                    const maxViews = sections[0]?.views ?? 1;
+                                    const biggestDrop = sections.reduce(
+                                        (max, s) =>
+                                            s.drop_from_prev >
+                                            max.drop_from_prev
+                                                ? s
+                                                : max,
+                                        sections[0],
+                                    );
 
-                                const maxViews = sections[0]?.views ?? 1;
-                                const biggestDrop = sections.reduce(
-                                    (max, s) => (s.drop_from_prev > max.drop_from_prev ? s : max),
-                                    sections[0],
-                                );
+                                    return (
+                                        <div
+                                            key={item.landing_source}
+                                            className="space-y-3"
+                                        >
+                                            {/* Source Header */}
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-mono text-sm font-semibold text-foreground">
+                                                    {item.landing_source}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {maxViews.toLocaleString()}{' '}
+                                                    total sessions
+                                                </span>
+                                            </div>
 
-                                return (
-                                    <div key={item.landing_source} className="space-y-3">
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-mono text-sm font-semibold text-foreground">
-                                                {item.landing_source}
-                                            </span>
-                                            <span className="text-xs text-muted-foreground">
-                                                {maxViews.toLocaleString()} total sessions
-                                            </span>
-                                        </div>
+                                            {/* Funnel Bars */}
+                                            <div className="space-y-1">
+                                                {sections.map(
+                                                    (section, idx) => (
+                                                        <div key={section.id}>
+                                                            {/* Drop indicator between bars */}
+                                                            {idx > 0 &&
+                                                                section.drop_from_prev >
+                                                                    0 && (
+                                                                    <div className="flex items-center justify-center py-1">
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <ArrowDown className="h-3 w-3 text-muted-foreground" />
+                                                                            <Badge
+                                                                                variant={getDropBadgeVariant(
+                                                                                    section.drop_from_prev,
+                                                                                )}
+                                                                                className="px-2 py-0 text-[10px]"
+                                                                            >
+                                                                                −
+                                                                                {formatPercent(
+                                                                                    section.drop_from_prev,
+                                                                                    1,
+                                                                                )}
 
-                                        <div className="space-y-1">
-                                            {sections.map((section, idx) => (
-                                                <div key={section.id}>
-                                                    {idx > 0 && section.drop_from_prev > 0 && (
-                                                        <div className="flex items-center justify-center py-1">
-                                                            <div className="flex items-center gap-1.5">
-                                                                <ArrowDown className="h-3 w-3 text-muted-foreground" />
-                                                                <Badge
-                                                                    variant={getDropBadgeVariant(section.drop_from_prev)}
-                                                                    className="px-2 py-0 text-[10px]"
-                                                                >
-                                                                    −{formatPercent(section.drop_from_prev, 1)}%
-                                                                </Badge>
-                                                            </div>
-                                                        </div>
-                                                    )}
+                                                                                %
+                                                                            </Badge>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
 
-                                                    <div className="group relative">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-28 shrink-0 text-right">
-                                                                <span
-                                                                    className={`text-xs font-medium ${
-                                                                        section.id === biggestDrop?.id &&
-                                                                        biggestDrop.drop_from_prev > 15
-                                                                            ? 'text-destructive'
-                                                                            : 'text-foreground'
-                                                                    }`}
-                                                                >
-                                                                    {section.name}
-                                                                </span>
-                                                            </div>
+                                                            {/* Section bar */}
+                                                            <div className="group relative">
+                                                                <div className="flex items-center gap-3">
+                                                                    {/* Section name */}
+                                                                    <div className="w-28 shrink-0 text-right">
+                                                                        <span
+                                                                            className={`text-xs font-medium ${
+                                                                                section.id ===
+                                                                                    biggestDrop?.id &&
+                                                                                biggestDrop.drop_from_prev >
+                                                                                    15
+                                                                                    ? 'text-destructive'
+                                                                                    : 'text-foreground'
+                                                                            }`}
+                                                                        >
+                                                                            {
+                                                                                section.name
+                                                                            }
+                                                                        </span>
+                                                                    </div>
 
-                                                            <div className="relative h-8 flex-1 overflow-hidden rounded-md bg-muted">
-                                                                <div
-                                                                    className={`h-full rounded-md transition-all duration-500 ${getDropOffColor(section.pct)}`}
-                                                                    style={{ width: `${Math.max(section.pct, 2)}%` }}
-                                                                />
-                                                                <div className="absolute inset-0 flex items-center px-3">
-                                                                    <span
-                                                                        className={`text-xs font-bold ${
-                                                                            section.pct > 30 ? 'text-white' : 'text-foreground'
-                                                                        }`}
-                                                                    >
-                                                                        {formatPercent(section.pct, 1)}%
-                                                                    </span>
+                                                                    {/* Progress bar */}
+                                                                    <div className="relative h-8 flex-1 overflow-hidden rounded-md bg-muted">
+                                                                        <div
+                                                                            className={`h-full rounded-md transition-all duration-500 ${getDropOffColor(section.pct)}`}
+                                                                            style={{
+                                                                                width: `${Math.max(section.pct, 2)}%`,
+                                                                            }}
+                                                                        />
+                                                                        {/* Percentage text inside bar */}
+                                                                        <div className="absolute inset-0 flex items-center px-3">
+                                                                            <span
+                                                                                className={`text-xs font-bold ${
+                                                                                    section.pct >
+                                                                                    30
+                                                                                        ? 'text-white'
+                                                                                        : 'text-foreground'
+                                                                                }`}
+                                                                            >
+                                                                                {formatPercent(
+                                                                                    section.pct,
+                                                                                    1,
+                                                                                )}
+
+                                                                                %
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* View count */}
+                                                                    <div className="w-16 shrink-0 text-right">
+                                                                        <span className="text-xs text-muted-foreground">
+                                                                            {section.views.toLocaleString()}
+                                                                        </span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
 
-                                                            <div className="w-16 shrink-0 text-right">
-                                                                <span className="text-xs text-muted-foreground">
-                                                                    {section.views.toLocaleString()}
-                                                                </span>
-                                                            </div>
+                                            {/* Biggest drop insight */}
+                                            {biggestDrop &&
+                                                biggestDrop.drop_from_prev >
+                                                    15 && (
+                                                    <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs">
+                                                        <ArrowDown className="mt-0.5 h-3.5 w-3.5 shrink-0 text-destructive" />
+                                                        <div>
+                                                            <span className="font-medium text-foreground">
+                                                                Biggest drop:{' '}
+                                                                {
+                                                                    biggestDrop.name
+                                                                }
+                                                            </span>
+                                                            <span className="text-muted-foreground">
+                                                                {' '}
+                                                                —{' '}
+                                                                {formatPercent(
+                                                                    biggestDrop.drop_from_prev,
+                                                                    1,
+                                                                )}
+                                                                % of visitors
+                                                                didn&apos;t
+                                                                reach this
+                                                                section from the
+                                                                previous one.
+                                                                Consider
+                                                                repositioning or
+                                                                improving the
+                                                                section above.
+                                                            </span>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                )}
                                         </div>
-
-                                        {biggestDrop && biggestDrop.drop_from_prev > 15 && (
-                                            <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs">
-                                                <ArrowDown className="mt-0.5 h-3.5 w-3.5 shrink-0 text-destructive" />
-                                                <div>
-                                                    <span className="font-medium text-foreground">
-                                                        Biggest drop: {biggestDrop.name}
-                                                    </span>
-                                                    <span className="text-muted-foreground">
-                                                        {' '}— {formatPercent(biggestDrop.drop_from_prev, 1)}% of visitors
-                                                        didn&apos;t reach this section from the previous one.
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
+                                    );
+                                })}
+                            </div>
+                        )}
 
                     {activeTab === 'personas' && safeReaders.length === 0 && (
-                        <p className="py-8 text-center text-muted-foreground">No persona data available</p>
-                    )}
-                    {activeTab === 'heatmap' && safeHeatmap.length === 0 && (
-                        <p className="py-8 text-center text-muted-foreground">No heatmap data available</p>
-                    )}
-                    {activeTab === 'sections' && safeSectionHeatmap.length === 0 && (
                         <p className="py-8 text-center text-muted-foreground">
-                            No section view data available yet. Data will appear after visitors scroll through
-                            landing page sections.
+                            No persona data available
                         </p>
                     )}
+
+                    {activeTab === 'heatmap' && safeHeatmap.length === 0 && (
+                        <p className="py-8 text-center text-muted-foreground">
+                            No heatmap data available
+                        </p>
+                    )}
+
+                    {activeTab === 'sections' &&
+                        safeSectionHeatmap.length === 0 && (
+                            <p className="py-8 text-center text-muted-foreground">
+                                No section view data available yet. Data will
+                                appear after visitors scroll through landing
+                                page sections.
+                            </p>
+                        )}
                 </CardContent>
             </Card>
         </div>

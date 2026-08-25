@@ -1,4 +1,5 @@
 import { Head, router, useHttp } from '@inertiajs/react';
+import { format, parse } from 'date-fns';
 import {
     Activity,
     AlertTriangle,
@@ -15,14 +16,13 @@ import {
     MousePointerClick,
     RefreshCw,
     ShoppingCart,
-    Target,
     TrendingUp,
     Trophy,
     Users,
     X,
 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import type { SimpleDateRange } from '@/components/date-range-picker';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { DateRange } from 'react-day-picker';
 import {
     Bar,
     BarChart,
@@ -58,7 +58,6 @@ import {
 } from '@/components/ui/select';
 import AdminLayout from '@/layouts/admin-layout';
 import {
-    formatCurrency,
     formatDuration,
     formatNumber,
     formatPercent,
@@ -86,9 +85,9 @@ const transformFunnelData = (
         'Visits',
         'Engaged',
         'Intent',
-        'Form Start',
-        'Leads',
-        'Sales',
+        'Direct Checkout',
+        'WhatsApp Leads',
+        'Total Leads',
     ];
 
     return stages.map((stage) => {
@@ -128,6 +127,7 @@ export default function LabsIndex({
     heatmap: rawHeatmap,
     section_heatmap: rawSectionHeatmap,
     availableSources: rawAvailableSources,
+    minimumWinnerVisits,
     filters,
 }: LabsPageProps) {
     // Normalise all props — PHP Collections can serialize as objects
@@ -150,7 +150,8 @@ export default function LabsIndex({
     });
     // State
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [sortColumn, setSortColumn] = useState<keyof MatrixItem>('lead_cr');
+    const [sortColumn, setSortColumn] =
+        useState<keyof MatrixItem>('total_lead_rate');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
     const [currentPage, setCurrentPage] = useState(1);
     const [showToast, setShowToast] = useState(false);
@@ -158,22 +159,20 @@ export default function LabsIndex({
     const [toastType, setToastType] = useState<'success' | 'error'>('success');
 
     // Date range state for custom filter
-    // AFTER
-    const [dateRange, setDateRange] = useState<SimpleDateRange | undefined>(
-        () => {
-            if (filters.start_date && filters.end_date) {
-                return {
-                    from: filters.start_date,
-                    to: filters.end_date,
-                };
-            }
-            return undefined;
-        },
-    );
+    const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
+        if (filters.start_date && filters.end_date) {
+            return {
+                from: parse(filters.start_date, 'yyyy-MM-dd', new Date()),
+                to: parse(filters.end_date, 'yyyy-MM-dd', new Date()),
+            };
+        }
+
+        return undefined;
+    });
 
     // ── Page Filter (localStorage persisted) ──────────────────
     // Normalize any landing_source to a clean pathname (strip protocol+domain if present)
-    const normalizePath = (source: string): string => {
+    const normalizePath = useCallback((source: string): string => {
         try {
             // If it looks like a full URL, extract just the pathname
             if (source.startsWith('http://') || source.startsWith('https://')) {
@@ -182,36 +181,46 @@ export default function LabsIndex({
         } catch {
             // ignore invalid URLs
         }
+
         // Already a path — ensure it starts with /
         return source.startsWith('/') ? source : `/${source}`;
-    };
+    }, []);
 
     const availablePages = useMemo(
         () =>
             [
                 ...new Set(matrix.map((m) => normalizePath(m.landing_source))),
             ].sort(),
-        [matrix],
+        [matrix, normalizePath],
     );
 
     const [selectedPages, setSelectedPages] = useState<string[]>(() => {
-        if (typeof window === 'undefined') return [];
+        if (typeof window === 'undefined') {
+            return [];
+        }
+
         try {
             const stored = localStorage.getItem('labs_page_filter');
+
             if (stored) {
                 const parsed = JSON.parse(stored) as string[];
+
                 // Only keep pages that still exist in the data
                 return parsed.filter((p) => availablePages.includes(p));
             }
         } catch {
             // ignore malformed JSON
         }
+
         return []; // empty = show all
     });
 
     // Persist page filter to localStorage
     useEffect(() => {
-        if (typeof window === 'undefined') return;
+        if (typeof window === 'undefined') {
+            return;
+        }
+
         localStorage.setItem('labs_page_filter', JSON.stringify(selectedPages));
     }, [selectedPages]);
 
@@ -228,40 +237,43 @@ export default function LabsIndex({
     // ── Filtered data (page filter applied) ──────────────────
     const isPageFiltered = selectedPages.length > 0;
     // Normalize both sides so /test-v1 matches whether stored as path or full URL
-    const pageMatch = (source: string) =>
-        !isPageFiltered || selectedPages.includes(normalizePath(source));
+    const pageMatch = useCallback(
+        (source: string) =>
+            !isPageFiltered || selectedPages.includes(normalizePath(source)),
+        [isPageFiltered, normalizePath, selectedPages],
+    );
 
     const filteredMatrix = useMemo(
         () => matrix.filter((m) => pageMatch(m.landing_source)),
-        [matrix, selectedPages],
+        [matrix, pageMatch],
     );
     const filteredFunnel = useMemo(
         () => safeFunnel.filter((f) => pageMatch(f.landing_source)),
-        [safeFunnel, selectedPages],
+        [pageMatch, safeFunnel],
     );
     const filteredQuality = useMemo(
         () => quality.filter((q: any) => pageMatch(q.landing_source)),
-        [quality, selectedPages],
+        [pageMatch, quality],
     );
     const filteredDevices = useMemo(
         () => devices.filter((d: any) => pageMatch(d.landing_source)),
-        [devices, selectedPages],
+        [devices, pageMatch],
     );
     const filteredCta = useMemo(
         () => cta.filter((c: any) => pageMatch(c.landing_source)),
-        [cta, selectedPages],
+        [cta, pageMatch],
     );
     const filteredReaders = useMemo(
         () => readers.filter((r: any) => pageMatch(r.landing_source)),
-        [readers, selectedPages],
+        [pageMatch, readers],
     );
     const filteredHeatmap = useMemo(
         () => heatmap.filter((h: any) => pageMatch(h.landing_source)),
-        [heatmap, selectedPages],
+        [heatmap, pageMatch],
     );
     const filteredSectionHeatmap = useMemo(
         () => sectionHeatmap.filter((s) => pageMatch(s.landing_source)),
-        [sectionHeatmap, selectedPages],
+        [pageMatch, sectionHeatmap],
     );
 
     const triggerToast = (message: string, type: 'success' | 'error') => {
@@ -278,22 +290,28 @@ export default function LabsIndex({
     const [selectedFunnelSources, setSelectedFunnelSources] = useState<
         string[]
     >(() => {
-        // Default: Top 2 by RPV
+        // Default: Top 2 by the primary metric (Total Lead Rate)
         return matrix.slice(0, 2).map((m) => m.landing_source);
     });
 
     const itemsPerPage = 10;
 
-    // Find winner (highest Lead CR)
+    // The primary outcome combines direct checkout and WhatsApp leads.
     const winner = useMemo(() => {
-        if (filteredMatrix.length === 0) {
+        const eligibleVariants = filteredMatrix.filter(
+            (variant) =>
+                variant.visits >= minimumWinnerVisits &&
+                variant.total_leads > 0,
+        );
+
+        if (eligibleVariants.length === 0) {
             return null;
         }
 
-        return filteredMatrix.reduce((prev, curr) =>
-            curr.lead_cr > prev.lead_cr ? curr : prev,
+        return eligibleVariants.reduce((prev, curr) =>
+            curr.total_lead_rate > prev.total_lead_rate ? curr : prev,
         );
-    }, [filteredMatrix]);
+    }, [filteredMatrix, minimumWinnerVisits]);
 
     // Sorted matrix data
     const sortedMatrix = useMemo(() => {
@@ -358,16 +376,17 @@ export default function LabsIndex({
         }
     };
 
-    // AFTER
-    const handleDateUpdate = (date: SimpleDateRange | undefined) => {
+    const handleDateUpdate = (date: DateRange | undefined) => {
         setDateRange(date);
+
+        // Only trigger router if both dates are selected
         if (date?.from && date?.to) {
             router.get(
                 '/admin/labs',
                 {
                     range: 'custom',
-                    start_date: date.from,
-                    end_date: date.to,
+                    start_date: format(date.from, 'yyyy-MM-dd'),
+                    end_date: format(date.to, 'yyyy-MM-dd'),
                     source: filters.source || undefined,
                 },
                 {
@@ -700,8 +719,16 @@ export default function LabsIndex({
                                         </CardTitle>
                                         <CardDescription>
                                             Landing page comparison sorted by
-                                            Revenue Per Visit
+                                            Total Lead Rate
                                         </CardDescription>
+                                        {!winner && (
+                                            <p className="mt-1 text-xs text-amber-500">
+                                                Insufficient data: winner
+                                                requires at least{' '}
+                                                {minimumWinnerVisits} visits and
+                                                one total lead.
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             </CardHeader>
@@ -743,7 +770,7 @@ export default function LabsIndex({
                                                     <button
                                                         onClick={() =>
                                                             handleSort(
-                                                                'conversions',
+                                                                'intent_rate',
                                                             )
                                                         }
                                                         className="flex items-center gap-1 hover:text-foreground"
@@ -757,13 +784,13 @@ export default function LabsIndex({
                                                     <button
                                                         onClick={() =>
                                                             handleSort(
-                                                                'form_start_rate',
+                                                                'direct_checkout_rate',
                                                             )
                                                         }
                                                         className="flex items-center gap-1 hover:text-foreground"
                                                     >
                                                         <ShoppingCart className="h-4 w-4" />{' '}
-                                                        Form Start
+                                                        Direct Checkout
                                                         <ArrowUpDown className="h-3 w-3" />
                                                     </button>
                                                 </th>
@@ -771,12 +798,12 @@ export default function LabsIndex({
                                                     <button
                                                         onClick={() =>
                                                             handleSort(
-                                                                'lead_cr',
+                                                                'whatsapp_lead_rate',
                                                             )
                                                         }
                                                         className="flex items-center gap-1 hover:text-foreground"
                                                     >
-                                                        Lead CR
+                                                        WhatsApp Lead Rate
                                                         <ArrowUpDown className="h-3 w-3" />
                                                     </button>
                                                 </th>
@@ -784,30 +811,14 @@ export default function LabsIndex({
                                                     <button
                                                         onClick={() =>
                                                             handleSort(
-                                                                'strict_cr',
+                                                                'total_lead_rate',
                                                             )
                                                         }
                                                         className="flex items-center gap-1 hover:text-foreground"
                                                     >
-                                                        <Target className="h-4 w-4" />{' '}
-                                                        Sales CR
+                                                        Total Leads CR
                                                         <ArrowUpDown className="h-3 w-3" />
                                                     </button>
-                                                </th>
-                                                <th className="p-4 text-left text-sm font-medium text-muted-foreground">
-                                                    <button
-                                                        onClick={() =>
-                                                            handleSort('rpv')
-                                                        }
-                                                        className="flex items-center gap-1 hover:text-foreground"
-                                                    >
-                                                        <TrendingUp className="h-4 w-4" />{' '}
-                                                        RPV
-                                                        <ArrowUpDown className="h-3 w-3" />
-                                                    </button>
-                                                </th>
-                                                <th className="p-4 text-left text-sm font-medium text-muted-foreground">
-                                                    Revenue
                                                 </th>
                                             </tr>
                                         </thead>
@@ -825,7 +836,7 @@ export default function LabsIndex({
                                                         key={
                                                             item.landing_source
                                                         }
-                                                        className={`border-b border-border transition hover:bg-muted/50 ${isWinner ? 'bg-chart-4/5' : ''}`}
+                                                        className="border-b border-border transition hover:bg-muted/50"
                                                     >
                                                         <td className="p-4">
                                                             <div className="flex items-center gap-2">
@@ -874,10 +885,19 @@ export default function LabsIndex({
                                                         </td>
                                                         <td className="p-4 text-foreground">
                                                             {formatPercent(
-                                                                item.form_start_rate,
+                                                                item.direct_checkout_rate,
                                                                 2,
                                                             )}
                                                             %
+                                                        </td>
+                                                        <td className="p-4">
+                                                            <Badge variant="secondary">
+                                                                {formatPercent(
+                                                                    item.whatsapp_lead_rate,
+                                                                    2,
+                                                                )}
+                                                                %
+                                                            </Badge>
                                                         </td>
                                                         <td className="p-4">
                                                             <Badge
@@ -888,40 +908,16 @@ export default function LabsIndex({
                                                                 }
                                                                 className={
                                                                     isWinner
-                                                                        ? 'gap-1 bg-chart-4 font-bold text-foreground'
-                                                                        : ''
+                                                                        ? 'bg-chart-4 text-foreground'
+                                                                        : undefined
                                                                 }
                                                             >
-                                                                {isWinner && (
-                                                                    <Trophy className="h-3 w-3" />
-                                                                )}
                                                                 {formatPercent(
-                                                                    item.lead_cr,
+                                                                    item.total_lead_rate,
                                                                     2,
                                                                 )}
                                                                 %
                                                             </Badge>
-                                                        </td>
-                                                        <td className="p-4">
-                                                            <Badge variant="outline">
-                                                                {formatPercent(
-                                                                    item.strict_cr,
-                                                                    2,
-                                                                )}
-                                                                %
-                                                            </Badge>
-                                                        </td>
-                                                        <td className="p-4">
-                                                            <span className="font-bold text-foreground">
-                                                                {formatCurrency(
-                                                                    item.rpv,
-                                                                )}
-                                                            </span>
-                                                        </td>
-                                                        <td className="p-4 text-foreground">
-                                                            {formatCurrency(
-                                                                item.revenue,
-                                                            )}
                                                         </td>
                                                     </tr>
                                                 );
@@ -993,11 +989,11 @@ export default function LabsIndex({
                                                         </div>
                                                         <div>
                                                             <span className="text-muted-foreground">
-                                                                Checkout:
+                                                                Direct Checkout:
                                                             </span>{' '}
                                                             <span className="text-foreground">
                                                                 {formatPercent(
-                                                                    item.form_start_rate,
+                                                                    item.direct_checkout_rate,
                                                                     2,
                                                                 )}
                                                                 %
@@ -1005,11 +1001,12 @@ export default function LabsIndex({
                                                         </div>
                                                         <div>
                                                             <span className="text-muted-foreground">
-                                                                Lead CR:
+                                                                WhatsApp Lead
+                                                                Rate:
                                                             </span>{' '}
                                                             <Badge variant="secondary">
                                                                 {formatPercent(
-                                                                    item.lead_cr,
+                                                                    item.whatsapp_lead_rate,
                                                                     2,
                                                                 )}
                                                                 %
@@ -1017,37 +1014,26 @@ export default function LabsIndex({
                                                         </div>
                                                         <div>
                                                             <span className="text-muted-foreground">
-                                                                Sales CR:
+                                                                Total Leads CR:
                                                             </span>{' '}
-                                                            <Badge variant="outline">
-                                                                {formatPercent(
-                                                                    item.strict_cr,
-                                                                    2,
-                                                                )}
-                                                                %
-                                                            </Badge>
-                                                        </div>
-                                                        <div>
-                                                            <span className="text-muted-foreground">
-                                                                RPV:
-                                                            </span>{' '}
-                                                            <span
-                                                                className={`font-bold ${isWinner ? 'text-chart-4' : 'text-foreground'}`}
+                                                            <Badge
+                                                                variant={
+                                                                    isWinner
+                                                                        ? 'default'
+                                                                        : 'secondary'
+                                                                }
+                                                                className={
+                                                                    isWinner
+                                                                        ? 'bg-chart-4 text-foreground'
+                                                                        : undefined
+                                                                }
                                                             >
-                                                                {formatCurrency(
-                                                                    item.rpv,
+                                                                {formatPercent(
+                                                                    item.total_lead_rate,
+                                                                    2,
                                                                 )}
-                                                            </span>
-                                                        </div>
-                                                        <div>
-                                                            <span className="text-muted-foreground">
-                                                                Revenue:
-                                                            </span>{' '}
-                                                            <span className="text-foreground">
-                                                                {formatCurrency(
-                                                                    item.revenue,
-                                                                )}
-                                                            </span>
+                                                                %
+                                                            </Badge>
                                                         </div>
                                                     </div>
                                                 </CardContent>
@@ -1255,9 +1241,9 @@ export default function LabsIndex({
                                                     'Visits',
                                                     'Engaged',
                                                     'Intent',
-                                                    'Form Start',
-                                                    'Leads',
-                                                    'Sales',
+                                                    'Direct Checkout',
+                                                    'WhatsApp Leads',
+                                                    'Total Leads',
                                                 ].map((stage) => (
                                                     <tr
                                                         key={stage}
@@ -1352,7 +1338,8 @@ export default function LabsIndex({
                                         Behavior Analysis
                                     </h2>
                                     <p className="text-sm text-muted-foreground">
-                                        Leads vs Non-Leads engagement comparison
+                                        Total Leads vs Others engagement
+                                        comparison
                                     </p>
                                 </div>
                             </div>
@@ -1364,9 +1351,10 @@ export default function LabsIndex({
                                         avg_scroll_depth: 0,
                                         avg_dwell_time: 0,
                                     };
-                                    const leads = item.leads ?? defaultMetrics;
+                                    const leads =
+                                        item.total_leads ?? defaultMetrics;
                                     const nonLeads =
-                                        item.non_leads ?? defaultMetrics;
+                                        item.others ?? defaultMetrics;
 
                                     const scrollGap = Math.abs(
                                         leads.avg_scroll_depth -
@@ -1415,7 +1403,7 @@ export default function LabsIndex({
                                                     <div className="space-y-1">
                                                         <div className="flex items-center justify-between text-xs">
                                                             <span className="text-primary">
-                                                                Leads (
+                                                                Total Leads (
                                                                 {leads.count})
                                                             </span>
                                                             <span className="font-medium text-foreground">
@@ -1475,7 +1463,7 @@ export default function LabsIndex({
                                                                 )}
                                                             </div>
                                                             <div className="text-xs text-muted-foreground">
-                                                                Leads
+                                                                Total Leads
                                                             </div>
                                                         </div>
                                                         <div className="text-xl text-muted-foreground">

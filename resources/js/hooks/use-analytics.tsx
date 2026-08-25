@@ -1,14 +1,29 @@
 import { useCallback, useEffect } from 'react';
-import type { AnalyticsEventType } from '@/types/analytics';
 
 const LANDING_SOURCE_KEY = 'landing_source';
-const VISIT_TRACKED_KEY = 'analytics_visit_tracked';
+const REFERRAL_SOURCE_KEY = 'referral_source';
+const VISIT_TRACKED_PREFIX = 'analytics_visit_tracked:';
+const pendingVisitKeys = new Set<string>();
 
-declare global {
-    interface Window {
-        fbq?: (...args: unknown[]) => void;
-        __META_PAGE_VIEW_EVENT_ID?: string;
-    }
+export type AnalyticsEventType =
+    | 'visit'
+    | 'scroll'
+    | 'engagement'
+    | 'cta_click'
+    | 'initiate_checkout'
+    | 'conversion'
+    | 'payment'
+    | 'section_view';
+
+interface AnalyticsEvent {
+    event_type: AnalyticsEventType;
+    event_data?: Record<string, unknown>;
+    referral_source?: string;
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+    utm_content?: string;
+    utm_term?: string;
 }
 
 export function generateEventId(): string {
@@ -25,17 +40,6 @@ function getCookieValue(name: string): string | null {
     return match ? decodeURIComponent(match[2]) : null;
 }
 
-interface AnalyticsEvent {
-    event_type: AnalyticsEventType;
-    event_data?: Record<string, unknown>;
-    referral_source?: string;
-    utm_source?: string;
-    utm_medium?: string;
-    utm_campaign?: string;
-    utm_content?: string;
-    utm_term?: string;
-}
-
 export function getLandingSource(): string {
     if (typeof window === 'undefined') {
         return 'unknown';
@@ -47,7 +51,7 @@ export function getLandingSource(): string {
 }
 
 export function useAnalytics() {
-    const coursePrice = Number(import.meta.env.VITE_COURSE_PRICE ?? 129000);
+    const coursePrice = import.meta.env.VITE_COURSE_PRICE;
 
     useEffect(() => {
         if (typeof window === 'undefined') {
@@ -60,84 +64,103 @@ export function useAnalytics() {
                 window.location.pathname,
             );
         }
-    }, []);
 
-    const track = useCallback(async (event: AnalyticsEvent): Promise<boolean> => {
-        try {
-            const landingSource = getLandingSource();
+        if (!sessionStorage.getItem(REFERRAL_SOURCE_KEY)) {
             const urlParams = new URLSearchParams(window.location.search);
+            let externalReferrer = '';
 
-            const eventData = {
-                ...event,
-                event_data: {
-                    ...event.event_data,
-                    landing_source: landingSource,
-                },
-                referral_source:
-                    event.referral_source ||
-                    urlParams.get('ref') ||
-                    document.referrer ||
-                    'direct',
-                utm_source: event.utm_source || urlParams.get('utm_source'),
-                utm_medium: event.utm_medium || urlParams.get('utm_medium'),
-                utm_campaign:
-                    event.utm_campaign || urlParams.get('utm_campaign'),
-                utm_content: event.utm_content || urlParams.get('utm_content'),
-                utm_term: event.utm_term || urlParams.get('utm_term'),
-            };
-
-            const response = await fetch('/analytics/track', {
-                method: 'POST',
-                credentials: 'same-origin',
-                keepalive: true, // survive navigation firing right after this call (e.g. redirect to payment gateway)
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN':
-                        document
-                            .querySelector('meta[name="csrf-token"]')
-                            ?.getAttribute('content') || '',
-                },
-                body: JSON.stringify(eventData),
-            });
-
-            if (!response.ok) {
-                // fetch() does NOT reject on 4xx/5xx — without this check,
-                // a rejected event_type (422) fails completely silently.
-                const body = await response.text().catch(() => '');
-                console.error(
-                    `Analytics tracking rejected (${response.status}) for event_type "${event.event_type}":`,
-                    body,
-                );
-
-                return false;
+            if (document.referrer) {
+                try {
+                    externalReferrer =
+                        new URL(document.referrer).hostname ===
+                        window.location.hostname
+                            ? ''
+                            : document.referrer;
+                } catch {
+                    externalReferrer = '';
+                }
             }
 
-            return true;
-        } catch (error) {
-            console.debug('Analytics tracking failed:', error);
-
-            return false;
+            sessionStorage.setItem(
+                REFERRAL_SOURCE_KEY,
+                urlParams.get('ref') || externalReferrer || 'direct',
+            );
         }
     }, []);
 
+    const track = useCallback(
+        async (event: AnalyticsEvent): Promise<boolean> => {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const payload = {
+                    ...event,
+                    event_data: {
+                        ...event.event_data,
+                        landing_source: getLandingSource(),
+                    },
+                    referral_source:
+                        event.referral_source ||
+                        sessionStorage.getItem(REFERRAL_SOURCE_KEY) ||
+                        'direct',
+                    utm_source: event.utm_source || urlParams.get('utm_source'),
+                    utm_medium: event.utm_medium || urlParams.get('utm_medium'),
+                    utm_campaign:
+                        event.utm_campaign || urlParams.get('utm_campaign'),
+                    utm_content:
+                        event.utm_content || urlParams.get('utm_content'),
+                    utm_term: event.utm_term || urlParams.get('utm_term'),
+                };
+
+                const response = await fetch('/analytics/track', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    keepalive: true,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN':
+                            document
+                                .querySelector('meta[name=csrf-token]')
+                                ?.getAttribute('content') || '',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    console.debug(
+                        `Analytics tracking rejected (${response.status})`,
+                    );
+
+                    return false;
+                }
+
+                return true;
+            } catch (error) {
+                console.debug('Analytics tracking failed:', error);
+
+                return false;
+            }
+        },
+        [],
+    );
+
     const trackVisit = useCallback(() => {
+        const landingSource = getLandingSource();
+        const visitKey = `${VISIT_TRACKED_PREFIX}${landingSource}`;
+
         if (
-            typeof window === 'undefined' ||
-            sessionStorage.getItem(VISIT_TRACKED_KEY)
+            sessionStorage.getItem(visitKey) === 'tracked' ||
+            pendingVisitKeys.has(visitKey)
         ) {
             return;
         }
 
-        sessionStorage.setItem(VISIT_TRACKED_KEY, '1');
+        pendingVisitKeys.add(visitKey);
 
-        const eventId = generateEventId();
-        window.__META_PAGE_VIEW_EVENT_ID = eventId;
+        const eventId =
+            ((window as unknown as Record<string, unknown>)
+                .__META_PAGE_VIEW_EVENT_ID as string) || generateEventId();
 
-        if (typeof window.fbq === 'function') {
-            window.fbq('track', 'PageView', {}, { eventID: eventId });
-        }
-
-        track({
+        void track({
             event_type: 'visit',
             event_data: {
                 page: window.location.pathname,
@@ -146,12 +169,22 @@ export function useAnalytics() {
                 _fbp: getCookieValue('_fbp'),
                 _fbc: getCookieValue('_fbc'),
             },
+        }).then((success) => {
+            pendingVisitKeys.delete(visitKey);
+
+            if (success) {
+                sessionStorage.setItem(visitKey, 'tracked');
+
+                return;
+            }
+
+            sessionStorage.removeItem(visitKey);
         });
     }, [track]);
 
     const trackScroll = useCallback(
         (depth: number) => {
-            track({
+            void track({
                 event_type: 'scroll',
                 event_data: {
                     depth,
@@ -164,8 +197,8 @@ export function useAnalytics() {
     );
 
     const trackEngagement = useCallback(
-        (duration: number, isInitial: boolean) => {
-            track({
+        (duration: number, isInitial = false) => {
+            void track({
                 event_type: 'engagement',
                 event_data: {
                     type: 'dwell_ping',
@@ -180,13 +213,13 @@ export function useAnalytics() {
     );
 
     const trackCTA = useCallback(
-        (location: string, text: string, destination?: string) => {
-            track({
+        (location: string, text: string, destination = 'unknown') => {
+            void track({
                 event_type: 'cta_click',
                 event_data: {
                     location,
                     text,
-                    destination: destination || 'unknown',
+                    destination,
                     page: window.location.pathname,
                     timestamp: new Date().toISOString(),
                 },
@@ -195,81 +228,38 @@ export function useAnalytics() {
         [track],
     );
 
-    /** Pricing CTA click → AddToCart pixel + cta_click event in DB */
-/** Pricing CTA click: fires AddToCart Meta + tracks form_start backend event */
-const trackFormStart = useCallback(
-    (location: string) => {
-        const eventId = generateEventId();
-
-        if (typeof window.fbq === 'function') {
-            window.fbq(
-                'track',
-                'AddToCart',
-                { value: coursePrice, currency: 'IDR' },
-                { eventID: eventId },
-            );
-        }
-
-        track({
-            event_type: 'form_start',
-            event_data: {
-                location,
-                page: window.location.pathname,
-                timestamp: new Date().toISOString(),
-                event_id: eventId,
-                meta_event: 'AddToCart',
-                _fbp: getCookieValue('_fbp'),
-                _fbc: getCookieValue('_fbc'),
-            },
-        });
-    },
-    [track, coursePrice],
-);
-
-/**
- * Checkout form submit: fires InitiateCheckout Meta pixel + tracks the
- * "conversion" backend event (spec: "submit form checkout -> conversion").
- * NOTE: this previously sent event_type 'lead', which is not in the backend's
- * validation whitelist — every call was rejected with a 422 and silently
- * dropped. Fixed to 'conversion', which the backend already accepts.
- */
-const trackLeadConversion = useCallback(
-    (data?: Record<string, unknown>) => {
-        const eventId = generateEventId();
-
-        if (typeof window.fbq === 'function') {
-            window.fbq(
-                'track',
-                'InitiateCheckout',
-                { value: coursePrice, currency: 'IDR' },
-                { eventID: eventId },
-            );
-        }
-
-        track({
-            event_type: 'conversion',
-            event_data: {
-                page: window.location.pathname,
-                timestamp: new Date().toISOString(),
-                event_id: eventId,
-                meta_event: 'InitiateCheckout',
-                _fbp: getCookieValue('_fbp'),
-                _fbc: getCookieValue('_fbc'),
-                ...data,
-            },
-        });
-    },
-    [track, coursePrice],
-);
-
-    const trackSectionView = useCallback(
-        (sectionId: string) => {
-            return track({
-                event_type: 'section_view',
+    const trackInitiateCheckout = useCallback(
+        (
+            location: string,
+            data?: Record<string, unknown>,
+            eventId = generateEventId(),
+        ) => {
+            void track({
+                event_type: 'initiate_checkout',
                 event_data: {
-                    section: sectionId,
+                    type: 'external_payment_redirect',
+                    location,
+                    event_id: eventId,
+                    _fbp: getCookieValue('_fbp'),
+                    _fbc: getCookieValue('_fbc'),
                     page: window.location.pathname,
                     timestamp: new Date().toISOString(),
+                    ...data,
+                },
+            });
+        },
+        [track],
+    );
+
+    const trackConversion = useCallback(
+        (type: string, data?: Record<string, unknown>) => {
+            void track({
+                event_type: 'conversion',
+                event_data: {
+                    type,
+                    page: window.location.pathname,
+                    timestamp: new Date().toISOString(),
+                    ...data,
                 },
             });
         },
@@ -278,16 +268,7 @@ const trackLeadConversion = useCallback(
 
     const trackPayment = useCallback(
         (status: string, data?: Record<string, unknown>) => {
-            // NOTE: this does NOT fire its own browser pixel. The Meta docs
-            // and this codebase's actual usage (see PaymentSuccess page)
-            // expect the CALLER to fire fbq('track', 'Purchase', ...) itself
-            // with a deterministic event_id (e.g. derived from order number,
-            // not a fresh UUID — stable across page refreshes), and pass that
-            // same event_id through `data.event_id` so the backend's
-            // sendPurchase() call shares it for CAPI dedup. Firing a second,
-            // independently-generated pixel here would create two
-            // undeduplicated Purchase events per sale in Meta.
-            track({
+            void track({
                 event_type: 'payment',
                 event_data: {
                     status,
@@ -301,14 +282,29 @@ const trackLeadConversion = useCallback(
         [track, coursePrice],
     );
 
+    const trackSectionView = useCallback(
+        (sectionId: string, data?: Record<string, unknown>) => {
+            return track({
+                event_type: 'section_view',
+                event_data: {
+                    section: sectionId,
+                    page: window.location.pathname,
+                    timestamp: new Date().toISOString(),
+                    ...data,
+                },
+            });
+        },
+        [track],
+    );
+
     return {
         track,
         trackVisit,
         trackScroll,
         trackEngagement,
         trackCTA,
-        trackLeadConversion,
-        trackFormStart,
+        trackInitiateCheckout,
+        trackConversion,
         trackPayment,
         trackSectionView,
     };

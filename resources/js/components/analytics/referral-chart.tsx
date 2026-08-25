@@ -6,7 +6,6 @@ import {
     ResponsiveContainer,
     Tooltip,
 } from 'recharts';
-import type { ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import { cn } from '@/lib/utils';
 
 interface ReferralData {
@@ -20,11 +19,11 @@ interface ReferralChartProps {
 }
 
 const COLORS = [
-    'var(--chart-1)',
-    'var(--chart-2)',
-    'var(--chart-3)',
-    'var(--chart-4)',
-    'var(--chart-5)',
+    'oklch(0.75 0.15 85)', // primary
+    'oklch(0.6 0.12 184)', // chart-2
+    'oklch(0.4 0.07 227)', // chart-3
+    'oklch(0.83 0.19 84)', // chart-4
+    'oklch(0.77 0.19 70)', // chart-5
 ];
 
 export function ReferralChart({ data, className }: ReferralChartProps) {
@@ -53,50 +52,44 @@ export function ReferralChart({ data, className }: ReferralChartProps) {
             </div>
 
             <div className="h-64">
-                {chartData.length === 0 ? (
-                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                        No data yet
-                    </div>
-                ) : (
-                    <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={chartData}
-                                cx="50%"
-                                cy="50%"
-                                outerRadius={80}
-                                dataKey="value"
-                                stroke="var(--card)"
-                                strokeWidth={2}
-                            >
-                                {chartData.map((entry, index) => (
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={entry.color}
-                                    />
-                                ))}
-                            </Pie>
-                            <Tooltip
-                                contentStyle={{
-                                    backgroundColor: 'var(--popover)',
-                                    border: '1px solid var(--border)',
-                                    borderRadius: '8px',
-                                    color: 'var(--popover-foreground)',
-                                }}
-                                formatter={(value: ValueType | undefined) => [
-                                    Number(value ?? 0).toLocaleString(),
-                                    'Visits',
-                                ]}
-                            />
-                            <Legend
-                                wrapperStyle={{
-                                    fontSize: '12px',
-                                    color: 'var(--muted-foreground)',
-                                }}
-                            />
-                        </PieChart>
-                    </ResponsiveContainer>
-                )}
+                <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                        <Pie
+                            data={chartData}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            dataKey="value"
+                            stroke="oklch(0.06 0 0)"
+                            strokeWidth={2}
+                        >
+                            {chartData.map((entry, index) => (
+                                <Cell
+                                    key={`cell-${index}`}
+                                    fill={entry.color}
+                                />
+                            ))}
+                        </Pie>
+                        <Tooltip
+                            contentStyle={{
+                                backgroundColor: 'oklch(0.75 0.15 85)',
+                                border: '1px solid oklch(0.15 0 0)',
+                                borderRadius: '8px',
+                                color: 'oklch(0.98 0 0)',
+                            }}
+                            formatter={(value) => [
+                                Number(value ?? 0).toLocaleString(),
+                                'Visits',
+                            ]}
+                        />
+                        <Legend
+                            wrapperStyle={{
+                                fontSize: '12px',
+                                color: 'oklch(0.65 0 0)',
+                            }}
+                        />
+                    </PieChart>
+                </ResponsiveContainer>
             </div>
         </div>
     );

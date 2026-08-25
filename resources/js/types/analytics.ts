@@ -1,57 +1,7 @@
 // ============================================================
-// Analytics & Labs — Shared Type Definitions
+// Labs Analytics — Shared Type Definitions
 // Matches the data shapes returned by AbTestingService.php
-// and AnalyticsController.php
 // ============================================================
-
-export type AnalyticsEventType =
-    | 'visit'
-    | 'scroll'
-    | 'engagement'
-    | 'cta_click'
-    | 'form_start'
-    | 'initiate_checkout'
-    | 'conversion'
-    | 'conversions'
-    | 'lead'
-    | 'leads'
-    | 'payment'
-    | 'section_view';
-
-// ── Admin Analytics Dashboard ────────────────────────────────
-
-export interface AnalyticsStats {
-    total_visits: number;
-    unique_visitors: number;
-    engagement_rate: number;
-    engaged_users: number;
-    intent_rate: number;
-    cta_clicks: number;
-    form_start: number;
-    form_start_rate: number;
-    lead_rate: number;
-    leads: number;
-    lead_to_payment_rate: number;
-    payment_rate: number;
-    total_revenue: number;
-    payments: number;
-}
-
-export interface ReferralDataItem {
-    referral_source: string;
-    count: number;
-}
-
-export interface FunnelStage {
-    stage: string;
-    count: number;
-    /** % of total visits — used for bar width (classic funnel shape). */
-    percentage: number;
-    /** A→B retention rate: what % of the previous stage reached this stage. Null for Visits. */
-    transition_pct: number | null;
-    /** Label of the previous stage, used in the transition connector text. Null for Visits. */
-    from_stage: string | null;
-}
 
 // ── Performance Matrix ──────────────────────────────────────
 
@@ -60,21 +10,29 @@ export interface MatrixItem {
     visits: number;
     bounce_rate: number;
     intent_rate: number;
-    lead_cr: number;
-    strict_cr: number;
-    form_start_rate: number;
-    rpv: number;
-    revenue: number;
-    conversions: number;
-    payments: number;
+    direct_checkout_rate: number;
+    direct_checkouts: number;
+    whatsapp_lead_rate: number;
+    whatsapp_leads: number;
+    total_lead_rate: number;
+    total_leads: number;
     cta_clicks: number;
 }
 
 // ── Split Funnel ────────────────────────────────────────────
 
+export interface FunnelStep {
+    stage: string;
+    count: number;
+    percentage: number;
+    branch?: 'main' | 'checkout' | 'lead' | 'total';
+    from_stage?: string | null;
+    transition_percentage?: number;
+}
+
 export interface FunnelItem {
     landing_source: string;
-    steps: FunnelStage[];
+    steps: FunnelStep[];
 }
 
 // ── Quality / Behavior Analysis ─────────────────────────────
@@ -87,16 +45,16 @@ export interface QualityMetrics {
 
 export interface QualityItem {
     landing_source: string;
-    leads: QualityMetrics;
-    non_leads: QualityMetrics;
+    total_leads: QualityMetrics;
+    others: QualityMetrics;
 }
 
 // ── Device Performance ──────────────────────────────────────
 
 export interface DeviceMetrics {
     visits: number;
-    leads: number;
-    conversion_rate: number;
+    total_leads: number;
+    total_lead_rate: number;
 }
 
 export interface DeviceData {
@@ -110,8 +68,8 @@ export interface DeviceData {
 export interface CtaLocation {
     location: string;
     click_count: number;
-    leads: number;
-    lead_rate: number;
+    total_leads: number;
+    total_lead_rate: number;
 }
 
 export interface CtaData {
@@ -149,8 +107,6 @@ export interface HeatmapData {
     depth_analysis: DepthAnalysis[];
 }
 
-// ── Section Views ────────────────────────────────────────────
-
 export interface SectionViewData {
     id: string;
     name: string;
@@ -185,6 +141,13 @@ export interface LabsPageProps {
     heatmap: HeatmapData[];
     section_heatmap: SectionHeatmapItem[];
     availableSources: string[];
+    capabilities: {
+        initiate_checkout: boolean;
+        lead: boolean;
+        payment: boolean;
+        revenue: boolean;
+    };
+    minimumWinnerVisits: number;
     filters: LabsFilters;
 }
 

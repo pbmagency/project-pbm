@@ -1,19 +1,14 @@
-import type { ReactNode } from 'react';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
-import type { BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem } from '@/types';
+import { type ReactNode } from 'react';
 
 interface AdminLayoutProps {
     children: ReactNode;
     breadcrumbs?: BreadcrumbItem[];
 }
 
-export default function AdminLayout({
-    children,
-    breadcrumbs,
-}: AdminLayoutProps) {
-    return (
-        <AppSidebarLayout breadcrumbs={breadcrumbs}>
-            {children}
-        </AppSidebarLayout>
-    );
-}
+export default ({ children, breadcrumbs, ...props }: AdminLayoutProps) => (
+    <AppSidebarLayout breadcrumbs={breadcrumbs} {...props}>
+        {children}
+    </AppSidebarLayout>
+);
