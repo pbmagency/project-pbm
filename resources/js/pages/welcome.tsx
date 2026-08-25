@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { useScrollTracking } from '@/hooks/use-scroll-tracking';
 import { useDwellTime } from '@/hooks/use-dwell-time';
@@ -8,6 +8,8 @@ import { useSectionTracking } from '@/hooks/use-section-tracking';
 // UI
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, Zap, TrendingDown, TrendingUp, BarChart3, Star, ArrowRight, ShieldCheck, Users, AlertCircle, Calendar, Clock, Search, Check, X } from 'lucide-react';
+
+const FloatingWhatsApp = lazy(() => import('@/components/landing/floating-whatsapp').then(m => ({ default: m.FloatingWhatsApp })));
 
 const WA_NUMBER = '6285966688711';
 const WA_MESSAGE = encodeURIComponent('Halo, saya mau daftar Webinar The Silent Conversion Leak seharga Rp79.000. Bagaimana cara daftarnya?');
@@ -1025,13 +1027,15 @@ export default function Welcome() {
                 </div>
             </section>
 
-            {/* FOOTER */}
-            <footer className="py-12 text-center border-t border-slate-200 bg-slate-50 text-slate-500 text-base pb-28 sm:pb-12">
-                <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-                    <p className="font-medium">© 2026 PBM Agency. All rights reserved.</p>
-                </div>
-            </footer>
+            {/* FOOTER */}                <footer className="py-12 text-center border-t border-slate-200 bg-slate-50 text-slate-500 text-base pb-28 sm:pb-12">
+                    <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+                        <p className="font-medium">© 2026 PBM Agency. All rights reserved.</p>
+                    </div>
+                </footer>
 
+                <Suspense fallback={null}>
+                    <FloatingWhatsApp />
+                </Suspense>
 
         </div>
     );

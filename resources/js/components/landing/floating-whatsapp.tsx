@@ -1,15 +1,23 @@
 import { usePage } from '@inertiajs/react';
+import { useAnalytics } from '@/hooks/use-analytics';
 
 export function FloatingWhatsApp() {
     const { settings } = usePage<any>().props;
+    const { trackCTA, trackConversion } = useAnalytics();
     const waNumber = settings?.wa_support_number || '6285966688711';
 
     // Default message when they click the WhatsApp button
     const WA_LINK = `https://wa.me/${waNumber}?text=${encodeURIComponent('Halo Tim PBM Agency, saya mau tanya tentang Webinar The Silent Conversion Leak.')}`;
 
+    const handleClick = () => {
+        trackCTA('floating_wa', 'WhatsApp Floating Button', WA_LINK);
+        trackConversion('wa_inquiry', { location: 'floating_wa' });
+    };
+
     return (
         <a
             href={WA_LINK}
+            onClick={handleClick}
             target="_blank"
             rel="noopener noreferrer"
             className="group fixed right-6 bottom-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/30 transition-all duration-300 hover:-translate-y-1 hover:scale-110 hover:shadow-xl hover:shadow-[#25D366]/40"
