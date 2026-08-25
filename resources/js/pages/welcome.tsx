@@ -104,7 +104,7 @@ export default function Welcome() {
                             <span className="text-slate-900 font-extrabold text-2xl tracking-tight">PBM Agency</span>
                         </div>
                         <div>
-                            <a href={WA_LINK} onClick={() => trackCTA('nav_cta', 'Daftar Sekarang', WA_LINK)} data-cta-zone="nav_cta" target="_blank" rel="noopener noreferrer" className="cursor-pointer">
+                            <a href="#pricing" onClick={() => trackCTA('nav_cta', 'Daftar Sekarang', '#pricing')} data-cta-zone="nav_cta" className="cursor-pointer">
                                 <Button className="h-auto bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-5 py-2 font-semibold shadow-md shadow-indigo-600/20 hidden sm:flex flex-col items-center justify-center cursor-pointer">
                                     <span>Amankan Seat</span>
                                 </Button>
@@ -151,7 +151,7 @@ export default function Welcome() {
                                     UNTUK ANDA YANG IKLANNYA SUDAH JALAN TAPI BONCOS:
                                 </div>
                                 
-                                <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-[4rem] text-slate-900 leading-[1.1] mb-6">
+                                <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl lg:text-[3rem] text-slate-900 leading-[1.1] mb-6">
                                     Traffic Iklan Udah Banyak, <br />
                                     <span className="text-indigo-600">Tapi Closing Tetap Sepi?<br />Ini yang Sering Kelewat</span>
                                 </h1>
@@ -161,7 +161,7 @@ export default function Welcome() {
                                 </p>
                                 
                                 <div className="flex flex-col items-start gap-3 pt-2">
-                                    <a href={WA_LINK} onClick={() => trackCTA('hero_cta', 'Amankan Seat Webinar', WA_LINK)} data-cta-zone="hero_cta" target="_blank" rel="noopener noreferrer" className="cursor-pointer">
+                                    <a href="#pricing" onClick={() => trackCTA('hero_cta', 'Amankan Seat Webinar', '#pricing')} data-cta-zone="hero_cta" className="cursor-pointer">
                                         <Button size="lg" className="h-14 px-8 text-base rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:shadow-xl hover:-translate-y-0.5 transition-all bg-indigo-600 hover:bg-indigo-700 text-white group cursor-pointer">
                                             Amankan Seat Webinar
                                             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -812,9 +812,8 @@ export default function Welcome() {
 
                     <div className="mt-12 flex justify-center">
                         <a
-                            href={WA_LINK}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            href="#pricing"
+                            onClick={() => trackCTA('social_proof_cta', 'Amankan Kursi Anda Sekarang', '#pricing')}
                             className="inline-flex w-full sm:w-auto items-center justify-center px-8 py-4 text-base font-bold text-white transition-all bg-indigo-600 border border-transparent rounded-full shadow-lg shadow-indigo-600/30 hover:bg-indigo-700 hover:shadow-indigo-600/50 hover:-translate-y-0.5"
                         >
                             Amankan Kursi Anda Sekarang
