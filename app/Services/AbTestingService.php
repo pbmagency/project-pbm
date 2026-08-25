@@ -364,7 +364,7 @@ class AbTestingService
         }
 
         // Group by landing source
-        $grouped = $rows->groupByRaw("json_extract(event_data, '$.landing_source')");
+        $grouped = $rows->groupBy('landing_source');
 
         $result = [];
         foreach ($grouped as $source => $sourceRows) {
@@ -482,7 +482,7 @@ class AbTestingService
 
         $this->metrics->applyBounceConditions($rows, $startDate, $endDate, 'v');
 
-        $rows = $rows->groupByRaw("json_extract(event_data, '$.landing_source')")->get();
+        $rows = $rows->groupByRaw("json_extract(v.event_data, '$.landing_source')")->get();
 
         return $rows->mapWithKeys(fn ($row) => [
             $this->normalizeLandingSource($row->landing_source) => $row->bounced,
