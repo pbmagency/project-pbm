@@ -261,7 +261,7 @@ class AbTestingService
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
-            ->groupBy('landing_source', 'session_id')
+            ->groupByRaw("json_extract(event_data, '$.landing_source'), session_id")
             ->get()
             ->groupBy(fn ($row) => $this->normalizeLandingSource($row->landing_source));
 
@@ -356,7 +356,7 @@ class AbTestingService
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
             ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
-            ->groupBy('landing_source', 'section_name')
+            ->groupByRaw("json_extract(event_data, '$.landing_source'), json_extract(event_data, '$.section')")
             ->get();
 
         if ($rows->isEmpty()) {
@@ -364,7 +364,7 @@ class AbTestingService
         }
 
         // Group by landing source
-        $grouped = $rows->groupBy('landing_source');
+        $grouped = $rows->groupByRaw("json_extract(event_data, '$.landing_source')");
 
         $result = [];
         foreach ($grouped as $source => $sourceRows) {
@@ -455,7 +455,7 @@ class AbTestingService
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
             ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
-            ->groupBy('landing_source', 'event_type')
+            ->groupByRaw("json_extract(event_data, '$.landing_source'), event_type")
             ->get();
 
         $result = [];
@@ -482,7 +482,7 @@ class AbTestingService
 
         $this->metrics->applyBounceConditions($rows, $startDate, $endDate, 'v');
 
-        $rows = $rows->groupBy('landing_source')->get();
+        $rows = $rows->groupByRaw("json_extract(event_data, '$.landing_source')")->get();
 
         return $rows->mapWithKeys(fn ($row) => [
             $this->normalizeLandingSource($row->landing_source) => $row->bounced,
@@ -504,7 +504,7 @@ class AbTestingService
         $this->metrics->applyCheckoutEventConditions($rows);
 
         return $rows
-            ->groupBy('landing_source')
+            ->groupByRaw("json_extract(event_data, '$.landing_source')")
             ->get()
             ->mapWithKeys(fn ($row) => [
                 $this->normalizeLandingSource($row->landing_source) => (int) $row->cnt,
@@ -684,7 +684,7 @@ class AbTestingService
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
             ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($q) => $q->where('referral_source', $sourceFilter))
-            ->groupBy('landing_source')
+            ->groupByRaw("json_extract(event_data, '$.landing_source')")
             ->get();
     }
 
