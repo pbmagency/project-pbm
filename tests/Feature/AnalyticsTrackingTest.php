@@ -1,8 +1,15 @@
 <?php
 
 use App\Models\UserAnalytic;
+use App\Services\MetaConversionService;
 
 test('a visitor can post a visit event', function () {
+    $this->mock(MetaConversionService::class, function ($mock) {
+        $mock->shouldReceive('sendPageView')
+            ->once()
+            ->withArgs(fn ($request, string $eventId) => $eventId === 'abc123');
+    });
+
     $response = $this->postJson('/analytics/track', [
         'event_type' => 'visit',
         'event_data' => ['landing_source' => '/', 'event_id' => 'abc123'],
@@ -12,6 +19,29 @@ test('a visitor can post a visit event', function () {
     $response->assertOk()->assertJson(['success' => true]);
 
     expect(UserAnalytic::where('event_type', 'visit')->count())->toBe(1);
+});
+
+test('an add to cart event is stored and forwarded to Meta CAPI', function () {
+    $this->mock(MetaConversionService::class, function ($mock) {
+        $mock->shouldReceive('sendAddToCart')
+            ->once()
+            ->withArgs(fn ($request, string $eventId, array $data) => $eventId === 'atc-123' && $data['value'] === 129000
+            );
+    });
+
+    $this->postJson('/analytics/track', [
+        'event_type' => 'add_to_cart',
+        'event_data' => [
+            'event_id' => 'atc-123',
+            'content_ids' => ['silent-conversion-leak-webinar'],
+            'content_name' => 'The Silent Conversion Leak Webinar',
+            'content_type' => 'product',
+            'value' => 129000,
+            'currency' => 'IDR',
+        ],
+    ])->assertOk();
+
+    expect(UserAnalytic::where('event_type', 'add_to_cart')->count())->toBe(1);
 });
 
 test('the pricing cta click fires both cta_click and conversion events', function () {

@@ -2,23 +2,32 @@
 
 namespace App\Services;
 
+use FacebookAds\Api;
+use FacebookAds\Object\ServerSide\ActionSource;
+use FacebookAds\Object\ServerSide\Content;
+use FacebookAds\Object\ServerSide\CustomData;
+use FacebookAds\Object\ServerSide\Event;
+use FacebookAds\Object\ServerSide\EventRequest;
+use FacebookAds\Object\ServerSide\UserData;
 use Illuminate\Http\Request;
 use Log;
 
 class MetaConversionService
 {
     private string $pixelId;
+
     private string $accessToken;
+
     private bool $sdkAvailable;
 
     public function __construct()
     {
-        $this->pixelId      = config('services.meta.pixel_id', '');
-        $this->accessToken  = config('services.meta.access_token', '');
+        $this->pixelId = config('services.meta.pixel_id', '');
+        $this->accessToken = config('services.meta.access_token', '');
         $this->sdkAvailable = class_exists('\FacebookAds\Api');
 
         if ($this->isConfigured() && $this->sdkAvailable) {
-            \FacebookAds\Api::init(null, null, $this->accessToken, false);
+            Api::init(null, null, $this->accessToken, false);
         }
     }
 
@@ -35,12 +44,12 @@ class MetaConversionService
 
         $userData = $this->buildUserData($request);
 
-        $event = (new \FacebookAds\Object\ServerSide\Event)
+        $event = (new Event)
             ->setEventName('PageView')
             ->setEventTime(time())
             ->setEventId($eventId)
             ->setEventSourceUrl($request->header('Referer', $request->url()))
-            ->setActionSource(\FacebookAds\Object\ServerSide\ActionSource::WEBSITE)
+            ->setActionSource(ActionSource::WEBSITE)
             ->setUserData($userData);
 
         $this->sendEvents([$event]);
@@ -54,41 +63,36 @@ class MetaConversionService
 
         $userData = $this->buildUserData($request);
 
-        $level       = $eventData['level'] ?? 'Starter';
-        $price       = match ($level) {
-            'Intermediate' => 350000,
-            'Bundling'     => 375000,
-            default        => 250000,
-        };
-        $productId   = 'toefl-' . strtolower($level);
-        $contentName = "TOEFL Full Bright Level {$level}";
+        $price = (int) ($eventData['value'] ?? config('services.meta.course_price', 129000));
+        $productId = $eventData['content_ids'][0] ?? 'silent-conversion-leak-webinar';
+        $contentName = $eventData['content_name'] ?? 'The Silent Conversion Leak Webinar';
 
-        $content = (new \FacebookAds\Object\ServerSide\Content)
+        $content = (new Content)
             ->setProductId($productId)
             ->setQuantity(1);
 
-        $customData = (new \FacebookAds\Object\ServerSide\CustomData)
+        $customData = (new CustomData)
             ->setContentName($contentName)
             ->setContentType('product')
             ->setValue($price)
             ->setCurrency('IDR')
             ->setContents([$content]);
 
-        $event = (new \FacebookAds\Object\ServerSide\Event)
+        $event = (new Event)
             ->setEventName('AddToCart')
             ->setEventTime(time())
             ->setEventId($eventId)
             ->setEventSourceUrl($request->header('Referer', $request->url()))
-            ->setActionSource(\FacebookAds\Object\ServerSide\ActionSource::WEBSITE)
+            ->setActionSource(ActionSource::WEBSITE)
             ->setUserData($userData)
             ->setCustomData($customData);
 
         $this->sendEvents([$event]);
     }
 
-    private function buildUserData(Request $request): \FacebookAds\Object\ServerSide\UserData
+    private function buildUserData(Request $request): UserData
     {
-        $userData = (new \FacebookAds\Object\ServerSide\UserData)
+        $userData = (new UserData)
             ->setClientIpAddress($request->ip())
             ->setClientUserAgent($request->userAgent());
 
@@ -108,7 +112,7 @@ class MetaConversionService
     private function sendEvents(array $events): void
     {
         try {
-            $eventRequest = (new \FacebookAds\Object\ServerSide\EventRequest($this->pixelId))
+            $eventRequest = (new EventRequest($this->pixelId))
                 ->setEvents($events);
 
             $response = $eventRequest->execute();

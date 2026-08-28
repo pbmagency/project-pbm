@@ -20,8 +20,8 @@ const INCLUDES = [
 export function Pricing() {
     const { settings } = usePage<any>().props;
     const coursePrice = Number(import.meta.env.VITE_COURSE_PRICE ?? 129000);
-    const { trackFormStart } = useAnalytics();
-    const hasTrackedIntent = useRef(false);
+    const { trackAddToCart } = useAnalytics();
+    const addToCartEventId = useRef<string>(generateEventId());
     // Generated once on first intent, shared with CAPI via meta_event_id for deduplication
     const checkoutEventId = useRef<string>(generateEventId());
 
@@ -31,15 +31,25 @@ export function Pricing() {
         phone: '',
     });
 
-    const handleFirstTyping = (value: string) => {
-        if (!hasTrackedIntent.current && value.trim() !== '') {
-            hasTrackedIntent.current = true;
-            trackFormStart('pricing_form');
-        }
-    };
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        const commerceData = {
+            content_ids: ['silent-conversion-leak-webinar'],
+            content_name: 'The Silent Conversion Leak Webinar',
+            content_type: 'product',
+            value: coursePrice,
+            currency: 'IDR',
+        };
+
+        window.fbq?.('track', 'AddToCart', commerceData, {
+            eventID: addToCartEventId.current,
+        });
+        trackAddToCart(
+            'pricing_submit',
+            commerceData,
+            addToCartEventId.current,
+        );
 
         // Fire browser pixel BEFORE the Inertia post — Inertia::location() on the
         // server side causes a full-page redirect, so onSuccess never runs.
@@ -73,10 +83,7 @@ export function Pricing() {
     };
 
     return (
-        <section
-            id="pricing"
-            className="relative overflow-hidden bg-lp-bg"
-        >
+        <section id="pricing" className="relative overflow-hidden bg-lp-bg">
             <div className="relative mx-auto max-w-lg px-4 pt-16 pb-10 sm:px-6 sm:pt-24 sm:pb-12 lg:pt-28">
                 <div className="text-center">
                     <Eyebrow className="mx-auto" tone="amber">
@@ -171,11 +178,6 @@ export function Pricing() {
                                             onChange={(e) =>
                                                 setData('name', e.target.value)
                                             }
-                                            onBlur={(e) =>
-                                                handleFirstTyping(
-                                                    e.target.value,
-                                                )
-                                            }
                                             placeholder="Nama Lengkap"
                                             className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 transition outline-none focus:border-white/70 focus:bg-white/20"
                                         />
@@ -194,11 +196,6 @@ export function Pricing() {
                                             onChange={(e) =>
                                                 setData('email', e.target.value)
                                             }
-                                            onBlur={(e) =>
-                                                handleFirstTyping(
-                                                    e.target.value,
-                                                )
-                                            }
                                             placeholder="Email"
                                             className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 transition outline-none focus:border-white/70 focus:bg-white/20"
                                         />
@@ -216,11 +213,6 @@ export function Pricing() {
                                             value={data.phone}
                                             onChange={(e) =>
                                                 setData('phone', e.target.value)
-                                            }
-                                            onBlur={(e) =>
-                                                handleFirstTyping(
-                                                    e.target.value,
-                                                )
                                             }
                                             placeholder="Nomor WhatsApp"
                                             className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm text-white placeholder-white/60 transition outline-none focus:border-white/70 focus:bg-white/20"

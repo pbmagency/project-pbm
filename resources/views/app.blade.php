@@ -16,6 +16,8 @@
 
     <script>
         let trackingLoaded = false;
+        window.__META_PAGE_VIEW_EVENT_ID = window.crypto?.randomUUID?.() ??
+            `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
         function loadTrackingScripts() {
             if (trackingLoaded) return;
@@ -40,6 +42,9 @@
                     s.parentNode.insertBefore(t, s)
                 }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
                 fbq('init', '{{ $metaPixelId }}');
+                fbq('track', 'PageView', {}, {
+                    eventID: window.__META_PAGE_VIEW_EVENT_ID
+                });
             @endif
 
             // Load Microsoft Clarity

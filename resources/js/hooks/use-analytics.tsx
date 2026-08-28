@@ -10,6 +10,7 @@ export type AnalyticsEventType =
     | 'scroll'
     | 'engagement'
     | 'cta_click'
+    | 'add_to_cart'
     | 'initiate_checkout'
     | 'conversion'
     | 'payment'
@@ -182,6 +183,28 @@ export function useAnalytics() {
         });
     }, [track]);
 
+    const trackAddToCart = useCallback(
+        (
+            location: string,
+            data?: Record<string, unknown>,
+            eventId = generateEventId(),
+        ) => {
+            void track({
+                event_type: 'add_to_cart',
+                event_data: {
+                    location,
+                    event_id: eventId,
+                    _fbp: getCookieValue('_fbp'),
+                    _fbc: getCookieValue('_fbc'),
+                    page: window.location.pathname,
+                    timestamp: new Date().toISOString(),
+                    ...data,
+                },
+            });
+        },
+        [track],
+    );
+
     const trackScroll = useCallback(
         (depth: number) => {
             void track({
@@ -303,6 +326,7 @@ export function useAnalytics() {
         trackScroll,
         trackEngagement,
         trackCTA,
+        trackAddToCart,
         trackInitiateCheckout,
         trackConversion,
         trackPayment,

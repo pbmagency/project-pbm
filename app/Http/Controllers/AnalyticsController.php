@@ -45,6 +45,7 @@ class AnalyticsController extends Controller
                 'scroll',
                 'engagement',
                 'cta_click',
+                'add_to_cart',
                 'initiate_checkout',
                 'conversion',
                 'payment',
@@ -64,6 +65,11 @@ class AnalyticsController extends Controller
             'event_data.destination' => ['nullable', 'string', 'max:2048'],
             'event_data.section' => ['nullable', 'string', 'max:100'],
             'event_data.package' => ['nullable', 'string', 'max:100'],
+            'event_data.content_name' => ['nullable', 'string', 'max:255'],
+            'event_data.content_type' => ['nullable', 'string', 'max:100'],
+            'event_data.content_ids' => ['nullable', 'array'],
+            'event_data.content_ids.*' => ['string', 'max:100'],
+            'event_data.value' => ['nullable', 'numeric', 'min:0'],
             'event_data.price' => ['nullable', 'numeric', 'min:0'],
             'event_data.payment_url' => ['nullable', 'string', 'max:2048'],
             'event_data.status' => ['nullable', 'string', 'max:50'],
@@ -112,7 +118,7 @@ class AnalyticsController extends Controller
                 $metaService->sendPageView($request, $eventId);
             }
 
-            if ($validated['event_type'] === 'initiate_checkout') {
+            if ($validated['event_type'] === 'add_to_cart') {
                 $metaService->sendAddToCart($request, $eventId, $eventData);
             }
         }
