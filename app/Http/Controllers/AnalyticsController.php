@@ -108,7 +108,7 @@ class AnalyticsController extends Controller
             'utm_campaign' => $validated['utm_campaign'] ?? null,
             'utm_content' => $validated['utm_content'] ?? null,
             'utm_term' => $validated['utm_term'] ?? null,
-            'ip_hash' => hash('sha256', $request->ip().config('app.key')),
+            'ip_hash' => hash('sha256', $request->ip() . config('app.key')),
             'user_agent' => $request->userAgent(),
             'user_id' => $request->user()?->id,
             'created_at' => now(),
@@ -127,10 +127,12 @@ class AnalyticsController extends Controller
             $metaService->sendAddToCart($request, $capiEventId, $eventData);
         }
 
-        // WhatsApp lead conversions (floating button or pricing CTA) → Contact event.
+        // Floating WhatsApp button (wa_inquiry) → Contact CAPI event.
+        // wa_registration (pricing CTA) is intentionally excluded here because
+        // it already fires an AddToCart event — Contact would be a duplicate intent.
         if (
             $validated['event_type'] === 'conversion' &&
-            in_array($eventData['type'] ?? '', AnalyticsMetricsService::LEAD_CONVERSION_TYPES, true)
+            ($eventData['type'] ?? '') === 'wa_inquiry'
         ) {
             $metaService->sendContact($request, $capiEventId);
         }
@@ -226,7 +228,7 @@ class AnalyticsController extends Controller
         $totalLeadData = $directCheckoutData
             ->concat($whatsAppLeadData)
             ->groupBy('date')
-            ->map(fn ($rows, $date) => (object) [
+            ->map(fn($rows, $date) => (object) [
                 'date' => $date,
                 'total' => $rows->sum('total'),
             ])
