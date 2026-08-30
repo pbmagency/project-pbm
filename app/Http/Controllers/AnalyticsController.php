@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -113,14 +114,25 @@ class AnalyticsController extends Controller
             'created_at' => now(),
         ]);
 
-        if ($eventId) {
-            if ($validated['event_type'] === 'visit') {
-                $metaService->sendPageView($request, $eventId);
-            }
+        // Ensure every CAPI-eligible event has an event_id for deduplication.
+        // trackConversion() on the frontend does not currently send one, so we
+        // generate a server-side UUID as a fallback.
+        $capiEventId = $eventId ?: (string) Str::uuid();
 
-            if ($validated['event_type'] === 'add_to_cart') {
-                $metaService->sendAddToCart($request, $eventId, $eventData);
-            }
+        if ($validated['event_type'] === 'visit') {
+            $metaService->sendPageView($request, $capiEventId);
+        }
+
+        if ($validated['event_type'] === 'add_to_cart') {
+            $metaService->sendAddToCart($request, $capiEventId, $eventData);
+        }
+
+        // WhatsApp lead conversions (floating button or pricing CTA) → Contact event.
+        if (
+            $validated['event_type'] === 'conversion' &&
+            in_array($eventData['type'] ?? '', AnalyticsMetricsService::LEAD_CONVERSION_TYPES, true)
+        ) {
+            $metaService->sendContact($request, $capiEventId);
         }
 
         return response()->json(['success' => true]);

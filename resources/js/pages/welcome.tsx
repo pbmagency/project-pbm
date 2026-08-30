@@ -15,6 +15,22 @@ const WA_NUMBER = '6285966688711';
 const WA_MESSAGE = encodeURIComponent('Halo, saya mau daftar Webinar The Silent Conversion Leak seharga Rp79.000. Bagaimana cara daftarnya?');
 const WA_LINK = `https://wa.me/${WA_NUMBER}?text=${WA_MESSAGE}`;
 
+/**
+ * Safe wrapper around fbq() — initialises the Meta Pixel if it hasn't been
+ * loaded yet (via the lazy-loader exposed as window.__initPixel), then fires
+ * the event.  Silently no-ops when the Pixel ID is not configured.
+ */
+function fbqTrack(event: string, data?: Record<string, unknown>, options?: Record<string, unknown>) {
+    const w = window as unknown as Record<string, unknown>;
+    if (!w.__META_PIXEL_ID) return;
+    // Eagerly initialise the pixel (idempotent — safe to call multiple times).
+    if (typeof w.__initPixel === 'function') {
+        (w.__initPixel as () => void)();
+    }
+    if (typeof w.fbq !== 'function') return;
+    (w.fbq as (...args: unknown[]) => void)('track', event, data ?? {}, options ?? {});
+}
+
 // Lazy video embed — only loads iframe when user scrolls near it
 function VideoEmbed({ src }: { src: string }) {
     const ref = useRef<HTMLDivElement>(null);
@@ -55,7 +71,7 @@ function VideoEmbed({ src }: { src: string }) {
 
 export default function Welcome() {
     // 1. Core Tracking Hooks
-    const { trackVisit, trackCTA, trackFormStart, trackConversion } = useAnalytics();
+    const { trackVisit, trackCTA, trackConversion, trackAddToCart } = useAnalytics();
     
     // Register scroll and dwell time trackers globally
     useScrollTracking();
@@ -886,7 +902,24 @@ export default function Welcome() {
                             <a 
                                 href={WA_LINK}
                                 onClick={() => {
+                                    // Shared event ID ensures Meta deduplicates
+                                    // the browser Pixel call and the CAPI call.
+                                    const eventId = crypto.randomUUID();
                                     trackCTA('pricing_submit', 'Daftar Sekarang', WA_LINK);
+                                    trackAddToCart('pricing_submit', {
+                                        value: 79000,
+                                        content_name: 'The Silent Conversion Leak Webinar',
+                                        content_ids: ['silent-conversion-leak-webinar'],
+                                        content_type: 'product',
+                                        currency: 'IDR',
+                                    }, eventId);
+                                    fbqTrack('AddToCart', {
+                                        value: 79000,
+                                        currency: 'IDR',
+                                        content_name: 'The Silent Conversion Leak Webinar',
+                                        content_ids: ['silent-conversion-leak-webinar'],
+                                        content_type: 'product',
+                                    }, { eventID: eventId });
                                     trackConversion('wa_registration', { location: 'pricing_submit', package: 'Webinar' });
                                 }}
                                 data-cta-zone="pricing_submit"

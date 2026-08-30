@@ -1,0 +1,18 @@
+{
+    "permissions": {
+        "defaultMode": "default",
+        "deny": [
+            "Edit(database/**)",
+            "Edit(app/Http/**)",
+            "Edit(app/Services/**)",
+            "Edit(config/**)"
+        ],
+        "ask": ["Bash(git push:*)", "Edit(.env*)", "Edit(routes/**)"],
+        "allow": [
+            "Edit(resources/js/Pages/**)",
+            "Edit(resources/js/Components/**)",
+            "Bash(npm run build)",
+            "Bash(npm run lint)"
+        ]
+    }
+}

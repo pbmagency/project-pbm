@@ -10,8 +10,24 @@ export function FloatingWhatsApp() {
     const WA_LINK = `https://wa.me/${waNumber}?text=${encodeURIComponent('Halo Tim PBM Agency, saya mau tanya tentang Webinar The Silent Conversion Leak.')}`;
 
     const handleClick = () => {
+        // Shared event ID — same value is sent to both the browser Pixel and
+        // the server-side CAPI call so Meta can deduplicate the two signals.
+        const eventId = crypto.randomUUID();
+
         trackCTA('floating_wa', 'WhatsApp Floating Button', WA_LINK);
-        trackConversion('wa_inquiry', { location: 'floating_wa' });
+        trackConversion('wa_inquiry', { location: 'floating_wa', event_id: eventId });
+
+        // Browser-side Meta Pixel Contact event (deduped against CAPI via eventID).
+        const w = window as unknown as Record<string, unknown>;
+        if (w.__META_PIXEL_ID) {
+            // Eagerly initialise the pixel in case this is the user's first interaction.
+            if (typeof w.__initPixel === 'function') {
+                (w.__initPixel as () => void)();
+            }
+            if (typeof w.fbq === 'function') {
+                (w.fbq as (...args: unknown[]) => void)('track', 'Contact', {}, { eventID: eventId });
+            }
+        }
     };
 
     return (

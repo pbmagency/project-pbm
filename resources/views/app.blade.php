@@ -18,6 +18,9 @@
         let trackingLoaded = false;
         window.__META_PAGE_VIEW_EVENT_ID = window.crypto?.randomUUID?.() ??
             `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        @if ($metaPixelId = config('services.meta.pixel_id'))
+        window.__META_PIXEL_ID = '{{ $metaPixelId }}';
+        @endif
 
         function loadTrackingScripts() {
             if (trackingLoaded) return;
@@ -60,13 +63,28 @@
             })(window, document, "clarity", "script", "xnf0g1adw1");
         }
 
-        // Load scripts instantly when the user interacts with the page (scroll, click, mousemove, touch)
+        // Load scripts instantly when the user interacts with the page.
+        //
+        // IMPORTANT: click and touchstart use capture:true so that
+        // loadTrackingScripts fires in the CAPTURE phase (window → element),
+        // BEFORE any React onClick / onTouchStart handler runs on the element.
+        // Without this, a user's first click fires the React handler before fbq
+        // is defined, making AddToCart / Contact events silently drop.
+        //
+        // scroll, mousemove and keydown do not need capture because they fire
+        // well before any subsequent click.
+        var captureEvents = { click: true, touchstart: true };
         ['scroll', 'mousemove', 'touchstart', 'keydown', 'click'].forEach(function(e) {
             window.addEventListener(e, loadTrackingScripts, {
                 once: true,
-                passive: true
+                passive: true,
+                capture: !!captureEvents[e]
             });
         });
+
+        // Expose for use inside fbqTrack — lets React components eagerly
+        // initialise the pixel before firing a custom event.
+        window.__initPixel = loadTrackingScripts;
 
         // Fallback: If they do nothing for 6 seconds, load them anyway
         setTimeout(loadTrackingScripts, 6000);
