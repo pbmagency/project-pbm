@@ -1,11 +1,10 @@
 import { createInertiaApp } from '@inertiajs/react';
 import { lazy, Suspense } from 'react';
-import { Toaster } from '@/components/ui/sonner';
-import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 
 // PostHog: only load when API key is configured (skip when POSTHOG_DISABLED=true)
 const apiKey = import.meta.env.VITE_POSTHOG_KEY;
+
 if (apiKey) {
     import('@/lib/posthog').then(() => import('@/lib/posthog-tracking'));
 }
@@ -31,13 +30,7 @@ createInertiaApp({
     },
     strictMode: true,
     withApp(app) {
-        return (
-            <TooltipProvider delayDuration={0}>
-                {/* Suspense is required when using lazy() layout imports */}
-                <Suspense fallback={null}>{app}</Suspense>
-                <Toaster />
-            </TooltipProvider>
-        );
+        return <Suspense fallback={null}>{app}</Suspense>;
     },
     progress: {
         color: '#4B5563',

@@ -25,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        if (env('VITE_USE_BUILD', true)) {
+            \Illuminate\Support\Facades\Vite::useHotFile(storage_path('vite.hot'));
+        }
     }
 
     /**

@@ -21,6 +21,7 @@ class AnalyticsMetricsService
     public const LEAD_CONVERSION_TYPES = [
         'wa_inquiry',
         'wa_registration',
+        'audit_request',
     ];
 
     public const LEGACY_CHECKOUT_CONVERSION_TYPES = [
@@ -69,7 +70,7 @@ class AnalyticsMetricsService
             ['stage' => 'Engaged', 'count' => $stats['engaged'], 'branch' => 'main', 'from_stage' => 'Visits'],
             ['stage' => 'Intent', 'count' => $stats['intent'], 'branch' => 'main', 'from_stage' => 'Engaged'],
             ['stage' => 'Direct Checkout', 'count' => $stats['direct_checkouts'], 'branch' => 'checkout', 'from_stage' => 'Intent'],
-            ['stage' => 'WhatsApp Leads', 'count' => $stats['whatsapp_leads'], 'branch' => 'lead', 'from_stage' => 'Intent'],
+            ['stage' => 'Contact Leads', 'count' => $stats['whatsapp_leads'], 'branch' => 'lead', 'from_stage' => 'Intent'],
             ['stage' => 'Total Leads', 'count' => $stats['total_leads'], 'branch' => 'total', 'from_stage' => 'Intent'],
         ];
         $counts = collect($steps)->pluck('count', 'stage');

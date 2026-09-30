@@ -34,7 +34,7 @@ class LabsController extends Controller
 
         $sourceFilter = $request->get('source');
         $sourceKey = $sourceFilter ?? 'all';
-        $cacheKey = "ab_testing_v11_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}";
+        $cacheKey = "ab_testing_v12_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}";
 
         // 30-minute cache for high-traffic tolerance
         $data = Cache::remember($cacheKey, 30 * 60, function () use ($startDate, $endDate, $sourceFilter) {
@@ -97,7 +97,7 @@ class LabsController extends Controller
         }
 
         $sourceKey = $sourceFilter ?? 'all';
-        Cache::forget("ab_testing_v11_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}");
+        Cache::forget("ab_testing_v12_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}");
 
         return response()->json(['success' => true, 'message' => 'Cache cleared successfully']);
     }

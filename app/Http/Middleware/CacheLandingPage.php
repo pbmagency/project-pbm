@@ -19,13 +19,13 @@ class CacheLandingPage
     {
         // Only cache GET requests for guests visiting the landing page or policy pages
         $isLandingPage = in_array($request->path(), ['/', 'terms', 'refund']);
-        
-        if (! $request->isMethod('GET') || $request->user() || ! $isLandingPage) {
+
+        if (! $request->isMethod('GET') || $request->header('X-Inertia') || $request->user() || ! $isLandingPage) {
             return $next($request);
         }
 
         $pathKey = str_replace('/', '_', $request->path());
-        $cacheKey = "landing_page_html_{$pathKey}:" . self::manifestVersion();
+        $cacheKey = "landing_page_html_{$pathKey}:".self::manifestVersion();
 
         if (Cache::has($cacheKey)) {
             /** @var string $html */
@@ -38,7 +38,24 @@ class CacheLandingPage
         $response = $next($request);
 
         if ($response->getStatusCode() === 200) {
-            Cache::put($cacheKey, $response->getContent(), self::TTL_SECONDS);
+            $content = $response->getContent();
+
+            // Normalize URLs to relative paths to prevent CORS issues across origins (localhost vs 127.0.0.1)
+            $host = $request->schemeAndHttpHost();
+            if ($host) {
+                $content = str_replace($host.'/build/', '/build/', $content);
+            }
+            $content = str_replace(['http://127.0.0.1:8000/build/', 'http://localhost:8000/build/'], '/build/', $content);
+
+            Cache::put($cacheKey, $content, self::TTL_SECONDS);
+
+            // Write static cache for server.php fast-path when visiting root
+            if ($request->path() === '/') {
+                @file_put_contents(storage_path('framework/cache/landing.html'), $content);
+                @file_put_contents(storage_path('framework/cache/landing.html.gz'), gzencode($content, 9));
+            }
+
+            $response->setContent($content);
         }
 
         return $response;

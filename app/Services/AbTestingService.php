@@ -90,7 +90,7 @@ class AbTestingService
                     ['stage' => 'Engaged',           'count' => $engaged,     'percentage' => round($this->safePct($engaged, $visits), 1)],
                     ['stage' => 'Intent',            'count' => $intent,      'percentage' => round($this->safePct($intent, $visits), 1)],
                     ['stage' => 'Direct Checkout', 'count' => $directCheckouts, 'percentage' => round($this->safePct($directCheckouts, $visits), 1)],
-                    ['stage' => 'WhatsApp Leads',  'count' => $whatsAppLeads,   'percentage' => round($this->safePct($whatsAppLeads, $visits), 1)],
+                    ['stage' => 'Contact Leads',  'count' => $whatsAppLeads,   'percentage' => round($this->safePct($whatsAppLeads, $visits), 1)],
                     ['stage' => 'Total Leads',     'count' => $totalLeads,      'percentage' => round($this->safePct($totalLeads, $visits), 1)],
                 ],
             ];

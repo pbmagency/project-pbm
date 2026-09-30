@@ -15,10 +15,10 @@ export default defineConfig({
             refresh: true,
             fonts: [
                 bunny('Instrument Sans', {
-                    weights: [400, 500, 600],
-                }),
-                bunny('Space Grotesk', {
-                    weights: [600, 700],
+                    weights: [400, 600, 700],
+                    subsets: ['latin'],
+                    preload: false,
+                    display: 'swap',
                 }),
             ],
         }),

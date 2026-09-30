@@ -3,8 +3,8 @@ import {
     BookOpen,
     FlaskConical,
     FolderGit2,
-    LayoutGrid,
     LineChart,
+    Mail,
     ShoppingCart,
     Settings, // <-- Added this import right here!
 } from 'lucide-react';
@@ -48,25 +48,30 @@ export function AppSidebar() {
         ...(isAdmin
             ? [
                   {
-                    title: 'Analytics',
-                    href: AnalyticsController.index(),
-                    icon: LineChart,
+                      title: 'Analytics',
+                      href: AnalyticsController.index(),
+                      icon: LineChart,
                   },
                   {
-                    title: 'A/B Testing Labs',
-                    href: LabsController.index(),
-                    icon: FlaskConical,
+                      title: 'A/B Testing Labs',
+                      href: LabsController.index(),
+                      icon: FlaskConical,
                   },
                   {
-                    title: 'Orders',
-                    href: OrderController.index(),
-                    icon: ShoppingCart,
-                },
-                {
-                    title: 'Settings',
-                    href: '/admin/configs',
-                    icon: Settings,
-                },
+                      title: 'Permintaan Audit',
+                      href: '/admin/audit-requests',
+                      icon: Mail,
+                  },
+                  {
+                      title: 'Orders',
+                      href: OrderController.index(),
+                      icon: ShoppingCart,
+                  },
+                  {
+                      title: 'Settings',
+                      href: '/admin/configs',
+                      icon: Settings,
+                  },
               ]
             : []),
     ];

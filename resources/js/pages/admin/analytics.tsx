@@ -166,10 +166,10 @@ export default function Analytics({
                                 description={`${stats.direct_checkouts} external checkout redirects`}
                             />
                             <MetricCard
-                                title="WhatsApp Lead Rate"
+                                title="Contact Lead Rate"
                                 value={`${stats.whatsapp_lead_rate}%`}
                                 icon={MessageCircle}
-                                description={`${stats.whatsapp_leads} WhatsApp leads`}
+                                description={`${stats.whatsapp_leads} audit or WhatsApp leads`}
                             />
                             <MetricCard
                                 title="Total Leads"
@@ -223,7 +223,7 @@ export default function Analytics({
                                 </div>
                                 <div className="mt-1 text-sm text-muted-foreground">
                                     {stats.direct_checkouts} Direct Checkout ·{' '}
-                                    {stats.whatsapp_leads} WhatsApp Leads
+                                    {stats.whatsapp_leads} Contact Leads
                                 </div>
                             </div>
                         </div>

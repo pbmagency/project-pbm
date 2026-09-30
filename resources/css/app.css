@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@import 'tw-animate-css';
 
 /* Prevent fonts from blocking initial render */
 @layer base {

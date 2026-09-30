@@ -135,11 +135,10 @@ export function ConversionFunnel({ data, className }: ConversionFunnelProps) {
                 <div className="space-y-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
                     <div>
                         <h4 className="font-semibold text-emerald-400">
-                            WhatsApp Leads
+                            Contact Leads
                         </h4>
                         <p className="text-xs text-muted-foreground">
-                            Leads from pricing, floating, and other WhatsApp
-                            CTAs.
+                            Audit form and WhatsApp inquiries.
                         </p>
                     </div>
                     {leadStages.map((stage) => (
@@ -159,7 +158,7 @@ export function ConversionFunnel({ data, className }: ConversionFunnelProps) {
                         Total Leads
                     </h4>
                     <p className="text-xs text-muted-foreground">
-                        Direct Checkout + WhatsApp leads.
+                        Direct Checkout + contact leads.
                     </p>
                 </div>
                 {totalStages.map((stage) => (

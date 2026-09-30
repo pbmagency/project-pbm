@@ -1,7 +1,10 @@
 <?php
 
 use App\Models\UserAnalytic;
+use App\Services\AbTestingService;
+use App\Services\AnalyticsMetricsService;
 use App\Services\MetaConversionService;
+use Carbon\Carbon;
 
 test('a visitor can post a visit event', function () {
     $this->mock(MetaConversionService::class, function ($mock) {
@@ -65,6 +68,33 @@ test('an unknown event type is rejected', function () {
     ]);
 
     $response->assertStatus(422);
+});
+
+test('an audit request from the root page is counted as a contact lead in admin metrics and labs', function () {
+    $this->postJson('/analytics/track', [
+        'event_type' => 'visit',
+        'event_data' => ['landing_source' => '/', 'event_id' => 'audit-visit'],
+    ])->assertOk();
+
+    $this->postJson('/analytics/track', [
+        'event_type' => 'conversion',
+        'event_data' => [
+            'landing_source' => '/',
+            'type' => 'audit_request',
+            'event_id' => 'audit-lead',
+            'name' => 'Test Visitor',
+            'email' => 'visitor@example.com',
+        ],
+    ])->assertOk();
+
+    $start = Carbon::now()->subMinute();
+    $end = Carbon::now()->addMinute();
+    $stats = app(AnalyticsMetricsService::class)->dashboardStats($start, $end);
+    $matrix = app(AbTestingService::class)->getPerformanceMatrix($start, $end);
+
+    expect($stats['whatsapp_leads'])->toBe(1)
+        ->and($matrix[0]['landing_source'])->toBe('/')
+        ->and($matrix[0]['total_leads'])->toBe(1);
 });
 
 test('a section_view event is accepted and populates the generated section_id column', function () {

@@ -155,7 +155,7 @@ export function RevenueChart({ data, className }: RevenueChartProps) {
                         <Line
                             type="monotone"
                             dataKey="whatsAppLeads"
-                            name="WhatsApp Leads"
+                            name="Contact Leads"
                             stroke="oklch(0.65 0.18 145)"
                             strokeWidth={2}
                             dot={{

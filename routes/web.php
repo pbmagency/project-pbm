@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AuditRequestController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\CheckoutController;
@@ -18,9 +19,10 @@ $welcomeController = function () {
         'phpVersion' => PHP_VERSION,
     ]);
 };
-Route::get('/', $welcomeController)->name('home');
+Route::inertia('/', 'project')->name('landing');
+Route::get('/test', $welcomeController)->name('home');
 Route::get('/c2-design-1', $welcomeController)->name('c2-design-1');
-Route::inertia('/c2-design-2', 'cycle1/c1-angle-3')->name('landing');
+Route::inertia('/c2-design-2', 'cycle1/c1-angle-3')->name('landing-2');
 
 // mini-audit
 Route::get('/mini-audit', [MiniAuditController::class, 'create'])->name('mini-audit');
@@ -43,6 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AnalyticsController::class, 'index'])->name('analytics');
     Route::get('/export', [AnalyticsController::class, 'export'])->name('analytics.export');
+    Route::get('/audit-requests', [AuditRequestController::class, 'index'])->name('audit-requests.index');
 
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders');
     Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');

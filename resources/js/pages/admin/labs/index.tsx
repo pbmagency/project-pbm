@@ -86,7 +86,7 @@ const transformFunnelData = (
         'Engaged',
         'Intent',
         'Direct Checkout',
-        'WhatsApp Leads',
+        'Contact Leads',
         'Total Leads',
     ];
 
@@ -803,7 +803,7 @@ export default function LabsIndex({
                                                         }
                                                         className="flex items-center gap-1 hover:text-foreground"
                                                     >
-                                                        WhatsApp Lead Rate
+                                                        Contact Lead Rate
                                                         <ArrowUpDown className="h-3 w-3" />
                                                     </button>
                                                 </th>
@@ -1001,7 +1001,7 @@ export default function LabsIndex({
                                                         </div>
                                                         <div>
                                                             <span className="text-muted-foreground">
-                                                                WhatsApp Lead
+                                                                Contact Lead
                                                                 Rate:
                                                             </span>{' '}
                                                             <Badge variant="secondary">
@@ -1242,7 +1242,7 @@ export default function LabsIndex({
                                                     'Engaged',
                                                     'Intent',
                                                     'Direct Checkout',
-                                                    'WhatsApp Leads',
+                                                    'Contact Leads',
                                                     'Total Leads',
                                                 ].map((stage) => (
                                                     <tr
