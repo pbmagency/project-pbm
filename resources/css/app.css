@@ -3,7 +3,6 @@
 /* Prevent fonts from blocking initial render */
 @layer base {
     @font-face { font-family: 'Instrument Sans'; font-display: swap; }
-    @font-face { font-family: 'Space Grotesk'; font-display: swap; }
 }
 
 @source '../views';
@@ -19,7 +18,7 @@
 
     /* Landing page display font, used for headings via font-display. */
     --font-display:
-        'Space Grotesk', 'Instrument Sans', ui-sans-serif, sans-serif;
+        'Instrument Sans', ui-sans-serif, sans-serif;
 
     /* Upgrades font-mono app-wide (currently used for data/labels on the
        landing page and in the admin analytics tables). */

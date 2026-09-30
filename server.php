@@ -15,19 +15,24 @@ header('Access-Control-Allow-Methods: GET, HEAD, OPTIONS');
 // Fast-path landing page cache
 $landingCache = __DIR__.'/storage/framework/cache/landing.html';
 $buildManifest = __DIR__.'/public/build/manifest.json';
-if ($uri === '/' && empty($_SERVER['HTTP_X_INERTIA']) && file_exists($landingCache) && (! file_exists($buildManifest) || filemtime($landingCache) >= filemtime($buildManifest))) {
-    $acceptEncoding = $_SERVER['HTTP_ACCEPT_ENCODING'] ?? '';
-    header('Content-Type: text/html; charset=UTF-8');
-    if (strpos($acceptEncoding, 'gzip') !== false && file_exists(__DIR__.'/storage/framework/cache/landing.html.gz')) {
-        header('Content-Encoding: gzip');
-        header('Vary: Accept-Encoding');
-        header('Content-Length: '.(string) filesize(__DIR__.'/storage/framework/cache/landing.html.gz'));
-        readfile(__DIR__.'/storage/framework/cache/landing.html.gz');
+if ($uri === '/' && empty($_SERVER['HTTP_X_INERTIA']) && file_exists($landingCache)) {
+    if (file_exists($buildManifest) && filemtime($landingCache) < filemtime($buildManifest)) {
+        @unlink($landingCache);
+        @unlink(__DIR__.'/storage/framework/cache/landing.html.gz');
+    } else {
+        $acceptEncoding = $_SERVER['HTTP_ACCEPT_ENCODING'] ?? '';
+        header('Content-Type: text/html; charset=UTF-8');
+        if (strpos($acceptEncoding, 'gzip') !== false && file_exists(__DIR__.'/storage/framework/cache/landing.html.gz')) {
+            header('Content-Encoding: gzip');
+            header('Vary: Accept-Encoding');
+            header('Content-Length: '.(string) filesize(__DIR__.'/storage/framework/cache/landing.html.gz'));
+            readfile(__DIR__.'/storage/framework/cache/landing.html.gz');
+            exit;
+        }
+        header('Content-Length: '.(string) filesize(__DIR__.'/storage/framework/cache/landing.html'));
+        readfile(__DIR__.'/storage/framework/cache/landing.html');
         exit;
     }
-    header('Content-Length: '.(string) filesize(__DIR__.'/storage/framework/cache/landing.html'));
-    readfile(__DIR__.'/storage/framework/cache/landing.html');
-    exit;
 }
 
 // Handle static files in public/
