@@ -577,7 +577,11 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                 setError('Mohon isi nomor WhatsApp aktif Anda (minimal 8 digit).');
                 return false;
             }
-            if (email.trim() && !/^\S+@\S+\.\S+$/.test(email.trim())) {
+            if (!email.trim()) {
+                setError('Mohon isi alamat email aktif Anda.');
+                return false;
+            }
+            if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
                 setError('Format email tidak valid.');
                 return false;
             }
@@ -676,6 +680,17 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
             totalBuyers !== 'belum ada' &&
             businessRole !== 'agency atau freelancer';
 
+        const calendlyUrl = `${CALENDLY_URL}?name=${encodeURIComponent(name.trim())}&email=${encodeURIComponent(email.trim())}&a1=${encodeURIComponent(phone.trim())}&a2=${encodeURIComponent(websiteLink.trim())}`;
+
+        // Jika lolos kualifikasi, langsung buka tab baru ke Calendly
+        if (qualified) {
+            try {
+                window.open(calendlyUrl, '_blank', 'noopener,noreferrer');
+            } catch {
+                // Fallback jika diblokir popup blocker
+            }
+        }
+
         setIsQualified(qualified);
         setError('');
         trackCTA(
@@ -699,7 +714,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                 landing_source: window.location.pathname,
                 name: name.trim(),
                 phone: phone.trim(),
-                email: email.trim() || undefined,
+                email: email.trim(),
                 website_link: websiteLink.trim(),
                 program_type: effectiveProgram,
                 total_buyers: totalBuyers,
@@ -916,7 +931,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                     </label>
                                                     <label className="flex flex-col gap-1.5">
                                                         <span className="text-xs font-bold text-[#334155]">
-                                                            Email <span className="font-normal text-[#94a3b8]">(opsional untuk Google Calendar)</span>
+                                                            Alamat Email <span className="text-[#e11d48]">*</span>
                                                         </span>
                                                         <input
                                                             id="audit-email"
@@ -1278,9 +1293,9 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                             </div>
 
                                             <div className="w-full rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] p-4 text-left text-xs text-[#166534]">
-                                                <div className="font-bold">Langkah Terakhir: Pilih Jadwal Meeting</div>
+                                                <div className="font-bold">Langkah Terakhir: Konfirmasi Jadwal di Calendly</div>
                                                 <div className="mt-1">
-                                                    Silakan pilih tanggal dan jam yang tersedia di kalender Calendly berikut untuk mengonfirmasi sesi Anda:
+                                                    Halaman Calendly telah dibuka di tab baru. Silakan pilih tanggal dan jam yang sesuai untuk sesi Zoom audit Anda.
                                                 </div>
                                             </div>
 
@@ -1296,26 +1311,9 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                 <ArrowRight />
                                             </a>
 
-                                            {/* Embedded Calendly iframe for seamless direct booking */}
-                                            <div className="w-full overflow-hidden rounded-2xl border border-[#cbd5e1] bg-white shadow-sm">
-                                                <div className="flex items-center justify-between border-b border-[#f1f5f9] bg-[#f8fafc] px-4 py-2 text-xs font-semibold text-[#64748b]">
-                                                    <span>Pilih Jadwal Langsung:</span>
-                                                    <span className="flex items-center gap-1.5 text-[#059669]">
-                                                        <span className="size-2 rounded-full bg-[#10b981] animate-ping" />
-                                                        Slot Tersedia
-                                                    </span>
-                                                </div>
-                                                <iframe
-                                                    src={`${CALENDLY_URL}?name=${encodeURIComponent(name)}${
-                                                        email ? `&email=${encodeURIComponent(email)}` : ''
-                                                    }&a1=${encodeURIComponent(phone)}&a2=${encodeURIComponent(websiteLink)}`}
-                                                    width="100%"
-                                                    height="620"
-                                                    frameBorder="0"
-                                                    title="Pilih Jadwal Audit di Calendly"
-                                                    className="w-full"
-                                                />
-                                            </div>
+                                            <p className="text-xs text-[#64748b]">
+                                                Jika tab Calendly belum terbuka otomatis, silakan klik tombol di atas.
+                                            </p>
                                         </div>
                                     ) : (
                                         /* DISQUALIFIED (GUGUR) */
