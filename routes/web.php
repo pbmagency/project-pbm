@@ -20,6 +20,7 @@ $welcomeController = function () {
     ]);
 };
 Route::inertia('/', 'project')->name('landing');
+Route::inertia('/meta-ads-2', 'project')->name('meta-ads-2');
 Route::get('/test', $welcomeController)->name('home');
 Route::get('/c2-design-1', $welcomeController)->name('c2-design-1');
 Route::inertia('/c2-design-2', 'cycle1/c1-angle-3')->name('landing-2');

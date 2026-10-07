@@ -10,6 +10,13 @@ interface AuditRequest {
     id: number;
     name: string;
     email: string;
+    phone?: string;
+    website_link?: string;
+    program_type?: string;
+    total_buyers?: string;
+    monthly_revenue?: string;
+    business_role?: string;
+    is_qualified?: boolean | null;
     created_at: string;
 }
 
@@ -163,19 +170,31 @@ export default function AuditRequestsIndex({
                                         scope="col"
                                         className="px-4 py-3 font-semibold"
                                     >
-                                        Nama
+                                        Status
                                     </th>
                                     <th
                                         scope="col"
                                         className="px-4 py-3 font-semibold"
                                     >
-                                        Email
+                                        Nama & Kontak
                                     </th>
                                     <th
                                         scope="col"
                                         className="px-4 py-3 font-semibold"
                                     >
-                                        Waktu mengisi
+                                        Program & Link
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-4 py-3 font-semibold"
+                                    >
+                                        Profil Bisnis
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-4 py-3 font-semibold"
+                                    >
+                                        Waktu Mengisi
                                     </th>
                                 </tr>
                             </thead>
@@ -183,7 +202,7 @@ export default function AuditRequestsIndex({
                                 {requests.data.length === 0 ? (
                                     <tr>
                                         <td
-                                            colSpan={3}
+                                            colSpan={5}
                                             className="px-4 py-12 text-center text-muted-foreground"
                                         >
                                             Belum ada permintaan audit yang
@@ -196,22 +215,71 @@ export default function AuditRequestsIndex({
                                             key={request.id}
                                             className="border-b border-border/40 last:border-0"
                                         >
-                                            <td className="px-4 py-3 font-medium text-foreground">
-                                                {request.name || '—'}
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                {request.email ? (
-                                                    <a
-                                                        className="text-primary hover:underline"
-                                                        href={`mailto:${request.email}`}
-                                                    >
-                                                        {request.email}
-                                                    </a>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                {request.is_qualified === true ? (
+                                                    <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                                        ✓ Qualified
+                                                    </span>
+                                                ) : request.is_qualified === false ? (
+                                                    <span className="inline-flex items-center rounded-full bg-rose-500/10 px-2.5 py-1 text-xs font-bold text-rose-600 dark:text-rose-400">
+                                                        ✕ Gugur
+                                                    </span>
                                                 ) : (
-                                                    '—'
+                                                    <span className="inline-flex items-center rounded-full bg-slate-500/10 px-2.5 py-1 text-xs font-medium text-slate-500">
+                                                        Lead
+                                                    </span>
                                                 )}
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
+                                            <td className="px-4 py-3">
+                                                <div className="font-medium text-foreground">
+                                                    {request.name || '—'}
+                                                </div>
+                                                <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs">
+                                                    {request.phone && (
+                                                        <a
+                                                            className="font-medium text-emerald-600 hover:underline dark:text-emerald-400"
+                                                            href={`https://wa.me/${request.phone.replace(/\D/g, '')}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                        >
+                                                            WA: {request.phone}
+                                                        </a>
+                                                    )}
+                                                    {request.email && (
+                                                        <a
+                                                            className="text-primary hover:underline"
+                                                            href={`mailto:${request.email}`}
+                                                        >
+                                                            {request.email}
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <div className="font-medium text-foreground capitalize">
+                                                    {request.program_type || '—'}
+                                                </div>
+                                                {request.website_link && (
+                                                    <a
+                                                        className="mt-0.5 block max-w-[200px] truncate text-xs text-primary hover:underline"
+                                                        href={
+                                                            request.website_link.startsWith('http')
+                                                                ? request.website_link
+                                                                : `https://${request.website_link}`
+                                                        }
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        {request.website_link}
+                                                    </a>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-3 text-xs text-muted-foreground">
+                                                <div>Alumni: <strong className="text-foreground">{request.total_buyers || '—'}</strong></div>
+                                                <div>Omzet: <strong className="text-foreground">{request.monthly_revenue || '—'}</strong></div>
+                                                <div>Role: <strong className="text-foreground">{request.business_role || '—'}</strong></div>
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-xs text-muted-foreground">
                                                 {formatSubmittedAt(
                                                     request.created_at,
                                                 )}

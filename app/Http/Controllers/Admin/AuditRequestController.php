@@ -28,7 +28,9 @@ class AuditRequestController extends Controller
         if ($search !== '') {
             $query->where(function ($matches) use ($search) {
                 $matches->where('event_data->name', 'like', "%{$search}%")
-                    ->orWhere('event_data->email', 'like', "%{$search}%");
+                    ->orWhere('event_data->email', 'like', "%{$search}%")
+                    ->orWhere('event_data->phone', 'like', "%{$search}%")
+                    ->orWhere('event_data->website_link', 'like', "%{$search}%");
             });
         }
 
@@ -48,6 +50,13 @@ class AuditRequestController extends Controller
                 'id' => $event->id,
                 'name' => $event->event_data['name'] ?? '',
                 'email' => $event->event_data['email'] ?? '',
+                'phone' => $event->event_data['phone'] ?? '',
+                'website_link' => $event->event_data['website_link'] ?? '',
+                'program_type' => $event->event_data['program_type'] ?? '',
+                'total_buyers' => $event->event_data['total_buyers'] ?? '',
+                'monthly_revenue' => $event->event_data['monthly_revenue'] ?? '',
+                'business_role' => $event->event_data['business_role'] ?? '',
+                'is_qualified' => $event->event_data['is_qualified'] ?? null,
                 'created_at' => $event->created_at->toIso8601String(),
             ]);
 

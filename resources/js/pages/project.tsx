@@ -59,6 +59,40 @@ const WA_SUPPORT = wa(
     'Halo Tim PBM, saya mau tanya tentang Audit Landing Page Gratis.',
 );
 
+const CALENDLY_URL =
+    (import.meta.env.VITE_CALENDLY_URL as string) ||
+    'https://calendly.com/pbm-agency/30min';
+
+const PROGRAM_OPTIONS = [
+    { value: 'belum punya', label: 'Belum punya' },
+    { value: 'kelas online', label: 'Kelas Online' },
+    { value: 'coaching', label: 'Coaching' },
+    { value: 'bootcamp', label: 'Bootcamp' },
+    { value: 'workshop', label: 'Workshop' },
+    { value: 'konsultasi', label: 'Konsultasi' },
+    { value: 'lainnya', label: 'Lainnya (Sebutkan jenis produk Anda)' },
+];
+
+const ALUMNI_OPTIONS = [
+    { value: 'belum ada', label: 'Belum ada' },
+    { value: '1–50', label: '1 – 50 Alumni / Pembeli' },
+    { value: '51–200', label: '51 – 200 Alumni / Pembeli' },
+    { value: '> 200', label: '> 200 Alumni / Pembeli' },
+];
+
+const REVENUE_OPTIONS = [
+    { value: '< Rp10jt', label: '< Rp10 Juta / bulan' },
+    { value: 'Rp10–30jt', label: 'Rp10 – 30 Juta / bulan' },
+    { value: 'Rp30–100jt', label: 'Rp30 – 100 Juta / bulan' },
+    { value: '> Rp100jt', label: '> Rp100 Juta / bulan' },
+];
+
+const ROLE_OPTIONS = [
+    { value: 'Owner', label: 'Owner / Co-Founder' },
+    { value: 'tim internal', label: 'Tim Internal (Marketing, Sales, Ops, dll)' },
+    { value: 'agency atau freelancer', label: 'Agency atau Freelancer' },
+];
+
 const svgBase =
     'fill-none stroke-current [stroke-linecap:round] [stroke-linejoin:round]';
 
@@ -421,9 +455,18 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
     const [slide, setSlide] = useState<number>(0);
     const [autoplay, setAutoplay] = useState<boolean>(true);
     const [lightbox, setLightbox] = useState<number | null>(null);
+    const [step, setStep] = useState<number>(1);
     const [name, setName] = useState<string>('');
+    const [phone, setPhone] = useState<string>('');
     const [email, setEmail] = useState<string>('');
+    const [websiteLink, setWebsiteLink] = useState<string>('');
+    const [programType, setProgramType] = useState<string>('');
+    const [otherProgram, setOtherProgram] = useState<string>('');
+    const [totalBuyers, setTotalBuyers] = useState<string>('');
+    const [monthlyRevenue, setMonthlyRevenue] = useState<string>('');
+    const [businessRole, setBusinessRole] = useState<string>('');
     const [submitted, setSubmitted] = useState<boolean>(false);
+    const [isQualified, setIsQualified] = useState<boolean | null>(null);
     const [submitting, setSubmitting] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
 
@@ -522,30 +565,130 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
         return () => window.removeEventListener('keydown', onKey);
     }, [lightbox, lbPrev, lbNext]);
 
+    const validateStep = (currentStep: number): boolean => {
+        setError('');
+        if (currentStep === 1) {
+            if (!name.trim()) {
+                setError('Mohon isi nama lengkap Anda.');
+                return false;
+            }
+            const cleanPhone = phone.trim().replace(/[\s-]/g, '');
+            if (!cleanPhone || cleanPhone.length < 8) {
+                setError('Mohon isi nomor WhatsApp aktif Anda (minimal 8 digit).');
+                return false;
+            }
+            if (email.trim() && !/^\S+@\S+\.\S+$/.test(email.trim())) {
+                setError('Format email tidak valid.');
+                return false;
+            }
+            return true;
+        }
+
+        if (currentStep === 2) {
+            if (!websiteLink.trim()) {
+                setError('Mohon isi link IG atau website program Anda.');
+                return false;
+            }
+            return true;
+        }
+
+        if (currentStep === 3) {
+            if (!programType) {
+                setError('Silakan pilih salah satu opsi program yang dijual.');
+                return false;
+            }
+            if (programType === 'lainnya' && !otherProgram.trim()) {
+                setError('Mohon sebutkan jenis produk Anda.');
+                return false;
+            }
+            return true;
+        }
+
+        if (currentStep === 4) {
+            if (!totalBuyers) {
+                setError('Silakan pilih total alumni / pembeli program Anda.');
+                return false;
+            }
+            return true;
+        }
+
+        if (currentStep === 5) {
+            if (!monthlyRevenue) {
+                setError('Silakan pilih kisaran omzet bisnis Anda per bulan.');
+                return false;
+            }
+            return true;
+        }
+
+        if (currentStep === 6) {
+            if (!businessRole) {
+                setError('Silakan pilih peran Anda dalam bisnis ini.');
+                return false;
+            }
+            return true;
+        }
+
+        return true;
+    };
+
+    const nextStep = (): void => {
+        if (validateStep(step)) {
+            setStep((prev) => Math.min(prev + 1, 6));
+        }
+    };
+
+    const prevStep = (): void => {
+        setError('');
+        setStep((prev) => Math.max(prev - 1, 1));
+    };
+
+    const resetForm = (): void => {
+        setStep(1);
+        setName('');
+        setPhone('');
+        setEmail('');
+        setWebsiteLink('');
+        setProgramType('');
+        setOtherProgram('');
+        setTotalBuyers('');
+        setMonthlyRevenue('');
+        setBusinessRole('');
+        setSubmitted(false);
+        setIsQualified(null);
+        setError('');
+    };
+
     const submit = async (): Promise<void> => {
         if (submitting) {
             return;
         }
 
-        if (!name.trim()) {
-            setError('Mohon isi nama lengkap Anda.');
-
+        if (!validateStep(6)) {
             return;
         }
 
-        if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
-            setError('Mohon isi email yang valid.');
+        // ❌ Rule Evaluasi Kualifikasi:
+        // Rule 1: Gugur jika programType === 'belum punya'
+        // Rule 2: Gugur jika totalBuyers === 'belum ada'
+        // Rule 3: Gugur jika businessRole === 'agency atau freelancer'
+        const qualified =
+            programType !== 'belum punya' &&
+            totalBuyers !== 'belum ada' &&
+            businessRole !== 'agency atau freelancer';
 
-            return;
-        }
-
+        setIsQualified(qualified);
         setError('');
         trackCTA(
-            'audit_form_submit',
-            'Klaim Audit Gratis Sekarang',
+            'audit_qualification_submit',
+            qualified ? 'Qualified - Book Calendly' : 'Disqualified',
             'audit-form',
         );
         setSubmitting(true);
+
+        const effectiveProgram =
+            programType === 'lainnya'
+                ? `lainnya: ${otherProgram.trim()}`
+                : programType;
 
         const saved = await track({
             event_type: 'conversion',
@@ -553,8 +696,16 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                 type: 'audit_request',
                 event_id: generateEventId(),
                 location: 'audit_form_submit',
+                landing_source: window.location.pathname,
                 name: name.trim(),
-                email: email.trim(),
+                phone: phone.trim(),
+                email: email.trim() || undefined,
+                website_link: websiteLink.trim(),
+                program_type: effectiveProgram,
+                total_buyers: totalBuyers,
+                monthly_revenue: monthlyRevenue,
+                business_role: businessRole,
+                is_qualified: qualified,
             },
         });
 
@@ -562,16 +713,17 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
 
         if (saved) {
             setSubmitted(true);
+            const formEl = document.getElementById('audit-form');
+            if (formEl) {
+                formEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         } else {
             setError('Permintaan belum terkirim. Silakan coba lagi.');
         }
     };
 
-    const errName = !!error && !name.trim();
-    const errEmail = !!error && !errName;
-
     const inputBase =
-        'h-[54px] rounded-xl border-[1.5px] bg-[#f8fafc] px-4 text-base text-[#0f172a] outline-hidden placeholder:text-[#94a3b8] focus:border-[#4f46e5] focus:bg-white focus:shadow-[0_0_0_4px_#e0e7ff]';
+        'h-[52px] w-full rounded-xl border-[1.5px] bg-[#f8fafc] px-4 text-base text-[#0f172a] outline-hidden placeholder:text-[#94a3b8] transition-all focus:border-[#4f46e5] focus:bg-white focus:shadow-[0_0_0_4px_#e0e7ff]';
 
     return (
         <main
@@ -697,100 +849,531 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                     </div>
 
                                     {!submitted ? (
-                                        <div className="flex flex-col gap-[18px] p-7">
-                                            <label
-                                                htmlFor="audit-name"
-                                                className="flex flex-col gap-2"
-                                            >
-                                                <span className="text-sm font-bold text-[#334155]">
-                                                    Nama Lengkap
-                                                </span>
-                                                <input
-                                                    id="audit-name"
-                                                    name="name"
-                                                    autoComplete="name"
-                                                    type="text"
-                                                    value={name}
-                                                    onChange={(
-                                                        e: ChangeEvent<HTMLInputElement>,
-                                                    ) =>
-                                                        setName(e.target.value)
-                                                    }
-                                                    placeholder="Nama lengkap Anda"
-                                                    className={`${inputBase} ${errName ? 'border-[#fb7185]' : 'border-[#e2e8f0]'}`}
-                                                />
-                                            </label>
-                                            <label
-                                                htmlFor="audit-email"
-                                                className="flex flex-col gap-2"
-                                            >
-                                                <span className="text-sm font-bold text-[#334155]">
-                                                    Email
-                                                </span>
-                                                <input
-                                                    id="audit-email"
-                                                    name="email"
-                                                    autoComplete="email"
-                                                    type="email"
-                                                    value={email}
-                                                    onChange={(
-                                                        e: ChangeEvent<HTMLInputElement>,
-                                                    ) =>
-                                                        setEmail(e.target.value)
-                                                    }
-                                                    placeholder="nama@email.com"
-                                                    className={`${inputBase} ${errEmail ? 'border-[#fb7185]' : 'border-[#e2e8f0]'}`}
-                                                />
-                                            </label>
-                                            {error && (
-                                                <p className="text-sm font-semibold text-[#e11d48]">
-                                                    {error}
-                                                </p>
-                                            )}
-                                            <div className="flex items-start gap-2.5 rounded-xl border border-[#fed7aa] bg-[#fff7ed] px-[14px] py-3">
-                                                <svg
-                                                    viewBox="0 0 24 24"
-                                                    className={`mt-px size-[18px] shrink-0 text-[#ea580c] ${svgBase}`}
-                                                    strokeWidth={2}
-                                                >
-                                                    <circle
-                                                        cx="12"
-                                                        cy="12"
-                                                        r="10"
+                                        <div className="flex flex-col p-6 sm:p-7">
+                                            {/* Progress Bar & Step Tracker */}
+                                            <div className="mb-5 flex flex-col gap-2">
+                                                <div className="flex items-center justify-between text-xs font-bold text-[#64748b]">
+                                                    <span className="flex items-center gap-1.5 text-[#4f46e5]">
+                                                        <span className="flex size-5 items-center justify-center rounded-full bg-[#eef2ff] text-[11px] font-extrabold text-[#4f46e5]">
+                                                            {step}
+                                                        </span>
+                                                        Langkah {step} dari 6
+                                                    </span>
+                                                    <span className="text-[11px] text-[#94a3b8]">
+                                                        {step === 1 && 'Kontak'}
+                                                        {step === 2 && 'Link Program'}
+                                                        {step === 3 && 'Jenis Program'}
+                                                        {step === 4 && 'Total Alumni'}
+                                                        {step === 5 && 'Omzet Bisnis'}
+                                                        {step === 6 && 'Peran di Bisnis'}
+                                                    </span>
+                                                </div>
+                                                <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#f1f5f9]">
+                                                    <div
+                                                        className="h-full rounded-full bg-[#4f46e5] transition-all duration-300 ease-out"
+                                                        style={{ width: `${(step / 6) * 100}%` }}
                                                     />
-                                                    <polyline points="12 6 12 12 16 14" />
-                                                </svg>
-                                                <span className="text-sm leading-[1.5] font-semibold text-[#9a3412]">
-                                                    Hanya menerima 5 bisnis per
-                                                    minggu untuk menjaga
-                                                    kualitas audit.
-                                                </span>
+                                                </div>
                                             </div>
-                                            <button
-                                                type="button"
-                                                onClick={submit}
-                                                disabled={submitting}
-                                                className="flex h-[60px] cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-[#4f46e5] text-[17px] font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all duration-150 hover:-translate-y-0.5 hover:bg-[#4338ca]"
+
+                                            {/* Error Alert */}
+                                            {error && (
+                                                <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-[#fecdd3] bg-[#fff1f2] px-3.5 py-2.5 text-xs font-semibold text-[#be123c]">
+                                                    <svg
+                                                        viewBox="0 0 24 24"
+                                                        className={`mt-0.5 size-4 shrink-0 ${svgBase}`}
+                                                        strokeWidth={2}
+                                                    >
+                                                        <circle cx="12" cy="12" r="10" />
+                                                        <line x1="12" y1="8" x2="12" y2="12" />
+                                                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                                                    </svg>
+                                                    <span>{error}</span>
+                                                </div>
+                                            )}
+
+                                            {/* STEP 1: Nama & Nomor WA */}
+                                            {step === 1 && (
+                                                <div className="flex flex-col gap-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <h3 className="text-base font-extrabold text-[#0f172a]">
+                                                            1. Nama &amp; Nomor WhatsApp Anda
+                                                        </h3>
+                                                        <p className="text-xs text-[#64748b]">
+                                                            Untuk konfirmasi dan pengiriman link sesi Zoom audit.
+                                                        </p>
+                                                    </div>
+                                                    <label className="flex flex-col gap-1.5">
+                                                        <span className="text-xs font-bold text-[#334155]">
+                                                            Nama Lengkap <span className="text-[#e11d48]">*</span>
+                                                        </span>
+                                                        <input
+                                                            id="audit-name"
+                                                            name="name"
+                                                            type="text"
+                                                            autoComplete="name"
+                                                            value={name}
+                                                            onChange={(e) => {
+                                                                setName(e.target.value);
+                                                                if (error) setError('');
+                                                            }}
+                                                            placeholder="Contoh: Budi Santoso"
+                                                            className={inputBase}
+                                                        />
+                                                    </label>
+                                                    <label className="flex flex-col gap-1.5">
+                                                        <span className="text-xs font-bold text-[#334155]">
+                                                            Nomor WhatsApp <span className="text-[#e11d48]">*</span>
+                                                        </span>
+                                                        <input
+                                                            id="audit-phone"
+                                                            name="phone"
+                                                            type="tel"
+                                                            inputMode="numeric"
+                                                            autoComplete="tel"
+                                                            value={phone}
+                                                            onChange={(e) => {
+                                                                setPhone(e.target.value);
+                                                                if (error) setError('');
+                                                            }}
+                                                            placeholder="Contoh: 081234567890"
+                                                            className={inputBase}
+                                                        />
+                                                    </label>
+                                                    <label className="flex flex-col gap-1.5">
+                                                        <span className="text-xs font-bold text-[#334155]">
+                                                            Email <span className="font-normal text-[#94a3b8]">(opsional untuk Google Calendar)</span>
+                                                        </span>
+                                                        <input
+                                                            id="audit-email"
+                                                            name="email"
+                                                            type="email"
+                                                            autoComplete="email"
+                                                            value={email}
+                                                            onChange={(e) => {
+                                                                setEmail(e.target.value);
+                                                                if (error) setError('');
+                                                            }}
+                                                            placeholder="nama@email.com"
+                                                            className={inputBase}
+                                                        />
+                                                    </label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={nextStep}
+                                                        className="mt-2 flex h-[52px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
+                                                    >
+                                                        Lanjut ke Pertanyaan 2
+                                                        <ArrowRight />
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {/* STEP 2: Link IG / Website Program */}
+                                            {step === 2 && (
+                                                <div className="flex flex-col gap-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <h3 className="text-base font-extrabold text-[#0f172a]">
+                                                            2. Link IG / Website Program Anda
+                                                        </h3>
+                                                        <p className="text-xs text-[#64748b]">
+                                                            Agar tim PBM dapat menganalisis penawaran &amp; funnel Anda sebelum sesi.
+                                                        </p>
+                                                    </div>
+                                                    <label className="flex flex-col gap-1.5">
+                                                        <span className="text-xs font-bold text-[#334155]">
+                                                            Link Instagram atau Website <span className="text-[#e11d48]">*</span>
+                                                        </span>
+                                                        <input
+                                                            id="audit-link"
+                                                            name="website_link"
+                                                            type="text"
+                                                            value={websiteLink}
+                                                            onChange={(e) => {
+                                                                setWebsiteLink(e.target.value);
+                                                                if (error) setError('');
+                                                            }}
+                                                            placeholder="misal: instagram.com/brandanda atau brandanda.com"
+                                                            className={inputBase}
+                                                        />
+                                                    </label>
+                                                    <div className="mt-2 flex items-center gap-3">
+                                                        <button
+                                                            type="button"
+                                                            onClick={prevStep}
+                                                            className="flex h-[52px] flex-1 cursor-pointer items-center justify-center rounded-xl border border-[#cbd5e1] bg-white text-sm font-bold text-[#475569] transition-all hover:bg-[#f8fafc]"
+                                                        >
+                                                            Kembali
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={nextStep}
+                                                            className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
+                                                        >
+                                                            Lanjut ke Pertanyaan 3
+                                                            <ArrowRight />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* STEP 3: Program yang dijual */}
+                                            {step === 3 && (
+                                                <div className="flex flex-col gap-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <h3 className="text-base font-extrabold text-[#0f172a]">
+                                                            3. Program yang Anda Jual?
+                                                        </h3>
+                                                        <p className="text-xs text-[#64748b]">
+                                                            Pilih jenis produk atau program utama yang sedang dipasarkan.
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex max-h-[280px] flex-col gap-2 overflow-y-auto pr-1">
+                                                        {PROGRAM_OPTIONS.map((opt) => (
+                                                            <label
+                                                                key={opt.value}
+                                                                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-all ${
+                                                                    programType === opt.value
+                                                                        ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
+                                                                        : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
+                                                                }`}
+                                                            >
+                                                                <input
+                                                                    type="radio"
+                                                                    name="program_type"
+                                                                    value={opt.value}
+                                                                    checked={programType === opt.value}
+                                                                    onChange={() => {
+                                                                        setProgramType(opt.value);
+                                                                        if (error) setError('');
+                                                                    }}
+                                                                    className="size-4 text-[#4f46e5] accent-[#4f46e5]"
+                                                                />
+                                                                <span className="text-sm font-semibold text-[#1e293b]">
+                                                                    {opt.label}
+                                                                </span>
+                                                            </label>
+                                                        ))}
+                                                    </div>
+                                                    {programType === 'lainnya' && (
+                                                        <div className="flex flex-col gap-1.5">
+                                                            <span className="text-xs font-bold text-[#334155]">
+                                                                Sebutkan jenis produk Anda: <span className="text-[#e11d48]">*</span>
+                                                            </span>
+                                                            <input
+                                                                type="text"
+                                                                value={otherProgram}
+                                                                onChange={(e) => {
+                                                                    setOtherProgram(e.target.value);
+                                                                    if (error) setError('');
+                                                                }}
+                                                                placeholder="Contoh: Membership, Agency Jasa, dll"
+                                                                className={inputBase}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                    <div className="mt-2 flex items-center gap-3">
+                                                        <button
+                                                            type="button"
+                                                            onClick={prevStep}
+                                                            className="flex h-[52px] flex-1 cursor-pointer items-center justify-center rounded-xl border border-[#cbd5e1] bg-white text-sm font-bold text-[#475569] transition-all hover:bg-[#f8fafc]"
+                                                        >
+                                                            Kembali
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={nextStep}
+                                                            className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
+                                                        >
+                                                            Lanjut ke Pertanyaan 4
+                                                            <ArrowRight />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* STEP 4: Total alumni / pembeli */}
+                                            {step === 4 && (
+                                                <div className="flex flex-col gap-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <h3 className="text-base font-extrabold text-[#0f172a]">
+                                                            4. Total Alumni / Pembeli Saat Ini?
+                                                        </h3>
+                                                        <p className="text-xs text-[#64748b]">
+                                                            Akumulasi peserta atau pembeli sejak program pertama kali dirilis.
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex flex-col gap-2">
+                                                        {ALUMNI_OPTIONS.map((opt) => (
+                                                            <label
+                                                                key={opt.value}
+                                                                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3.5 transition-all ${
+                                                                    totalBuyers === opt.value
+                                                                        ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
+                                                                        : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
+                                                                }`}
+                                                            >
+                                                                <input
+                                                                    type="radio"
+                                                                    name="total_buyers"
+                                                                    value={opt.value}
+                                                                    checked={totalBuyers === opt.value}
+                                                                    onChange={() => {
+                                                                        setTotalBuyers(opt.value);
+                                                                        if (error) setError('');
+                                                                    }}
+                                                                    className="size-4 text-[#4f46e5] accent-[#4f46e5]"
+                                                                />
+                                                                <span className="text-sm font-semibold text-[#1e293b]">
+                                                                    {opt.label}
+                                                                </span>
+                                                            </label>
+                                                        ))}
+                                                    </div>
+                                                    <div className="mt-2 flex items-center gap-3">
+                                                        <button
+                                                            type="button"
+                                                            onClick={prevStep}
+                                                            className="flex h-[52px] flex-1 cursor-pointer items-center justify-center rounded-xl border border-[#cbd5e1] bg-white text-sm font-bold text-[#475569] transition-all hover:bg-[#f8fafc]"
+                                                        >
+                                                            Kembali
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={nextStep}
+                                                            className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
+                                                        >
+                                                            Lanjut ke Pertanyaan 5
+                                                            <ArrowRight />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* STEP 5: Omzet bisnis per bulan */}
+                                            {step === 5 && (
+                                                <div className="flex flex-col gap-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <h3 className="text-base font-extrabold text-[#0f172a]">
+                                                            5. Omzet Bisnis per Bulan?
+                                                        </h3>
+                                                        <p className="text-xs text-[#64748b]">
+                                                            Estimasi rata-rata omzet bulanan dari penjualan program Anda.
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex flex-col gap-2">
+                                                        {REVENUE_OPTIONS.map((opt) => (
+                                                            <label
+                                                                key={opt.value}
+                                                                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3.5 transition-all ${
+                                                                    monthlyRevenue === opt.value
+                                                                        ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
+                                                                        : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
+                                                                }`}
+                                                            >
+                                                                <input
+                                                                    type="radio"
+                                                                    name="monthly_revenue"
+                                                                    value={opt.value}
+                                                                    checked={monthlyRevenue === opt.value}
+                                                                    onChange={() => {
+                                                                        setMonthlyRevenue(opt.value);
+                                                                        if (error) setError('');
+                                                                    }}
+                                                                    className="size-4 text-[#4f46e5] accent-[#4f46e5]"
+                                                                />
+                                                                <span className="text-sm font-semibold text-[#1e293b]">
+                                                                    {opt.label}
+                                                                </span>
+                                                            </label>
+                                                        ))}
+                                                    </div>
+                                                    <div className="mt-2 flex items-center gap-3">
+                                                        <button
+                                                            type="button"
+                                                            onClick={prevStep}
+                                                            className="flex h-[52px] flex-1 cursor-pointer items-center justify-center rounded-xl border border-[#cbd5e1] bg-white text-sm font-bold text-[#475569] transition-all hover:bg-[#f8fafc]"
+                                                        >
+                                                            Kembali
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={nextStep}
+                                                            className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
+                                                        >
+                                                            Lanjut ke Pertanyaan 6
+                                                            <ArrowRight />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* STEP 6: Kamu siapa di bisnis ini? */}
+                                            {step === 6 && (
+                                                <div className="flex flex-col gap-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <h3 className="text-base font-extrabold text-[#0f172a]">
+                                                            6. Kamu Siapa di Bisnis Ini?
+                                                        </h3>
+                                                        <p className="text-xs text-[#64748b]">
+                                                            Untuk memastikan keputusan perbaikan funnel bisa langsung dieksekusi.
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex flex-col gap-2">
+                                                        {ROLE_OPTIONS.map((opt) => (
+                                                            <label
+                                                                key={opt.value}
+                                                                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3.5 transition-all ${
+                                                                    businessRole === opt.value
+                                                                        ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
+                                                                        : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
+                                                                }`}
+                                                            >
+                                                                <input
+                                                                    type="radio"
+                                                                    name="business_role"
+                                                                    value={opt.value}
+                                                                    checked={businessRole === opt.value}
+                                                                    onChange={() => {
+                                                                        setBusinessRole(opt.value);
+                                                                        if (error) setError('');
+                                                                    }}
+                                                                    className="size-4 text-[#4f46e5] accent-[#4f46e5]"
+                                                                />
+                                                                <span className="text-sm font-semibold text-[#1e293b]">
+                                                                    {opt.label}
+                                                                </span>
+                                                            </label>
+                                                        ))}
+                                                    </div>
+                                                    <div className="mt-2 flex items-center gap-3">
+                                                        <button
+                                                            type="button"
+                                                            onClick={prevStep}
+                                                            className="flex h-[52px] flex-1 cursor-pointer items-center justify-center rounded-xl border border-[#cbd5e1] bg-white text-sm font-bold text-[#475569] transition-all hover:bg-[#f8fafc]"
+                                                        >
+                                                            Kembali
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={submit}
+                                                            disabled={submitting}
+                                                            className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca] disabled:opacity-75"
+                                                        >
+                                                            {submitting ? 'Memproses...' : 'Kirim & Cek Kualifikasi'}
+                                                            {!submitting && <ArrowRight />}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : isQualified ? (
+                                        /* QUALIFIED: LANGSUNG BOOKING KALENDER CALENDLY */
+                                        <div className="flex flex-col items-center gap-5 p-6 sm:p-7 text-center">
+                                            <div className="flex size-16 items-center justify-center rounded-full bg-[#d1fae5] shadow-inner">
+                                                <CheckIcon className="size-[32px] text-[#059669]" />
+                                            </div>
+                                            <div className="flex flex-col gap-1.5">
+                                                <span className="inline-flex items-center gap-1.5 self-center rounded-full bg-[#d1fae5] px-3 py-1 text-xs font-extrabold text-[#047857]">
+                                                    ✓ MEMENUHI KUALIFIKASI AUDIT
+                                                </span>
+                                                <h3 className="text-[22px] font-extrabold text-[#0f172a]">
+                                                    Selamat, {name}!
+                                                </h3>
+                                                <p className="max-w-[420px] text-sm leading-[1.6] text-[#475569]">
+                                                    Bisnis Anda memenuhi kriteria untuk mengikuti <strong>Sesi Audit Funnel 1-on-1 Gratis via Zoom</strong> bersama tim PBM.
+                                                </p>
+                                            </div>
+
+                                            <div className="w-full rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] p-4 text-left text-xs text-[#166534]">
+                                                <div className="font-bold">Langkah Terakhir: Pilih Jadwal Meeting</div>
+                                                <div className="mt-1">
+                                                    Silakan pilih tanggal dan jam yang tersedia di kalender Calendly berikut untuk mengonfirmasi sesi Anda:
+                                                </div>
+                                            </div>
+
+                                            <a
+                                                href={`${CALENDLY_URL}?name=${encodeURIComponent(name)}${
+                                                    email ? `&email=${encodeURIComponent(email)}` : ''
+                                                }&a1=${encodeURIComponent(phone)}&a2=${encodeURIComponent(websiteLink)}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex h-[54px] w-full items-center justify-center gap-2 rounded-xl bg-[#059669] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(5,150,105,.35)] transition-all hover:-translate-y-0.5 hover:bg-[#047857]"
                                             >
-                                                {submitting
-                                                    ? 'Mengirim...'
-                                                    : 'Klaim Audit Gratis Sekarang'}
+                                                Buka Kalender Calendly (Tab Baru)
                                                 <ArrowRight />
-                                            </button>
+                                            </a>
+
+                                            {/* Embedded Calendly iframe for seamless direct booking */}
+                                            <div className="w-full overflow-hidden rounded-2xl border border-[#cbd5e1] bg-white shadow-sm">
+                                                <div className="flex items-center justify-between border-b border-[#f1f5f9] bg-[#f8fafc] px-4 py-2 text-xs font-semibold text-[#64748b]">
+                                                    <span>Pilih Jadwal Langsung:</span>
+                                                    <span className="flex items-center gap-1.5 text-[#059669]">
+                                                        <span className="size-2 rounded-full bg-[#10b981] animate-ping" />
+                                                        Slot Tersedia
+                                                    </span>
+                                                </div>
+                                                <iframe
+                                                    src={`${CALENDLY_URL}?name=${encodeURIComponent(name)}${
+                                                        email ? `&email=${encodeURIComponent(email)}` : ''
+                                                    }&a1=${encodeURIComponent(phone)}&a2=${encodeURIComponent(websiteLink)}`}
+                                                    width="100%"
+                                                    height="620"
+                                                    frameBorder="0"
+                                                    title="Pilih Jadwal Audit di Calendly"
+                                                    className="w-full"
+                                                />
+                                            </div>
                                         </div>
                                     ) : (
-                                        <div className="flex flex-col items-center gap-[14px] px-7 py-10 text-center">
-                                            <div className="flex size-16 items-center justify-center rounded-full bg-[#d1fae5]">
-                                                <CheckIcon className="size-[30px] text-[#059669]" />
+                                        /* DISQUALIFIED (GUGUR) */
+                                        <div className="flex flex-col items-center gap-4 p-6 sm:p-7 text-center">
+                                            <div className="flex size-14 items-center justify-center rounded-full bg-[#fef3c7]">
+                                                <svg
+                                                    viewBox="0 0 24 24"
+                                                    className={`size-7 text-[#d97706] ${svgBase}`}
+                                                    strokeWidth={2.5}
+                                                >
+                                                    <circle cx="12" cy="12" r="10" />
+                                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                                                </svg>
                                             </div>
-                                            <h3 className="text-[22px] font-extrabold text-[#0f172a]">
-                                                Terima kasih, {name}!
-                                            </h3>
-                                            <p className="max-w-[320px] text-base leading-[1.6] text-[#475569]">
-                                                Jadwal sesi audit akan kami
-                                                konfirmasi ke {email} maksimal
-                                                1x24 jam.
-                                            </p>
+                                            <div className="flex flex-col gap-1.5">
+                                                <span className="inline-flex items-center self-center rounded-full bg-[#fef3c7] px-3 py-1 text-xs font-extrabold text-[#b45309]">
+                                                    STATUS KUALIFIKASI
+                                                </span>
+                                                <h3 className="text-[20px] font-extrabold text-[#0f172a]">
+                                                    Terima kasih, {name}!
+                                                </h3>
+                                                <p className="max-w-[380px] text-sm leading-[1.6] text-[#475569]">
+                                                    Mohon maaf, saat ini sesi audit 1-on-1 intensif dikhususkan untuk program edukasi yang sudah memiliki alumni/pembeli aktif dan dikelola oleh internal owner.
+                                                </p>
+                                            </div>
+
+                                            <div className="w-full rounded-xl border border-[#fed7aa] bg-[#fff7ed] p-4 text-left text-xs leading-[1.5] text-[#9a3412]">
+                                                Hal ini penting agar sesi bedah funnel bisa langsung mengevaluasi data analitik nyata dan memberikan rekomendasi yang langsung berdampak pada penjualan.
+                                            </div>
+
+                                            <div className="mt-2 flex w-full flex-col gap-2.5">
+                                                <a
+                                                    href={wa(
+                                                        `Halo Tim PBM, saya ${name}. Saya sudah mengisi form kualifikasi di website PBM dan ingin berkonsultasi seputar funnel program saya.`
+                                                    )}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] text-sm font-extrabold text-white shadow-md transition-all hover:bg-[#1eb956]"
+                                                >
+                                                    Tanya Tim PBM via WhatsApp
+                                                </a>
+                                                <button
+                                                    type="button"
+                                                    onClick={resetForm}
+                                                    className="flex h-[44px] w-full items-center justify-center rounded-xl border border-[#cbd5e1] bg-white text-xs font-bold text-[#64748b] transition-all hover:bg-[#f8fafc]"
+                                                >
+                                                    Ulangi Pengisian Formulir
+                                                </button>
+                                            </div>
                                         </div>
                                     )}
 
