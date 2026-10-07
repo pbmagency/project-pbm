@@ -850,32 +850,6 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
 
                                     {!submitted ? (
                                         <div className="flex flex-col p-6 sm:p-7">
-                                            {/* Progress Bar & Step Tracker */}
-                                            <div className="mb-5 flex flex-col gap-2">
-                                                <div className="flex items-center justify-between text-xs font-bold text-[#64748b]">
-                                                    <span className="flex items-center gap-1.5 text-[#4f46e5]">
-                                                        <span className="flex size-5 items-center justify-center rounded-full bg-[#eef2ff] text-[11px] font-extrabold text-[#4f46e5]">
-                                                            {step}
-                                                        </span>
-                                                        Langkah {step} dari 6
-                                                    </span>
-                                                    <span className="text-[11px] text-[#94a3b8]">
-                                                        {step === 1 && 'Kontak'}
-                                                        {step === 2 && 'Link Program'}
-                                                        {step === 3 && 'Jenis Program'}
-                                                        {step === 4 && 'Total Alumni'}
-                                                        {step === 5 && 'Omzet Bisnis'}
-                                                        {step === 6 && 'Peran di Bisnis'}
-                                                    </span>
-                                                </div>
-                                                <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#f1f5f9]">
-                                                    <div
-                                                        className="h-full rounded-full bg-[#4f46e5] transition-all duration-300 ease-out"
-                                                        style={{ width: `${(step / 6) * 100}%` }}
-                                                    />
-                                                </div>
-                                            </div>
-
                                             {/* Error Alert */}
                                             {error && (
                                                 <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-[#fecdd3] bg-[#fff1f2] px-3.5 py-2.5 text-xs font-semibold text-[#be123c]">
@@ -897,7 +871,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                 <div className="flex flex-col gap-4">
                                                     <div className="flex flex-col gap-1">
                                                         <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            1. Nama &amp; Nomor WhatsApp Anda
+                                                            Nama &amp; Nomor WhatsApp Anda
                                                         </h3>
                                                         <p className="text-xs text-[#64748b]">
                                                             Untuk konfirmasi dan pengiriman link sesi Zoom audit.
@@ -963,9 +937,12 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                         onClick={nextStep}
                                                         className="mt-2 flex h-[52px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
                                                     >
-                                                        Lanjut ke Pertanyaan 2
+                                                        Klaim Sesi Audit Gratis
                                                         <ArrowRight />
                                                     </button>
+                                                    <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
+                                                        <span className="text-amber-500">⚡</span> Cuma butuh 30 detik untuk mengisi
+                                                    </p>
                                                 </div>
                                             )}
 
@@ -974,7 +951,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                 <div className="flex flex-col gap-4">
                                                     <div className="flex flex-col gap-1">
                                                         <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            2. Link IG / Website Program Anda
+                                                            Link Instagram atau Website Program
                                                         </h3>
                                                         <p className="text-xs text-[#64748b]">
                                                             Agar tim PBM dapat menganalisis penawaran &amp; funnel Anda sebelum sesi.
@@ -1010,10 +987,13 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                             onClick={nextStep}
                                                             className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
                                                         >
-                                                            Lanjut ke Pertanyaan 3
+                                                            Konfirmasi Link Program
                                                             <ArrowRight />
                                                         </button>
                                                     </div>
+                                                    <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
+                                                        <span className="text-amber-500">⚡</span> Cuma butuh 30 detik untuk mengisi
+                                                    </p>
                                                 </div>
                                             )}
 
@@ -1022,7 +1002,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                 <div className="flex flex-col gap-4">
                                                     <div className="flex flex-col gap-1">
                                                         <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            3. Program yang Anda Jual?
+                                                            Program yang Anda Jual
                                                         </h3>
                                                         <p className="text-xs text-[#64748b]">
                                                             Pilih jenis produk atau program utama yang sedang dipasarkan.
@@ -1085,10 +1065,13 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                             onClick={nextStep}
                                                             className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
                                                         >
-                                                            Lanjut ke Pertanyaan 4
+                                                            Konfirmasi Jenis Program
                                                             <ArrowRight />
                                                         </button>
                                                     </div>
+                                                    <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
+                                                        <span className="text-amber-500">⚡</span> Cuma butuh 30 detik untuk mengisi
+                                                    </p>
                                                 </div>
                                             )}
 
@@ -1097,7 +1080,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                 <div className="flex flex-col gap-4">
                                                     <div className="flex flex-col gap-1">
                                                         <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            4. Total Alumni / Pembeli Saat Ini?
+                                                            Total Alumni / Pembeli Saat Ini
                                                         </h3>
                                                         <p className="text-xs text-[#64748b]">
                                                             Akumulasi peserta atau pembeli sejak program pertama kali dirilis.
@@ -1143,10 +1126,13 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                             onClick={nextStep}
                                                             className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
                                                         >
-                                                            Lanjut ke Pertanyaan 5
+                                                            Konfirmasi Total Pembeli
                                                             <ArrowRight />
                                                         </button>
                                                     </div>
+                                                    <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
+                                                        <span className="text-amber-500">⚡</span> Cuma butuh 30 detik untuk mengisi
+                                                    </p>
                                                 </div>
                                             )}
 
@@ -1155,7 +1141,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                 <div className="flex flex-col gap-4">
                                                     <div className="flex flex-col gap-1">
                                                         <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            5. Omzet Bisnis per Bulan?
+                                                            Estimasi Omzet Bisnis per Bulan
                                                         </h3>
                                                         <p className="text-xs text-[#64748b]">
                                                             Estimasi rata-rata omzet bulanan dari penjualan program Anda.
@@ -1201,10 +1187,13 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                             onClick={nextStep}
                                                             className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
                                                         >
-                                                            Lanjut ke Pertanyaan 6
+                                                            Konfirmasi Omzet Bisnis
                                                             <ArrowRight />
                                                         </button>
                                                     </div>
+                                                    <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
+                                                        <span className="text-amber-500">⚡</span> Cuma butuh 30 detik untuk mengisi
+                                                    </p>
                                                 </div>
                                             )}
 
@@ -1213,7 +1202,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                 <div className="flex flex-col gap-4">
                                                     <div className="flex flex-col gap-1">
                                                         <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            6. Kamu Siapa di Bisnis Ini?
+                                                            Peran Anda di Bisnis Ini
                                                         </h3>
                                                         <p className="text-xs text-[#64748b]">
                                                             Untuk memastikan keputusan perbaikan funnel bisa langsung dieksekusi.
@@ -1264,6 +1253,9 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                             {!submitting && <ArrowRight />}
                                                         </button>
                                                     </div>
+                                                    <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
+                                                        <span className="text-amber-500">⚡</span> Cuma butuh 30 detik untuk mengisi
+                                                    </p>
                                                 </div>
                                             )}
                                         </div>
@@ -2275,53 +2267,29 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
             {/* FOOTER */}
             <footer className="border-t border-[#e2e8f0] bg-[#f8fafc] pt-16 pb-10 text-[15px] leading-[1.6] text-[#475569]">
                 <div className={`${CONTAINER} max-w-[1152px]`}>
-                    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] gap-10">
-                        <div className="flex flex-col gap-[14px]">
-                            <div className="flex items-center gap-3">
-                                <img
-                                    src="/assets/logo.webp"
-                                    alt="PBM Logo"
-                                    width={36}
-                                    height={36}
-                                    loading="lazy"
-                                    decoding="async"
-                                    className="size-9 rounded-lg object-cover"
-                                />
-                                <span className="text-lg font-extrabold text-[#0f172a]">
-                                    PBM
-                                </span>
-                            </div>
-                            <p className="font-semibold text-[#334155]">
-                                Performance Business Marketing
-                            </p>
-                            <p>
-                                Spesialis High-Converting Landing Page &amp;
-                                Funnel CRO untuk Pemilik Kelas Online, Coach,
-                                Trainer &amp; Konsultan.
-                            </p>
+                    <div className="flex max-w-[540px] flex-col gap-[14px]">
+                        <div className="flex items-center gap-3">
+                            <img
+                                src="/assets/logo.webp"
+                                alt="PBM Logo"
+                                width={36}
+                                height={36}
+                                loading="lazy"
+                                decoding="async"
+                                className="size-9 rounded-lg object-cover"
+                            />
+                            <span className="text-lg font-extrabold text-[#0f172a]">
+                                PBM
+                            </span>
                         </div>
-                        <div className="flex flex-col gap-2.5">
-                            <h3 className="mb-1 text-[13px] font-extrabold tracking-[.1em] text-[#0f172a] uppercase">
-                                Kontak &amp; Operasional
-                            </h3>
-                            <p>Email: support@pbm.id / hello@pbm.id</p>
-                            <p>WhatsApp: +62 812-XXXX-XXXX</p>
-                            <p>Jam Kerja: Senin – Jumat | 09.00 – 18.00 WIB</p>
-                        </div>
-                        <div className="flex flex-col gap-2.5">
-                            <h3 className="mb-1 text-[13px] font-extrabold tracking-[.1em] text-[#0f172a] uppercase">
-                                Legalitas &amp; Kebijakan
-                            </h3>
-                            <a href="/terms" className="hover:text-[#4f46e5]">
-                                Privacy Policy
-                            </a>
-                            <a href="/terms" className="hover:text-[#4f46e5]">
-                                Terms of Service
-                            </a>
-                            <a href="/refund" className="hover:text-[#4f46e5]">
-                                Disclaimer Result
-                            </a>
-                        </div>
+                        <p className="font-semibold text-[#334155]">
+                            Performance Business Marketing
+                        </p>
+                        <p>
+                            Spesialis High-Converting Landing Page &amp;
+                            Funnel CRO untuk Pemilik Kelas Online, Coach,
+                            Trainer &amp; Konsultan.
+                        </p>
                     </div>
                     <div className="mt-12 flex flex-col gap-3 border-t border-[#e2e8f0] pt-6">
                         <p className="text-sm text-[#475569]">
