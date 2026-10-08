@@ -34,13 +34,16 @@ interface Proof {
     label: string;
 }
 
+interface PainItem {
+    title: string;
+    desc: string;
+}
+
 interface Pillar {
-    key: string;
-    rest: string;
+    title: string;
     desc: string;
     icon: ReactNode;
 }
-
 
 interface Faq {
     q: string;
@@ -59,33 +62,55 @@ const CALENDLY_URL =
     'https://calendly.com/pbm-agency/30min';
 
 const PROGRAM_OPTIONS = [
-    { value: 'belum punya', label: 'Belum punya' },
-    { value: 'kelas online', label: 'Kelas Online' },
-    { value: 'coaching', label: 'Coaching' },
-    { value: 'bootcamp', label: 'Bootcamp' },
-    { value: 'workshop', label: 'Workshop' },
-    { value: 'konsultasi', label: 'Konsultasi' },
-    { value: 'lainnya', label: 'Lainnya (Sebutkan jenis produk Anda)' },
+    { value: 'Kelas online', label: 'Kelas online' },
+    { value: 'Coaching atau mentoring', label: 'Coaching atau mentoring' },
+    { value: 'Training atau pelatihan', label: 'Training atau pelatihan' },
+    { value: 'Konsultasi', label: 'Konsultasi' },
+    { value: 'Lainnya', label: 'Lainnya' },
 ];
 
 const ALUMNI_OPTIONS = [
-    { value: 'belum ada', label: 'Belum ada' },
-    { value: '1–50', label: '1 – 50 Alumni / Pembeli' },
-    { value: '51–200', label: '51 – 200 Alumni / Pembeli' },
-    { value: '> 200', label: '> 200 Alumni / Pembeli' },
+    { value: 'Belum ada', label: 'Belum ada' },
+    { value: '1-50 alumni/pembeli', label: '1-50 alumni/pembeli' },
+    { value: '51-200 alumni/pembeli', label: '51-200 alumni/pembeli' },
+    { value: '> 200 alumni/pembeli', label: '> 200 alumni/pembeli' },
 ];
 
-const REVENUE_OPTIONS = [
-    { value: '< Rp10jt', label: '< Rp10 Juta / bulan' },
-    { value: 'Rp10–30jt', label: 'Rp10 – 30 Juta / bulan' },
-    { value: 'Rp30–100jt', label: 'Rp30 – 100 Juta / bulan' },
-    { value: '> Rp100jt', label: '> Rp100 Juta / bulan' },
+const AUDIENCE_SOURCE_OPTIONS = [
+    'Konten media sosial',
+    'Iklan berbayar',
+    'Komunitas atau daftar kontak',
+    'Rekomendasi atau partner',
+    'Pencarian di internet',
+    'Sumber lainnya',
+    'Belum ada sumber calon pembeli',
 ];
 
-const ROLE_OPTIONS = [
-    { value: 'Owner', label: 'Owner / Co-Founder' },
-    { value: 'tim internal', label: 'Tim Internal (Marketing, Sales, Ops, dll)' },
-    { value: 'agency atau freelancer', label: 'Agency atau Freelancer' },
+const PRIMARY_PROBLEM_OPTIONS = [
+    'Banyak yang tertarik, sedikit yang daftar',
+    'Banyak chat, sedikit yang lanjut membeli',
+    'Penjualan belum konsisten',
+    'Marketing menyita waktu mengajar',
+    'Belum tahu penyebab penjualan turun',
+    'Masalah lainnya',
+];
+
+const HELP_STAGE_OPTIONS = [
+    'Ingin dibantu menjalankan perbaikan marketing',
+    'Ingin memahami kebutuhan dulu dan terbuka untuk kerja sama',
+    'Sedang mencari saran untuk dikerjakan sendiri',
+];
+
+const BUDGET_READY_OPTIONS = [
+    'Ya, saya siap mempertimbangkannya',
+    'Perlu memahami lingkup pekerjaan dan biayanya dulu',
+    'Saat ini belum menyiapkan biaya untuk bantuan agency',
+];
+
+const TIMELINE_OPTIONS = [
+    'Sesegera mungkin',
+    'Dalam 1 sampai 3 bulan',
+    'Masih mencari informasi',
 ];
 
 const svgBase =
@@ -165,19 +190,30 @@ const CONTAINER = 'mx-auto w-full px-[clamp(20px,5vw,32px)]';
 const KICKER =
     'mb-4 inline-block text-[13px] leading-4 font-bold tracking-[.2em] text-[#4f46e5] uppercase';
 
-const PAINS: string[] = [
-    'Follower ribuan, iklan jalan, klik ramai. Tapi peserta yang benar-benar transfer masih jauh dari target.',
-    'Capek balas puluhan chat WA yang cuma tanya harga, bilang "nanti dulu ya kak", lalu menghilang.',
-    'Omzet naik-turun tiap batch. Kemarin penuh, sekarang sepi, dan Anda tidak tahu pasti apa bedanya.',
-    'Gonta-ganti iklan, desain LP, sampai harga kelas berdasarkan tebak-tebakan, tapi hasilnya tetap sama.',
+const PAINS: PainItem[] = [
+    {
+        title: 'Orang tertarik, tapi belum banyak yang daftar',
+        desc: 'Kontenmu dilihat, link penawaran diklik, dan ada yang tanya lewat WhatsApp. Tapi ketika cek pendaftaran, jumlahnya masih jauh dari yang kamu harapkan.',
+    },
+    {
+        title: 'Chat panjang, ujungnya cuma tanya harga',
+        desc: 'Kamu sudah menjelaskan program berulang kali. Begitu masuk pembahasan harga atau jadwal, percakapannya berhenti. Kamu ingin tahu apa yang sebenarnya membuat mereka ragu.',
+    },
+    {
+        title: 'Setiap buka pendaftaran, hasilnya beda',
+        desc: 'Pernah ramai pembeli, lalu penjualan berikutnya turun. Kamu belum tahu apa yang berubah dan apa yang perlu dipertahankan supaya hasilnya lebih konsisten.',
+    },
+    {
+        title: 'Waktu buat mengajar ikut habis untuk marketing',
+        desc: 'Kamu ingin fokus mendampingi peserta, tapi masih sibuk mencari ide konten, mengecek iklan, dan mengganti halaman penawaran tanpa arah yang jelas.',
+    },
 ];
 
 const PILLAR_ICON = `size-6 ${svgBase}`;
 const PILLARS: Pillar[] = [
     {
-        key: 'APA',
-        rest: 'yang Bocor',
-        desc: 'Titik persis di mana calon peserta berhenti: headline, penawaran, harga, form, atau chat WA.',
+        title: 'Cari tahu di mana orang mulai ragu',
+        desc: 'Apakah mereka belum paham siapa yang cocok ikut programmu? Belum yakin dengan hasilnya? Atau bingung harus melakukan apa setelah membaca penawaran? Kita lihat bagian yang mungkin menahan mereka untuk lanjut.',
         icon: (
             <svg viewBox="0 0 24 24" className={PILLAR_ICON} strokeWidth={2}>
                 <circle cx="11" cy="11" r="8" />
@@ -186,22 +222,19 @@ const PILLARS: Pillar[] = [
         ),
     },
     {
-        key: 'MENGAPA',
-        rest: 'Itu Membunuh Konversi',
-        desc: 'Berbasis data: kenapa copy, struktur halaman, atau follow-up Anda bikin peserta ragu transfer.',
+        title: 'Pahami apa yang perlu dibuat lebih jelas',
+        desc: 'Kita bahas hal yang perlu dilihat calon pembeli sebelum memutuskan, seperti isi program, alasan memilih kamu, bukti hasil peserta, dan cara mendaftar.',
         icon: (
             <svg viewBox="0 0 24 24" className={PILLAR_ICON} strokeWidth={2}>
-                <path d="M3 3v18h18" />
-                <path d="M18 17V9" />
-                <path d="M13 17V5" />
-                <path d="M8 17v-3" />
+                <path d="M2 12h20" />
+                <path d="M20 12l-6-6" />
+                <path d="M20 12l-6 6" />
             </svg>
         ),
     },
     {
-        key: 'BAGAIMANA',
-        rest: 'Cara Memperbaikinya',
-        desc: 'Langkah konkret yang bisa langsung dieksekusi, diurutkan dari dampak terbesar.',
+        title: 'Tentukan perbaikan pertama',
+        desc: 'Kamu mendapat saran tentang bagian yang sebaiknya dikerjakan lebih dulu, beserta alasannya. Misalnya memperjelas penawaran di awal halaman atau memperbaiki jawaban untuk pertanyaan yang sering muncul di WhatsApp.',
         icon: (
             <svg viewBox="0 0 24 24" className={PILLAR_ICON} strokeWidth={2}>
                 <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
@@ -209,7 +242,6 @@ const PILLARS: Pillar[] = [
         ),
     },
 ];
-
 
 const TESTIMONIALS: Testimonial[] = [
     {
@@ -226,7 +258,6 @@ const TESTIMONIALS: Testimonial[] = [
     },
 ];
 
-
 const CHAPTERS: Chapter[] = [
     {
         title: 'Masalahnya',
@@ -241,16 +272,6 @@ const CHAPTERS: Chapter[] = [
             },
             'TAPI, saat membuka dashboard penjualan, angkanya stuck di Rp20 juta per bulan.',
             'Traffic masuk belasan ribu, tapi sebagian besar pengunjung cuma numpang lewat tanpa mendaftar.',
-        ],
-    },
-    {
-        title: 'Solusinya',
-        hasFlow: true,
-        paras: [
-            {
-                d: 'Kami membangun ulang halaman penjualannya dengan copywriting dan struktur yang dirancang khusus untuk cara audiensnya mengambil keputusan membeli.',
-                m: 'Kami bangun ulang halaman penjualannya dengan copy dan struktur yang sesuai cara audiensnya membeli.',
-            },
         ],
     },
     {
@@ -292,43 +313,43 @@ const FAQS: Faq[] = [
     {
         q: 'Apa yang akan saya dapatkan dari audit ini?',
         a: {
-            d: 'Sesi 1-on-1 via Zoom bersama tim PBM. Kami bedah landing page, penawaran, form, dan alur follow-up WA Anda, lalu memberikan daftar titik bocor beserta langkah perbaikan yang diurutkan dari dampak terbesar. Jadwal sesi dikonfirmasi maksimal 1x24 jam setelah form diisi.',
-            m: 'Sesi Zoom 1-on-1: kami bedah LP, penawaran, form & alur WA, lalu beri daftar perbaikan prioritas.',
+            d: 'Kita membahas kondisi marketing dan penjualan programmu, melihat hambatan yang perlu diperiksa, lalu menentukan perbaikan yang sebaiknya didahulukan. Saran mengikuti materi dan data yang tersedia. Kalau datanya belum cukup, kita bahas apa yang perlu dilihat sebelum mengambil keputusan.',
+            m: 'Kita bahas kondisi marketing & penjualan, cari hambatan, lalu tentukan perbaikan prioritas sesuai data yang ada.',
         },
     },
     {
-        q: 'Apakah audit ini benar-benar gratis?',
+        q: 'Apakah audit ini memang gratis?',
         a: {
-            d: 'Ya, 100% gratis dan tanpa kewajiban memakai jasa kami. Kalau setelah audit Anda ingin eksekusinya dibantu tim PBM, kita bisa diskusikan. Kalau tidak, semua rekomendasi tetap bisa Anda jalankan sendiri.',
-            m: 'Ya, 100% gratis tanpa kewajiban. Semua rekomendasi tetap bisa Anda jalankan sendiri.',
+            d: 'Ya, sesi audit ini gratis. Kalau kebutuhanmu cocok dan kamu ingin dibantu menjalankan perbaikannya, kita bisa membahas kerja sama berbayar dengan PBM. Kamu bisa menilai penawarannya dulu sebelum memutuskan.',
+            m: 'Ya, sesi audit ini gratis. Jika ingin dibantu menjalankan perbaikannya, kita bisa bahas kerja sama berbayar dengan PBM.',
         },
     },
     {
-        q: 'Iklan saya sudah bagus (CTR tinggi, CPC murah). Apakah audit ini masih relevan?',
+        q: 'Iklan saya sudah banyak diklik. Apakah auditnya masih berguna?',
         a: {
-            d: 'Justru sangat relevan. CTR tinggi hanya membuktikan iklan Anda menarik perhatian. Penentu transfer ada di langkah berikutnya: halaman, penawaran, dan alur WA. Di situlah kebocoran terbesar biasanya terjadi.',
-            m: 'Justru sangat relevan. CTR tinggi hanya bukti iklan menarik. Penentu transfer ada di halaman dan alur WA.',
+            d: 'Bisa, terutama kalau yang mendaftar belum sesuai harapan. Banyak klik belum menjelaskan apakah orang memahami programmu atau yakin untuk membeli. Kita lihat apa yang terjadi setelah mereka tertarik, termasuk halaman penawaran dan percakapan sebelum daftar.',
+            m: 'Bisa. Banyak klik belum tentu bikin orang yakin membeli. Kita lihat apa yang terjadi di halaman penawaran & chat pendaftaran.',
         },
     },
     {
         q: 'Apakah audit ini cocok untuk bisnis saya?',
         a: {
-            d: 'Cocok jika Anda menjual keahlian (kelas online, coaching, training, atau konsultasi), programnya sudah pernah terjual minimal 1 batch, dan sudah memiliki audience atau traffic. Jika program Anda belum pernah terjual sama sekali, kami sarankan validasi penawaran terlebih dahulu, karena audit paling berdampak saat sudah ada data untuk dibedah.',
-            m: 'Cocok jika Anda menjual keahlian, sudah terjual minimal 1 batch, dan sudah punya audience atau traffic.',
+            d: 'Sesi ini ditujukan untuk pemilik kelas, coaching, training, atau konsultasi yang programnya sudah tersedia, pernah terjual, punya bukti hasil pelanggan, dan sudah memiliki audiens atau pengunjung. Kamu juga terbuka untuk bekerja sama dengan tim yang membantu menjalankan marketing. Kalau masih menyiapkan produk pertama atau belum pernah menjual, fokus berikutnya adalah menguji penawaran dan mendapatkan pelanggan awal.',
+            m: 'Cocok jika programmu sudah pernah terjual, punya bukti hasil pelanggan, punya audiens, dan terbuka bekerja sama untuk marketing.',
         },
     },
     {
-        q: 'Apakah data saya aman?',
+        q: 'Data apa yang perlu saya siapkan?',
         a: {
-            d: 'Ya. Semua data, angka penjualan, dan materi yang Anda bagikan hanya digunakan untuk keperluan audit dan tidak akan dipublikasikan tanpa izin tertulis dari Anda.',
-            m: 'Ya. Semua data hanya dipakai untuk audit dan tidak dipublikasikan tanpa izin tertulis dari Anda.',
+            d: 'Siapkan link penawaran, contoh konten atau iklan, gambaran penjualan, dan pertanyaan yang sering muncul dari calon pembeli. Kamu bisa menyamarkan nama serta kontak pelanggan. Tidak perlu mengirim kata sandi atau akses akun lewat form.',
+            m: 'Siapkan link penawaran, contoh konten/iklan, gambaran penjualan, dan pertanyaan calon pembeli. Kontak bisa disamarkan.',
         },
     },
     {
-        q: 'Kenapa hanya 5 slot per minggu?',
+        q: 'Bagaimana cara mendapat jadwal audit?',
         a: {
-            d: 'Setiap audit dibedah langsung dan mendalam, bukan pakai template. Untuk menjaga kualitas rekomendasi, kami membatasi hanya 5 bisnis per minggu.',
-            m: 'Setiap audit dibedah langsung dan mendalam, bukan template. Karena itu kami batasi 5 bisnis per minggu.',
+            d: 'Isi form pengajuan terlebih dahulu. Kami meninjau kecocokan bisnis dan kebutuhanmu, lalu menghubungi kamu lewat WhatsApp untuk langkah penjadwalan jika sesuai. Sesi dilakukan secara personal agar pembahasannya fokus pada bisnismu.',
+            m: 'Isi form pengajuan terlebih dahulu. Kami meninjau kecocokan bisnis dan menghubungi lewat WhatsApp untuk jadwal audit.',
         },
     },
 ];
@@ -399,7 +420,7 @@ function CaseStudyVideo() {
                     </svg>
                 </div>
                 <span className="mt-3 text-sm font-bold tracking-wide">
-                    Tonton Video Studi Kasus (1 Menit)
+                    Tonton cerita Tsania
                 </span>
             </button>
         </div>
@@ -420,12 +441,17 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
     const [name, setName] = useState<string>('');
     const [phone, setPhone] = useState<string>('');
     const [email, setEmail] = useState<string>('');
-    const [websiteLink, setWebsiteLink] = useState<string>('');
     const [programType, setProgramType] = useState<string>('');
     const [otherProgram, setOtherProgram] = useState<string>('');
+    const [programNameTarget, setProgramNameTarget] = useState<string>('');
+    const [websiteLink, setWebsiteLink] = useState<string>('');
     const [totalBuyers, setTotalBuyers] = useState<string>('');
-    const [monthlyRevenue, setMonthlyRevenue] = useState<string>('');
-    const [businessRole, setBusinessRole] = useState<string>('');
+    const [audienceSources, setAudienceSources] = useState<string[]>([]);
+    const [primaryProblem, setPrimaryProblem] = useState<string>('');
+    const [otherProblem, setOtherProblem] = useState<string>('');
+    const [helpStage, setHelpStage] = useState<string>('');
+    const [agencyBudgetReady, setAgencyBudgetReady] = useState<string>('');
+    const [timeline, setTimeline] = useState<string>('');
     const [submitted, setSubmitted] = useState<boolean>(false);
     const [isQualified, setIsQualified] = useState<boolean | null>(null);
     const [submitting, setSubmitting] = useState<boolean>(false);
@@ -450,7 +476,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
         trackCTA(
             `${location}_cta`,
             link.textContent?.trim().replace(/\s+/g, ' ') ??
-                'Klaim Audit Gratis',
+                'Ajukan Audit Gratis',
             '#audit-form',
         );
     };
@@ -550,44 +576,60 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
         }
 
         if (currentStep === 2) {
+            if (!programType) {
+                setError('Silakan pilih salah satu jenis program Anda.');
+                return false;
+            }
+            if (programType === 'Lainnya' && !otherProgram.trim()) {
+                setError('Mohon sebutkan jenis program Anda.');
+                return false;
+            }
+            if (!programNameTarget.trim()) {
+                setError('Mohon jelaskan nama program dan siapa yang biasanya membeli.');
+                return false;
+            }
             if (!websiteLink.trim()) {
-                setError('Mohon isi link IG atau website program Anda.');
+                setError('Mohon isi link website atau akun Instagram bisnis Anda.');
                 return false;
             }
             return true;
         }
 
         if (currentStep === 3) {
-            if (!programType) {
-                setError('Silakan pilih salah satu opsi program yang dijual.');
-                return false;
-            }
-            if (programType === 'lainnya' && !otherProgram.trim()) {
-                setError('Mohon sebutkan jenis produk Anda.');
+            if (!totalBuyers) {
+                setError('Silakan pilih total alumni / pembeli program Anda saat ini.');
                 return false;
             }
             return true;
         }
 
         if (currentStep === 4) {
-            if (!totalBuyers) {
-                setError('Silakan pilih total alumni / pembeli program Anda.');
+            if (audienceSources.length === 0) {
+                setError('Silakan pilih minimal satu sumber calon pembeli.');
+                return false;
+            }
+            if (!primaryProblem) {
+                setError('Silakan pilih apa yang paling ingin Anda benahi sekarang.');
+                return false;
+            }
+            if (primaryProblem === 'Masalah lainnya' && !otherProblem.trim()) {
+                setError('Mohon jelaskan masalah yang ingin Anda benahi.');
                 return false;
             }
             return true;
         }
 
         if (currentStep === 5) {
-            if (!monthlyRevenue) {
-                setError('Silakan pilih kisaran omzet bisnis Anda per bulan.');
+            if (!helpStage) {
+                setError('Silakan pilih tahap bantuan yang Anda inginkan.');
                 return false;
             }
-            return true;
-        }
-
-        if (currentStep === 6) {
-            if (!businessRole) {
-                setError('Silakan pilih peran Anda dalam bisnis ini.');
+            if (!agencyBudgetReady) {
+                setError('Silakan tentukan kesiapan mempertimbangkan biaya kerja sama.');
+                return false;
+            }
+            if (!timeline) {
+                setError('Silakan tentukan kapan Anda ingin mulai membenahi marketing.');
                 return false;
             }
             return true;
@@ -607,17 +649,42 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
         setStep((prev) => Math.max(prev - 1, 1));
     };
 
+    const handleAudienceSourceToggle = (source: string): void => {
+        if (error) setError('');
+        if (source === 'Belum ada sumber calon pembeli') {
+            setAudienceSources((prev) =>
+                prev.includes(source) ? [] : ['Belum ada sumber calon pembeli'],
+            );
+            return;
+        }
+
+        setAudienceSources((prev) => {
+            const filtered = prev.filter(
+                (s) => s !== 'Belum ada sumber calon pembeli',
+            );
+            if (filtered.includes(source)) {
+                return filtered.filter((s) => s !== source);
+            }
+            return [...filtered, source];
+        });
+    };
+
     const resetForm = (): void => {
         setStep(1);
         setName('');
         setPhone('');
         setEmail('');
-        setWebsiteLink('');
         setProgramType('');
         setOtherProgram('');
+        setProgramNameTarget('');
+        setWebsiteLink('');
         setTotalBuyers('');
-        setMonthlyRevenue('');
-        setBusinessRole('');
+        setAudienceSources([]);
+        setPrimaryProblem('');
+        setOtherProblem('');
+        setHelpStage('');
+        setAgencyBudgetReady('');
+        setTimeline('');
         setSubmitted(false);
         setIsQualified(null);
         setError('');
@@ -628,18 +695,17 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
             return;
         }
 
-        if (!validateStep(6)) {
+        if (!validateStep(5)) {
             return;
         }
 
-        // ❌ Rule Evaluasi Kualifikasi:
-        // Rule 1: Gugur jika programType === 'belum punya'
-        // Rule 2: Gugur jika totalBuyers === 'belum ada'
-        // Rule 3: Gugur jika businessRole === 'agency atau freelancer'
-        const qualified =
-            programType !== 'belum punya' &&
-            totalBuyers !== 'belum ada' &&
-            businessRole !== 'agency atau freelancer';
+        // Rule Evaluasi Kualifikasi:
+        // Audit difokuskan pada program yang sudah pernah terjual dan memiliki audiens.
+        const hasNoBuyers = totalBuyers === 'Belum ada';
+        const hasNoAudience =
+            audienceSources.length === 1 &&
+            audienceSources[0] === 'Belum ada sumber calon pembeli';
+        const qualified = !hasNoBuyers && !hasNoAudience;
 
         const calendlyUrl = `${CALENDLY_URL}?name=${encodeURIComponent(name.trim())}&email=${encodeURIComponent(email.trim())}&a1=${encodeURIComponent(phone.trim())}&a2=${encodeURIComponent(websiteLink.trim())}`;
 
@@ -662,9 +728,14 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
         setSubmitting(true);
 
         const effectiveProgram =
-            programType === 'lainnya'
-                ? `lainnya: ${otherProgram.trim()}`
+            programType === 'Lainnya'
+                ? `Lainnya: ${otherProgram.trim()}`
                 : programType;
+
+        const effectiveProblem =
+            primaryProblem === 'Masalah lainnya'
+                ? `Masalah lainnya: ${otherProblem.trim()}`
+                : primaryProblem;
 
         const saved = await track({
             event_type: 'conversion',
@@ -678,9 +749,13 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                 email: email.trim(),
                 website_link: websiteLink.trim(),
                 program_type: effectiveProgram,
+                program_name_target: programNameTarget.trim(),
                 total_buyers: totalBuyers,
-                monthly_revenue: monthlyRevenue,
-                business_role: businessRole,
+                audience_sources: audienceSources,
+                primary_problem: effectiveProblem,
+                help_stage: helpStage,
+                agency_budget_ready: agencyBudgetReady,
+                timeline: timeline,
                 is_qualified: qualified,
             },
         });
@@ -738,17 +813,16 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                 </span>
                             </div>
                             <span className="hidden items-center rounded-full border border-[#e0e7ff] bg-white px-[14px] py-1.5 text-xs leading-4 font-bold tracking-[.08em] whitespace-nowrap text-[#4338ca] uppercase min-[1100px]:inline-flex">
-                                Khusus Pemilik Kelas Online, Coaching, Training
-                                &amp; Konsultasi
+                                Untuk pemilik kelas, coaching, training, dan konsultasi
                             </span>
                         </div>
                         <a
                             href="#audit-form"
                             className="flex cursor-pointer items-center justify-center rounded-lg bg-[#4f46e5] px-5 py-2 text-sm leading-5 font-semibold whitespace-nowrap text-white shadow-[0_4px_6px_-1px_rgba(79,70,229,.2),0_2px_4px_-2px_rgba(79,70,229,.2)] hover:bg-[#4338ca] hover:text-white"
                         >
-                            <span className="md:hidden">Klaim Audit</span>
+                            <span className="md:hidden">Ajukan Audit</span>
                             <span className="hidden md:inline">
-                                Klaim Audit Gratis
+                                Ajukan Audit Gratis
                             </span>
                         </a>
                     </div>
@@ -768,8 +842,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                         <div className="flex flex-wrap items-center gap-8 md:gap-12">
                             <div className="relative z-20 flex min-w-0 flex-[7_1_480px] flex-col gap-[18px] md:gap-6">
                                 <span className="inline-flex max-w-full items-center self-start rounded-full border border-[#e0e7ff] bg-white px-[14px] py-1.5 text-[11px] leading-4 font-bold tracking-[.04em] text-[#4338ca] uppercase min-[1100px]:hidden">
-                                    Khusus Kelas Online, Coaching &amp;
-                                    Konsultasi
+                                    Untuk pemilik kelas, coaching, training, dan konsultasi
                                 </span>
                                 <span className="inline-flex max-w-full items-center gap-2 self-start rounded-full border border-[#a7f3d0] bg-[#d1fae5] px-4 py-2 text-[length:clamp(12px,3.2vw,14px)] leading-5 font-bold text-[#047857]">
                                     <svg
@@ -780,21 +853,19 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                         <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
                                         <polyline points="16 7 22 7 22 13" />
                                     </svg>
-                                    +50% Omzet Klien Tanpa Tambah Budget Iklan
+                                    Khusus bisnis yang sudah punya pelanggan dan audiens
                                 </span>
                                 <h1 className="text-[length:clamp(34px,9vw,62px)] leading-[1.1] font-extrabold tracking-[-0.03em] text-balance text-[#0f172a]">
-                                    Ubah Traffic Berkualitas yang Benar-Benar
-                                    Jadi{' '}
+                                    Program sudah pernah laku, tapi{' '}
                                     <span className="text-[#4f46e5]">
-                                        Potensial Pembeli
+                                        penjualannya masih naik turun?
                                     </span>
                                 </h1>
                                 <p className="max-w-[620px] text-[17px] leading-[1.65] font-medium text-pretty text-[#475569]">
-                                    Kebocoran omzet terbanyak terjadi setelah
-                                    orang klik iklan tanpa membeli. Kami bangun
-                                    High-Converting Landing Page yang
-                                    memaksimalkan setiap pengunjung menjadi
-                                    pembeli berkualitas tinggi secara konsisten.
+                                    Sudah bikin konten, menjalankan iklan, atau melayani banyak chat, tapi belum tahu kenapa yang mendaftar masih sedikit?
+                                </p>
+                                <p className="max-w-[620px] text-[17px] leading-[1.65] font-medium text-pretty text-[#475569]">
+                                    Di audit gratis bersama Justin, kita lihat perjalanan calon pembeli dari pertama tertarik sampai memutuskan daftar. Kamu akan mendapat gambaran hambatannya dan tahu bagian mana yang perlu dibenahi lebih dulu.
                                 </p>
                             </div>
 
@@ -818,8 +889,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                 Audit Funnel 1-on-1 Gratis
                                             </span>
                                             <span className="text-sm font-medium text-[#c7d2fe]">
-                                                Via Zoom · 1-on-1 · bersama tim
-                                                PBM
+                                                Via Zoom · 1-on-1 · bersama Justin Wijaya
                                             </span>
                                         </div>
                                     </div>
@@ -842,15 +912,15 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                 </div>
                                             )}
 
-                                            {/* STEP 1: Nama & Nomor WA */}
+                                            {/* STEP 1: Nama Lengkap & Kontak WhatsApp */}
                                             {step === 1 && (
                                                 <div className="flex flex-col gap-4">
                                                     <div className="flex flex-col gap-1">
                                                         <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            Nama &amp; Nomor WhatsApp Anda
+                                                            Nama Lengkap & Kontak WhatsApp
                                                         </h3>
                                                         <p className="text-xs text-[#64748b]">
-                                                            Untuk konfirmasi dan pengiriman link sesi Zoom audit.
+                                                            Untuk konfirmasi dan pembahasan jadwal sesi audit.
                                                         </p>
                                                     </div>
                                                     <label className="flex flex-col gap-1.5">
@@ -913,7 +983,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                         onClick={nextStep}
                                                         className="mt-2 flex h-[52px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
                                                     >
-                                                        Klaim Sesi Audit Gratis
+                                                        Ajukan Audit Gratis
                                                         <ArrowRight />
                                                     </button>
                                                     <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
@@ -922,20 +992,84 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                 </div>
                                             )}
 
-                                            {/* STEP 2: Link IG / Website Program */}
+                                            {/* STEP 2: Program dan Bisnis */}
                                             {step === 2 && (
                                                 <div className="flex flex-col gap-4">
                                                     <div className="flex flex-col gap-1">
                                                         <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            Link Instagram atau Website Program
+                                                            Ceritakan program yang kamu jual
                                                         </h3>
                                                         <p className="text-xs text-[#64748b]">
-                                                            Agar tim PBM dapat menganalisis penawaran &amp; funnel Anda sebelum sesi.
+                                                            Informasi program untuk memahami konteks penawaran Anda.
                                                         </p>
                                                     </div>
+                                                    <div className="flex flex-col gap-2">
+                                                        <span className="text-xs font-bold text-[#334155]">
+                                                            Apa jenis programmu? <span className="text-[#e11d48]">*</span>
+                                                        </span>
+                                                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                                            {PROGRAM_OPTIONS.map((opt) => (
+                                                                <label
+                                                                    key={opt.value}
+                                                                    className={`flex cursor-pointer items-center gap-2.5 rounded-xl border p-3 transition-all ${
+                                                                        programType === opt.value
+                                                                            ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
+                                                                            : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
+                                                                    }`}
+                                                                >
+                                                                    <input
+                                                                        type="radio"
+                                                                        name="program_type"
+                                                                        value={opt.value}
+                                                                        checked={programType === opt.value}
+                                                                        onChange={() => {
+                                                                            setProgramType(opt.value);
+                                                                            if (error) setError('');
+                                                                        }}
+                                                                        className="size-4 text-[#4f46e5] accent-[#4f46e5]"
+                                                                    />
+                                                                    <span className="text-xs font-semibold text-[#1e293b]">
+                                                                        {opt.label}
+                                                                    </span>
+                                                                </label>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    {programType === 'Lainnya' && (
+                                                        <label className="flex flex-col gap-1.5">
+                                                            <span className="text-xs font-bold text-[#334155]">
+                                                                Sebutkan jenis program Anda <span className="text-[#e11d48]">*</span>
+                                                            </span>
+                                                            <input
+                                                                type="text"
+                                                                value={otherProgram}
+                                                                onChange={(e) => {
+                                                                    setOtherProgram(e.target.value);
+                                                                    if (error) setError('');
+                                                                }}
+                                                                placeholder="Contoh: Membership, Agency Jasa, Workshop"
+                                                                className={inputBase}
+                                                            />
+                                                        </label>
+                                                    )}
                                                     <label className="flex flex-col gap-1.5">
                                                         <span className="text-xs font-bold text-[#334155]">
-                                                            Link Instagram atau Website <span className="text-[#e11d48]">*</span>
+                                                            Apa nama programmu dan siapa yang biasanya membeli? <span className="text-[#e11d48]">*</span>
+                                                        </span>
+                                                        <textarea
+                                                            rows={2}
+                                                            value={programNameTarget}
+                                                            onChange={(e) => {
+                                                                setProgramNameTarget(e.target.value);
+                                                                if (error) setError('');
+                                                            }}
+                                                            placeholder="Contoh: Kelas public speaking untuk pemilik bisnis yang ingin lebih percaya diri saat presentasi."
+                                                            className="w-full rounded-xl border-[1.5px] bg-[#f8fafc] p-3 text-sm text-[#0f172a] outline-hidden placeholder:text-[#94a3b8] transition-all focus:border-[#4f46e5] focus:bg-white focus:shadow-[0_0_0_4px_#e0e7ff]"
+                                                        />
+                                                    </label>
+                                                    <label className="flex flex-col gap-1.5">
+                                                        <span className="text-xs font-bold text-[#334155]">
+                                                            Link website / akun instagram bisnis <span className="text-[#e11d48]">*</span>
                                                         </span>
                                                         <input
                                                             id="audit-link"
@@ -963,7 +1097,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                             onClick={nextStep}
                                                             className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
                                                         >
-                                                            Konfirmasi Link Program
+                                                            Konfirmasi Data Program
                                                             <ArrowRight />
                                                         </button>
                                                     </div>
@@ -973,93 +1107,15 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                 </div>
                                             )}
 
-                                            {/* STEP 3: Program yang dijual */}
+                                            {/* STEP 3: Pengalaman Penjualan */}
                                             {step === 3 && (
                                                 <div className="flex flex-col gap-4">
                                                     <div className="flex flex-col gap-1">
                                                         <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            Program yang Anda Jual
+                                                            Programmu sudah sampai tahap mana?
                                                         </h3>
                                                         <p className="text-xs text-[#64748b]">
-                                                            Pilih jenis produk atau program utama yang sedang dipasarkan.
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex max-h-[280px] flex-col gap-2 overflow-y-auto pr-1">
-                                                        {PROGRAM_OPTIONS.map((opt) => (
-                                                            <label
-                                                                key={opt.value}
-                                                                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-all ${
-                                                                    programType === opt.value
-                                                                        ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
-                                                                        : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
-                                                                }`}
-                                                            >
-                                                                <input
-                                                                    type="radio"
-                                                                    name="program_type"
-                                                                    value={opt.value}
-                                                                    checked={programType === opt.value}
-                                                                    onChange={() => {
-                                                                        setProgramType(opt.value);
-                                                                        if (error) setError('');
-                                                                    }}
-                                                                    className="size-4 text-[#4f46e5] accent-[#4f46e5]"
-                                                                />
-                                                                <span className="text-sm font-semibold text-[#1e293b]">
-                                                                    {opt.label}
-                                                                </span>
-                                                            </label>
-                                                        ))}
-                                                    </div>
-                                                    {programType === 'lainnya' && (
-                                                        <div className="flex flex-col gap-1.5">
-                                                            <span className="text-xs font-bold text-[#334155]">
-                                                                Sebutkan jenis produk Anda: <span className="text-[#e11d48]">*</span>
-                                                            </span>
-                                                            <input
-                                                                type="text"
-                                                                value={otherProgram}
-                                                                onChange={(e) => {
-                                                                    setOtherProgram(e.target.value);
-                                                                    if (error) setError('');
-                                                                }}
-                                                                placeholder="Contoh: Membership, Agency Jasa, dll"
-                                                                className={inputBase}
-                                                            />
-                                                        </div>
-                                                    )}
-                                                    <div className="mt-2 flex items-center gap-3">
-                                                        <button
-                                                            type="button"
-                                                            onClick={prevStep}
-                                                            className="flex h-[52px] flex-1 cursor-pointer items-center justify-center rounded-xl border border-[#cbd5e1] bg-white text-sm font-bold text-[#475569] transition-all hover:bg-[#f8fafc]"
-                                                        >
-                                                            Kembali
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={nextStep}
-                                                            className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
-                                                        >
-                                                            Konfirmasi Jenis Program
-                                                            <ArrowRight />
-                                                        </button>
-                                                    </div>
-                                                    <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
-                                                        <span className="text-amber-500">⚡</span> Cuma butuh 30 detik untuk mengisi
-                                                    </p>
-                                                </div>
-                                            )}
-
-                                            {/* STEP 4: Total alumni / pembeli */}
-                                            {step === 4 && (
-                                                <div className="flex flex-col gap-4">
-                                                    <div className="flex flex-col gap-1">
-                                                        <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            Total Alumni / Pembeli Saat Ini
-                                                        </h3>
-                                                        <p className="text-xs text-[#64748b]">
-                                                            Akumulasi peserta atau pembeli sejak program pertama kali dirilis.
+                                                            Total alumni / pembeli saat ini
                                                         </p>
                                                     </div>
                                                     <div className="flex flex-col gap-2">
@@ -1102,7 +1158,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                             onClick={nextStep}
                                                             className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
                                                         >
-                                                            Konfirmasi Total Pembeli
+                                                            Konfirmasi Tahap Program
                                                             <ArrowRight />
                                                         </button>
                                                     </div>
@@ -1112,44 +1168,85 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                 </div>
                                             )}
 
-                                            {/* STEP 5: Omzet bisnis per bulan */}
-                                            {step === 5 && (
+                                            {/* STEP 4: Audiens dan Masalah Utama */}
+                                            {step === 4 && (
                                                 <div className="flex flex-col gap-4">
                                                     <div className="flex flex-col gap-1">
                                                         <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            Estimasi Omzet Bisnis per Bulan
+                                                            Dari mana calon pembelimu datang?
                                                         </h3>
                                                         <p className="text-xs text-[#64748b]">
-                                                            Estimasi rata-rata omzet bulanan dari penjualan program Anda.
+                                                            Pilih sumber yang sudah kamu gunakan. Boleh lebih dari satu.
                                                         </p>
                                                     </div>
-                                                    <div className="flex flex-col gap-2">
-                                                        {REVENUE_OPTIONS.map((opt) => (
+                                                    <div className="flex max-h-[190px] flex-col gap-1.5 overflow-y-auto pr-1">
+                                                        {AUDIENCE_SOURCE_OPTIONS.map((source) => (
                                                             <label
-                                                                key={opt.value}
-                                                                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3.5 transition-all ${
-                                                                    monthlyRevenue === opt.value
+                                                                key={source}
+                                                                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-2.5 transition-all ${
+                                                                    audienceSources.includes(source)
+                                                                        ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
+                                                                        : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
+                                                                }`}
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={audienceSources.includes(source)}
+                                                                    onChange={() => handleAudienceSourceToggle(source)}
+                                                                    className="size-4 rounded text-[#4f46e5] accent-[#4f46e5]"
+                                                                />
+                                                                <span className="text-xs font-semibold text-[#1e293b]">
+                                                                    {source}
+                                                                </span>
+                                                            </label>
+                                                        ))}
+                                                    </div>
+
+                                                    <div className="flex flex-col gap-1 pt-1">
+                                                        <h4 className="text-sm font-extrabold text-[#0f172a]">
+                                                            Apa yang paling ingin kamu benahi sekarang?
+                                                        </h4>
+                                                    </div>
+                                                    <div className="flex max-h-[190px] flex-col gap-1.5 overflow-y-auto pr-1">
+                                                        {PRIMARY_PROBLEM_OPTIONS.map((problem) => (
+                                                            <label
+                                                                key={problem}
+                                                                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-2.5 transition-all ${
+                                                                    primaryProblem === problem
                                                                         ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
                                                                         : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
                                                                 }`}
                                                             >
                                                                 <input
                                                                     type="radio"
-                                                                    name="monthly_revenue"
-                                                                    value={opt.value}
-                                                                    checked={monthlyRevenue === opt.value}
+                                                                    name="primary_problem"
+                                                                    value={problem}
+                                                                    checked={primaryProblem === problem}
                                                                     onChange={() => {
-                                                                        setMonthlyRevenue(opt.value);
+                                                                        setPrimaryProblem(problem);
                                                                         if (error) setError('');
                                                                     }}
                                                                     className="size-4 text-[#4f46e5] accent-[#4f46e5]"
                                                                 />
-                                                                <span className="text-sm font-semibold text-[#1e293b]">
-                                                                    {opt.label}
+                                                                <span className="text-xs font-semibold text-[#1e293b]">
+                                                                    {problem}
                                                                 </span>
                                                             </label>
                                                         ))}
                                                     </div>
+                                                    {primaryProblem === 'Masalah lainnya' && (
+                                                        <input
+                                                            type="text"
+                                                            value={otherProblem}
+                                                            onChange={(e) => {
+                                                                setOtherProblem(e.target.value);
+                                                                if (error) setError('');
+                                                            }}
+                                                            placeholder="Jelaskan masalah lainnya..."
+                                                            className={inputBase}
+                                                        />
+                                                    )}
+
                                                     <div className="mt-2 flex items-center gap-3">
                                                         <button
                                                             type="button"
@@ -1163,7 +1260,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                             onClick={nextStep}
                                                             className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
                                                         >
-                                                            Konfirmasi Omzet Bisnis
+                                                            Konfirmasi Sumber & Kendala
                                                             <ArrowRight />
                                                         </button>
                                                     </div>
@@ -1173,44 +1270,161 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                 </div>
                                             )}
 
-                                            {/* STEP 6: Kamu siapa di bisnis ini? */}
+                                            {/* STEP 5: Kebutuhan Bantuan */}
+                                            {step === 5 && (
+                                                <div className="flex flex-col gap-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <h3 className="text-base font-extrabold text-[#0f172a]">
+                                                            Kebutuhan Bantuan & Rencana
+                                                        </h3>
+                                                    </div>
+
+                                                    <div className="flex flex-col gap-1.5">
+                                                        <span className="text-xs font-bold text-[#334155]">
+                                                            Kamu ingin dibantu sampai tahap apa? <span className="text-[#e11d48]">*</span>
+                                                        </span>
+                                                        <div className="flex flex-col gap-1.5">
+                                                            {HELP_STAGE_OPTIONS.map((opt) => (
+                                                                <label
+                                                                    key={opt}
+                                                                    className={`flex cursor-pointer items-center gap-3 rounded-xl border p-2.5 transition-all ${
+                                                                        helpStage === opt
+                                                                            ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
+                                                                            : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
+                                                                    }`}
+                                                                >
+                                                                    <input
+                                                                        type="radio"
+                                                                        name="help_stage"
+                                                                        value={opt}
+                                                                        checked={helpStage === opt}
+                                                                        onChange={() => {
+                                                                            setHelpStage(opt);
+                                                                            if (error) setError('');
+                                                                        }}
+                                                                        className="size-4 text-[#4f46e5] accent-[#4f46e5]"
+                                                                    />
+                                                                    <span className="text-xs font-semibold text-[#1e293b]">
+                                                                        {opt}
+                                                                    </span>
+                                                                </label>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex flex-col gap-1.5">
+                                                        <span className="text-xs font-bold text-[#334155]">
+                                                            Kalau ada solusi yang cocok, apakah kamu siap mempertimbangkan biaya kerja sama dengan agency? <span className="text-[#e11d48]">*</span>
+                                                        </span>
+                                                        <div className="flex flex-col gap-1.5">
+                                                            {BUDGET_READY_OPTIONS.map((opt) => (
+                                                                <label
+                                                                    key={opt}
+                                                                    className={`flex cursor-pointer items-center gap-3 rounded-xl border p-2.5 transition-all ${
+                                                                        agencyBudgetReady === opt
+                                                                            ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
+                                                                            : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
+                                                                    }`}
+                                                                >
+                                                                    <input
+                                                                        type="radio"
+                                                                        name="budget_ready"
+                                                                        value={opt}
+                                                                        checked={agencyBudgetReady === opt}
+                                                                        onChange={() => {
+                                                                            setAgencyBudgetReady(opt);
+                                                                            if (error) setError('');
+                                                                        }}
+                                                                        className="size-4 text-[#4f46e5] accent-[#4f46e5]"
+                                                                    />
+                                                                    <span className="text-xs font-semibold text-[#1e293b]">
+                                                                        {opt}
+                                                                    </span>
+                                                                </label>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex flex-col gap-1.5">
+                                                        <span className="text-xs font-bold text-[#334155]">
+                                                            Kapan kamu ingin mulai membenahi marketing? <span className="text-[#e11d48]">*</span>
+                                                        </span>
+                                                        <div className="flex flex-col gap-1.5">
+                                                            {TIMELINE_OPTIONS.map((opt) => (
+                                                                <label
+                                                                    key={opt}
+                                                                    className={`flex cursor-pointer items-center gap-3 rounded-xl border p-2.5 transition-all ${
+                                                                        timeline === opt
+                                                                            ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
+                                                                            : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
+                                                                    }`}
+                                                                >
+                                                                    <input
+                                                                        type="radio"
+                                                                        name="timeline"
+                                                                        value={opt}
+                                                                        checked={timeline === opt}
+                                                                        onChange={() => {
+                                                                            setTimeline(opt);
+                                                                            if (error) setError('');
+                                                                        }}
+                                                                        className="size-4 text-[#4f46e5] accent-[#4f46e5]"
+                                                                    />
+                                                                    <span className="text-xs font-semibold text-[#1e293b]">
+                                                                        {opt}
+                                                                    </span>
+                                                                </label>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mt-2 flex items-center gap-3">
+                                                        <button
+                                                            type="button"
+                                                            onClick={prevStep}
+                                                            className="flex h-[52px] flex-1 cursor-pointer items-center justify-center rounded-xl border border-[#cbd5e1] bg-white text-sm font-bold text-[#475569] transition-all hover:bg-[#f8fafc]"
+                                                        >
+                                                            Kembali
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={nextStep}
+                                                            className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
+                                                        >
+                                                            Tinjau Pengajuan Audit
+                                                            <ArrowRight />
+                                                        </button>
+                                                    </div>
+                                                    <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
+                                                        <span className="text-amber-500">⚡</span> Cuma butuh 30 detik untuk mengisi
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {/* STEP 6: Tinjau dan Kirim */}
                                             {step === 6 && (
                                                 <div className="flex flex-col gap-4">
                                                     <div className="flex flex-col gap-1">
                                                         <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            Peran Anda di Bisnis Ini
+                                                            Cek jawabanmu sebelum dikirim
                                                         </h3>
                                                         <p className="text-xs text-[#64748b]">
-                                                            Untuk memastikan keputusan perbaikan funnel bisa langsung dieksekusi.
+                                                            Pastikan link bisnis dan nomor WhatsApp sudah benar. Kami akan meninjau kebutuhanmu sebelum membahas jadwal audit.
                                                         </p>
                                                     </div>
-                                                    <div className="flex flex-col gap-2">
-                                                        {ROLE_OPTIONS.map((opt) => (
-                                                            <label
-                                                                key={opt.value}
-                                                                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3.5 transition-all ${
-                                                                    businessRole === opt.value
-                                                                        ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
-                                                                        : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
-                                                                }`}
-                                                            >
-                                                                <input
-                                                                    type="radio"
-                                                                    name="business_role"
-                                                                    value={opt.value}
-                                                                    checked={businessRole === opt.value}
-                                                                    onChange={() => {
-                                                                        setBusinessRole(opt.value);
-                                                                        if (error) setError('');
-                                                                    }}
-                                                                    className="size-4 text-[#4f46e5] accent-[#4f46e5]"
-                                                                />
-                                                                <span className="text-sm font-semibold text-[#1e293b]">
-                                                                    {opt.label}
-                                                                </span>
-                                                            </label>
-                                                        ))}
+
+                                                    <div className="flex flex-col gap-2 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3.5 text-xs text-[#334155]">
+                                                        <div><span className="font-bold text-[#0f172a]">Nama:</span> {name}</div>
+                                                        <div><span className="font-bold text-[#0f172a]">WhatsApp:</span> {phone}</div>
+                                                        <div><span className="font-bold text-[#0f172a]">Email:</span> {email}</div>
+                                                        <div><span className="font-bold text-[#0f172a]">Link Bisnis:</span> {websiteLink}</div>
+                                                        <div><span className="font-bold text-[#0f172a]">Program:</span> {programType === 'Lainnya' ? otherProgram : programType} ({totalBuyers})</div>
                                                     </div>
+
+                                                    <p className="text-xs leading-[1.5] text-[#64748b]">
+                                                        Dengan mengirim pengajuan ini, saya setuju dihubungi PBM lewat WhatsApp atau email untuk membahas pengajuan dan penjadwalan audit.
+                                                    </p>
+
                                                     <div className="mt-2 flex items-center gap-3">
                                                         <button
                                                             type="button"
@@ -1225,7 +1439,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                             disabled={submitting}
                                                             className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca] disabled:opacity-75"
                                                         >
-                                                            {submitting ? 'Memproses...' : 'Kirim & Cek Kualifikasi'}
+                                                            {submitting ? 'Mengirim...' : 'Kirim Pengajuan Audit'}
                                                             {!submitting && <ArrowRight />}
                                                         </button>
                                                     </div>
@@ -1249,7 +1463,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                                     Selamat, {name}!
                                                 </h3>
                                                 <p className="max-w-[420px] text-sm leading-[1.6] text-[#475569]">
-                                                    Bisnis Anda memenuhi kriteria untuk mengikuti <strong>Sesi Audit Funnel 1-on-1 Gratis via Zoom</strong> bersama tim PBM.
+                                                    Bisnis Anda memenuhi kriteria untuk mengikuti <strong>Sesi Audit Funnel 1-on-1 Gratis via Zoom</strong> bersama Justin &amp; tim PBM.
                                                 </p>
                                             </div>
 
@@ -1292,24 +1506,20 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                             </div>
                                             <div className="flex flex-col gap-1.5">
                                                 <span className="inline-flex items-center self-center rounded-full bg-[#fef3c7] px-3 py-1 text-xs font-extrabold text-[#b45309]">
-                                                    STATUS KUALIFIKASI
+                                                    STATUS PENGAJUAN
                                                 </span>
                                                 <h3 className="text-[20px] font-extrabold text-[#0f172a]">
                                                     Terima kasih, {name}!
                                                 </h3>
-                                                <p className="max-w-[380px] text-sm leading-[1.6] text-[#475569]">
-                                                    Mohon maaf, saat ini sesi audit 1-on-1 intensif dikhususkan untuk program edukasi yang sudah memiliki alumni/pembeli aktif dan dikelola oleh internal owner.
+                                                <p className="max-w-[420px] text-sm leading-[1.6] text-[#475569]">
+                                                    Terima kasih sudah cerita tentang rencanamu. Audit ini difokuskan pada program yang sudah pernah terjual, punya bukti hasil pelanggan, dan sudah memiliki audiens. Untuk tahapmu sekarang, prioritasnya adalah menyiapkan penawaran dan mendapatkan pelanggan awal. Setelah itu, kamu bisa mengajukan audit kembali.
                                                 </p>
-                                            </div>
-
-                                            <div className="w-full rounded-xl border border-[#fed7aa] bg-[#fff7ed] p-4 text-left text-xs leading-[1.5] text-[#9a3412]">
-                                                Hal ini penting agar sesi bedah funnel bisa langsung mengevaluasi data analitik nyata dan memberikan rekomendasi yang langsung berdampak pada penjualan.
                                             </div>
 
                                             <div className="mt-2 flex w-full flex-col gap-2.5">
                                                 <a
                                                     href={wa(
-                                                        `Halo Tim PBM, saya ${name}. Saya sudah mengisi form kualifikasi di website PBM dan ingin berkonsultasi seputar funnel program saya.`
+                                                        `Halo Tim PBM, saya ${name}. Saya sudah mengisi form pengajuan di website PBM dan ingin berkonsultasi seputar program saya.`
                                                     )}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
@@ -1353,13 +1563,13 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
             <section id="pain" className="bg-white py-[clamp(72px,11vw,112px)]">
                 <div className={`${CONTAINER} max-w-[1152px]`}>
                     <div className="mb-12">
-                        <span className={KICKER}>// Pain Points</span>
+                        <span className={KICKER}>// Masalah</span>
                         <h2 className="text-[length:clamp(22px,5.6vw,44px)] leading-[1.2] font-extrabold tracking-[-0.025em] whitespace-nowrap text-[#0f172a]">
                             Apakah Anda Sedang Mengalami Ini?
                         </h2>
                     </div>
                     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] gap-5">
-                        {PAINS.map((text, i) => (
+                        {PAINS.map((p, i) => (
                             <div
                                 key={i}
                                 className="flex flex-col items-start gap-[14px] rounded-[20px] border border-[#f1f5f9] bg-[rgba(248,250,252,.7)] p-[22px] transition-all duration-300 hover:border-[#e0e7ff] hover:bg-[rgba(238,242,255,.4)] md:flex-row md:gap-5 md:p-7"
@@ -1367,16 +1577,21 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                 <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#eef2ff] text-base font-extrabold text-[#4f46e5]">
                                     0{i + 1}
                                 </div>
-                                <p className="text-[17px] leading-[1.65] font-medium text-[#334155]">
-                                    {text}
-                                </p>
+                                <div className="flex flex-col gap-1.5">
+                                    <h3 className="text-lg font-extrabold text-[#0f172a]">
+                                        {p.title}
+                                    </h3>
+                                    <p className="text-[15px] leading-[1.65] font-medium text-[#475569]">
+                                        {p.desc}
+                                    </p>
+                                </div>
                             </div>
                         ))}
                     </div>
 
                     <div className="relative mt-14 overflow-hidden rounded-[28px] border border-[#fecdd3] bg-[rgba(255,241,242,.6)] p-[clamp(28px,5vw,48px)]">
                         <div className="pointer-events-none absolute -top-20 -right-20 size-[280px] rounded-full bg-[rgba(254,205,211,.6)] blur-[60px]" />
-                        <div className="relative flex max-w-[820px] flex-col gap-5">
+                        <div className="relative flex max-w-[820px] flex-col gap-4">
                             <div className="inline-flex items-center gap-2 self-start rounded-full border border-[#fecdd3] bg-[#ffe4e6] px-[14px] py-1.5 text-xs leading-4 font-bold tracking-[.1em] text-[#be123c] uppercase">
                                 <svg
                                     viewBox="0 0 24 24"
@@ -1384,65 +1599,26 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                     strokeWidth={2.5}
                                 >
                                     <circle cx="12" cy="12" r="10" />
-                                    <line x1="12" x2="12" y1="8" y2="12" />
-                                    <line x1="12" x2="12.01" y1="16" y2="16" />
+                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                    <line x1="12" y1="16" x2="12.01" y2="16" />
                                 </svg>
-                                Kalau Dibiarkan Terus
+                                Dampak Kalau Dibiarkan
                             </div>
-                            <p className="text-[length:clamp(18px,2.4vw,22px)] leading-[1.6] font-semibold text-pretty text-[#0f172a]">
-                                <R
-                                    c={{
-                                        d: 'Bayangkan jika kebocoran ini dibiarkan. Setiap launching, ratusan calon peserta yang sudah klik, baca, bahkan chat, pergi tanpa mendaftar.',
-                                        m: 'Setiap launching, ratusan calon peserta yang sudah klik, baca, bahkan chat, pergi tanpa mendaftar.',
-                                    }}
-                                />
-                            </p>
-                            <div className="flex flex-wrap gap-3">
-                                <span className="inline-flex items-center gap-2 rounded-xl border border-[#fecdd3] bg-white px-4 py-2.5 text-base font-bold text-[#be123c]">
-                                    Batch ini boncos{' '}
-                                    <span className="text-xl font-extrabold">
-                                        3 juta
-                                    </span>
-                                </span>
-                                <span className="inline-flex items-center gap-2 rounded-xl border border-[#fecdd3] bg-white px-4 py-2.5 text-base font-bold text-[#be123c]">
-                                    Batch depan{' '}
-                                    <span className="text-xl font-extrabold">
-                                        10 juta
-                                    </span>
-                                </span>
-                            </div>
-                            <p className="text-lg leading-[1.6] text-[#475569]">
-                                <span className="hidden md:inline">
-                                    Sampai kapan budget iklan dipakai menambal
-                                    halaman yang bocor? Makin lama dibiarkan,
-                                    makin banyak calon peserta yang{' '}
-                                    <strong className="text-[#be123c]">
-                                        Anda serahkan ke kompetitor.
-                                    </strong>
-                                </span>
-                                <span className="md:hidden">
-                                    Makin lama halaman bocor dibiarkan, makin
-                                    banyak calon peserta yang{' '}
-                                    <strong className="text-[#be123c]">
-                                        Anda serahkan ke kompetitor.
-                                    </strong>
-                                </span>
+                            <h3 className="text-[length:clamp(20px,2.6vw,26px)] leading-[1.3] font-extrabold text-[#0f172a]">
+                                Yang bikin capek, kamu belum tahu harus memperbaiki apa dulu
+                            </h3>
+                            <p className="text-base md:text-[17px] leading-[1.65] text-[#475569]">
+                                Akhirnya, setiap penjualan turun kamu mencoba hal baru. Ganti iklan, ubah harga, atau tambah konten. Waktu dan biaya terus keluar, sementara penyebabnya belum jelas.
                             </p>
                         </div>
                     </div>
 
-                    <div className="mx-auto mt-14 flex max-w-[720px] flex-col items-center gap-7 text-center">
-                        <p className="text-[length:clamp(20px,2.6vw,24px)] leading-[1.55] font-bold text-balance text-[#0f172a]">
-                            <span className="text-[#4f46e5]">Tapi tenang.</span>{' '}
-                            <R
-                                c={{
-                                    d: 'Di sesi audit ini, kami bongkar semua titik bocor di jalur penjualan Anda, lengkap dengan cara menutupnya.',
-                                    m: 'Di sesi audit, kami bongkar semua titik bocor Anda, lengkap dengan cara menutupnya.',
-                                }}
-                            />
+                    <div className="mx-auto mt-14 flex max-w-[760px] flex-col items-center gap-7 text-center">
+                        <p className="text-[length:clamp(18px,2.4vw,22px)] leading-[1.6] font-semibold text-[#0f172a]">
+                            Kita mulai dengan melihat apa yang sudah berjalan dan di mana calon pembeli mulai berhenti. Dari situ, kamu bisa menentukan perbaikan yang masuk akal untuk kondisi bisnismu sekarang.
                         </p>
                         <a href="#audit-form" className={CTA_PRIMARY}>
-                            Klaim Audit Gratis Sekarang
+                            Ajukan Audit Gratis
                             <ArrowRight />
                         </a>
                     </div>
@@ -1456,24 +1632,19 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
             >
                 <div className={`${CONTAINER} max-w-[1152px]`}>
                     <div className="mx-auto mb-14 max-w-[800px] text-center">
-                        <span className={KICKER}>// Benefit</span>
+                        <span className={KICKER}>// Manfaat</span>
                         <h2 className="text-[length:clamp(24px,6.2vw,48px)] leading-[1.15] font-extrabold tracking-[-0.025em] text-balance text-[#0f172a]">
                             Audit Funnel 1-on-1 Gratis Untuk Bisnis Kelas &amp;
                             Coaching Anda
                         </h2>
                         <p className="mt-5 text-lg leading-[1.65] text-pretty text-[#475569]">
-                            <R
-                                c={{
-                                    d: 'Sesi 1-on-1 via Zoom untuk membongkar seluruh jalur penjualan Anda: iklan, landing page, form, sampai follow-up WhatsApp.',
-                                    m: 'Sesi Zoom 1-on-1 untuk membongkar iklan, landing page, form, sampai follow-up WA Anda.',
-                                }}
-                            />
+                            Di sesi Zoom, kita melihat cara kamu menawarkan program, konten atau iklan yang membawa calon pembeli, halaman pendaftaran, dan percakapan penjualan. Pembahasannya mengikuti materi dan data yang kamu punya.
                         </p>
                     </div>
                     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] gap-6">
                         {PILLARS.map((p, i) => (
                             <div
-                                key={p.key}
+                                key={p.title}
                                 className="relative flex flex-col gap-4 overflow-hidden rounded-[28px] border border-[#e0e7ff] bg-white px-8 py-9 shadow-[0_20px_25px_-5px_rgba(224,231,255,.5)] transition-all duration-[350ms] hover:-translate-y-1.5 hover:shadow-[0_30px_50px_-15px_rgba(79,70,229,.3)]"
                             >
                                 <span
@@ -1485,11 +1656,8 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                 <div className="relative flex size-[52px] items-center justify-center rounded-2xl bg-[#4f46e5] text-white shadow-[0_10px_20px_-8px_rgba(79,70,229,.6)]">
                                     {p.icon}
                                 </div>
-                                <h3 className="relative text-[22px] leading-[1.3] font-extrabold text-[#0f172a]">
-                                    <span className="text-[#4f46e5]">
-                                        {p.key}
-                                    </span>{' '}
-                                    {p.rest}
+                                <h3 className="relative text-[20px] leading-[1.3] font-extrabold text-[#0f172a]">
+                                    {p.title}
                                 </h3>
                                 <p className="relative text-base leading-[1.65] text-[#475569]">
                                     {p.desc}
@@ -1499,14 +1667,12 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                     </div>
                     <div className="mt-10 flex justify-center">
                         <a href="#audit-form" className={CTA_PRIMARY}>
-                            Klaim Audit Gratis Sekarang
+                            Ajukan Audit Gratis
                             <ArrowRight />
                         </a>
                     </div>
                 </div>
             </section>
-
-
 
             {/* ABOUT */}
             <section
@@ -1517,10 +1683,10 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                 <div className={`${CONTAINER} relative z-10 max-w-[1152px]`}>
                     <div className="mb-12">
                         <span className={`${KICKER} !text-[#fbbf24]`}>
-                            // About
+                            // Profil
                         </span>
-                        <h2 className="text-[length:clamp(20px,5.2vw,44px)] leading-[1.2] font-extrabold tracking-[-0.025em] whitespace-nowrap text-white">
-                            Siapa yang Akan Membedah Funnel Anda?
+                        <h2 className="text-[length:clamp(20px,4.5vw,40px)] leading-[1.25] font-extrabold tracking-[-0.025em] text-white">
+                            Kenalan dulu dengan orang yang akan mengaudit bisnismu
                         </h2>
                     </div>
                     <div className="flex flex-wrap items-start gap-8 md:gap-12">
@@ -1541,7 +1707,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                     Justin Wijaya
                                 </h3>
                                 <p className="text-base font-semibold text-[#c7d2fe]">
-                                    Founder PBM · CRO Specialist
+                                    Founder PBM Agency
                                 </p>
                                 <p className="flex items-center gap-2 text-[15px] font-semibold text-[#94a3b8]">
                                     <svg
@@ -1572,76 +1738,21 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                 </p>
                             </div>
                         </div>
-                        <div className="flex min-w-0 flex-[6_1_420px] flex-col gap-7">
+                        <div className="flex min-w-0 flex-[6_1_420px] flex-col gap-6">
                             <p className="text-[19px] leading-[1.7] text-pretty text-[#e2e8f0]">
-                                <R
-                                    c={{
-                                        d: 'Setelah membangun ratusan landing page, saya melihat pola yang sama: keahlian luar biasa, audiens sudah ada, tapi omzet mentok karena iklan dan halaman berjalan sendiri-sendiri.',
-                                        m: 'Dari ratusan landing page yang saya bangun, polanya sama: keahlian ada, audiens ada, tapi omzet mentok.',
-                                    }}
-                                />
-                            </p>
-                            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,220px),1fr))] gap-[14px]">
-                                <div className="flex flex-col gap-2 rounded-[18px] border border-[rgba(71,85,105,.5)] bg-[rgba(15,23,42,.6)] p-5">
-                                    <span className="text-xs font-bold tracking-[.12em] text-[#94a3b8] uppercase">
-                                        Advertiser
-                                    </span>
-                                    <p className="text-base leading-[1.5] font-semibold text-white">
-                                        Fokus mendatangkan traffic semurah
-                                        mungkin.
-                                    </p>
-                                </div>
-                                <div className="flex flex-col gap-2 rounded-[18px] border border-[rgba(71,85,105,.5)] bg-[rgba(15,23,42,.6)] p-5">
-                                    <span className="text-xs font-bold tracking-[.12em] text-[#94a3b8] uppercase">
-                                        Desainer
-                                    </span>
-                                    <p className="text-base leading-[1.5] font-semibold text-white">
-                                        Fokus membuat halaman terlihat cantik.
-                                    </p>
-                                </div>
-                            </div>
-                            <p className="text-lg leading-[1.7] text-[#cbd5e1]">
-                                <strong className="text-[#fda4af]">
-                                    Hasilnya?
-                                </strong>{' '}
-                                <R
-                                    c={{
-                                        d: 'Iklan ramai, halaman estetik, tapi yang transfer tetap sedikit. Tidak ada yang bertanggung jawab atas apa yang terjadi setelah orang klik.',
-                                        m: 'Iklan ramai, halaman estetik, tapi yang transfer tetap sedikit. Tak ada yang urus setelah orang klik.',
-                                    }}
-                                />
+                                Hai, saya Justin. Saya telah membantu puluhan pemilik kelas, coaching, training melihat apa yang membuat orang tertarik, lalu apa yang membantu mereka memutuskan untuk membeli.
                             </p>
                             <p className="text-lg leading-[1.7] text-[#cbd5e1]">
-                                <strong className="text-white">
-                                    PBM menjembatani celah itu.
-                                </strong>{' '}
-                                <R
-                                    c={{
-                                        d: 'Kami membaca data traffic sekaligus psikologi pembeli keahlian, karena membeli kelas adalah keputusan berbasis kepercayaan.',
-                                        m: 'Kami membaca data traffic sekaligus psikologi orang yang membeli keahlian.',
-                                    }}
-                                />
+                                Programmu mungkin sudah bagus dan pernah membantu pelanggan. Saat penjualan belum konsisten, kita perlu melihat bagaimana manfaat itu dijelaskan dan bagaimana calon pembeli diarahkan untuk mendaftar.
                             </p>
-                            <blockquote className="rounded-[20px] border border-[rgba(251,191,36,.35)] bg-[rgba(251,191,36,.08)] px-7 py-6 text-[length:clamp(19px,2.4vw,22px)] leading-[1.5] font-bold text-pretty text-white">
-                                "Landing page bukan brosur digital, tapi{' '}
-                                <span className="text-[#fbbf24]">
-                                    mesin penjualan
-                                </span>{' '}
-                                yang terukur dan bisa di-scale."
+                            <blockquote className="rounded-[20px] border border-[rgba(251,191,36,.35)] bg-[rgba(251,191,36,.08)] px-7 py-6 text-[length:clamp(18px,2.2vw,21px)] leading-[1.6] font-bold text-pretty text-white">
+                                "Di sesi audit nanti, saya ingin memahami apa yang sudah kamu coba, apa yang terjadi, dan apa yang ingin kamu capai. Kita gunakan materi serta data yang kamu punya untuk membantu scaleup program anda."
                             </blockquote>
-                            <p className="text-lg leading-[1.7] text-[#cbd5e1]">
-                                <R
-                                    c={{
-                                        d: 'Di sesi audit nanti, saya akan gunakan pengalaman ini untuk membantu Anda menemukan kebocoran terbesar di funnel Anda.',
-                                        m: 'Di sesi audit, saya pakai pengalaman ini untuk menemukan kebocoran terbesar di funnel Anda.',
-                                    }}
-                                />
-                            </p>
                             <a
                                 href="#audit-form"
                                 className={`${CTA_AMBER} self-start`}
                             >
-                                Klaim Audit Gratis Sekarang
+                                Ajukan Audit Gratis
                                 <ArrowRight />
                             </a>
                         </div>
@@ -1657,15 +1768,14 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                 <div className={`${CONTAINER} max-w-[1024px]`}>
                     <div className="mx-auto mb-12 max-w-[900px] text-center">
                         <div className="mb-6 inline-block rounded-full border border-[#c7d2fe] bg-[#eef2ff] px-5 py-1.5 text-xs leading-4 font-bold tracking-[.1em] text-[#4338ca] uppercase">
-                            Studi Kasus
+                            Cerita klien PBM
                         </div>
                         <h2 className="text-[length:clamp(22px,5.4vw,40px)] leading-[1.25] font-extrabold tracking-[-0.025em] text-balance text-[#0f172a]">
-                            Traffic Deras Tapi Omzet Mentok?{' '}
-                            <span className="text-[#4f46e5]">
-                                Cara Tsania Naikkan Omzet 50% Tanpa Tambah
-                                Budget Iklan.
-                            </span>
+                            Ini Cerita Tsania yang omzet kelasnya naik dari Rp20 juta ke Rp30 juta per bulan
                         </h2>
+                        <p className="mt-4 text-base md:text-lg leading-[1.65] text-[#475569]">
+                            Tsania Latheefa menjual kelas affiliate dan media sosial. Dalam testimoninya, ia menceritakan omzet bulanan yang sebelumnya sekitar Rp20 juta menjadi sekitar Rp30 juta setelah halaman penjualannya dibenahi bersama PBM.
+                        </p>
                     </div>
                     <div className="rounded-[28px] border border-[#e2e8f0] bg-white p-[clamp(20px,4vw,32px)] shadow-[0_20px_25px_-5px_rgba(0,0,0,.06)]">
                         <div className="mb-5 flex items-center gap-4">
@@ -1683,32 +1793,21 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                     Tsania Latheefa
                                 </h3>
                                 <p className="text-[15px] font-medium text-[#64748b]">
-                                    Affiliate Jago Jualan · Kelas Belajar
-                                    Affiliate &amp; Sosmed
+                                    Pemilik kelas Affiliate Jago Jualan · Kelas Belajar Affiliate &amp; Sosmed
                                 </p>
                             </div>
                         </div>
                         <CaseStudyVideo />
                         <blockquote className="mt-6 text-[length:clamp(19px,2.6vw,24px)] leading-[1.45] font-bold text-pretty text-[#0f172a]">
                             <span className="text-[#94a3b8]">"</span>
-                            <span className="hidden md:inline">
-                                Ya Alhamdulillah sih ya, yang biasanya di
-                                lynk.id kemarin itu 20 juta (per bulan), naik 10
-                                juta,{' '}
-                                <span className="text-[#059669]">
-                                    30 juta sekarang... bahkan lebih ya
-                                </span>
-                            </span>
-                            <span className="md:hidden">
-                                Biasanya di lynk.id 20 juta per bulan,{' '}
-                                <span className="text-[#059669]">
-                                    sekarang naik jadi 30 juta, bahkan lebih
-                                </span>
+                            yang biasanya di lynk.id kemarin itu 20 juta (per bulan), naik 10 juta,{' '}
+                            <span className="text-[#059669]">
+                                30 juta sekarang... bahkan lebih ya
                             </span>
                             <span className="text-[#94a3b8]">"</span>
                         </blockquote>
                         <p className="mt-2.5 text-[15px] font-semibold text-[#64748b]">
-                            — Tsania Latheefa, Affiliate Jago Jualan
+                            — Tsania Latheefa
                         </p>
                     </div>
 
@@ -1781,7 +1880,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                     </div>
                     <div className="mt-10 flex justify-center">
                         <a href="#audit-form" className={CTA_PRIMARY}>
-                            Klaim Audit Gratis Sekarang
+                            Ajukan Audit Gratis
                             <ArrowRight />
                         </a>
                     </div>
@@ -2055,7 +2154,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                             href="#audit-form"
                             className={`${CTA_AMBER} relative`}
                         >
-                            Klaim Audit Gratis Sekarang
+                            Ajukan Audit Gratis
                             <ArrowRight />
                         </a>
                     </div>
@@ -2071,7 +2170,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                     <div className="mb-12 text-center">
                         <span className={KICKER}>// FAQ</span>
                         <h2 className="text-[length:clamp(24px,6vw,40px)] leading-[1.2] font-extrabold tracking-[-0.025em]">
-                            Pertanyaan yang Sering Ditanyakan
+                            Mungkin kamu masih ingin tahu ini
                         </h2>
                     </div>
                     <div className="flex flex-col gap-[14px]">
@@ -2129,7 +2228,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                     </div>
                     <div className="mt-10 flex flex-col items-center gap-4 text-center">
                         <a href="#audit-form" className={CTA_PRIMARY}>
-                            Klaim Audit Gratis Sekarang
+                            Ajukan Audit Gratis
                             <ArrowRight />
                         </a>
                         <p className="text-[15px] font-medium text-[#64748b]">
@@ -2151,23 +2250,23 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                 <div className="absolute top-0 left-1/2 h-px w-full -translate-x-1/2 bg-[linear-gradient(to_right,transparent,rgba(99,102,241,.5),transparent)]" />
                 <div className="pointer-events-none absolute top-1/2 left-1/2 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[rgba(79,70,229,.22)] blur-[120px]" />
                 <div
-                    className={`${CONTAINER} relative z-10 flex max-w-[896px] flex-col items-center gap-9`}
+                    className={`${CONTAINER} relative z-10 flex max-w-[896px] flex-col items-center gap-7`}
                 >
-                    <h2 className="text-[length:clamp(28px,7vw,56px)] leading-[1.15] font-extrabold tracking-[-0.025em] text-balance text-white">
-                        Siap Menutup Kebocoran Funnel Anda?
+                    <h2 className="text-[length:clamp(26px,5.5vw,46px)] leading-[1.2] font-extrabold tracking-[-0.025em] text-balance text-white">
+                        Sebelum tambah budget atau ganti strategi lagi, cari tahu apa yang perlu dibenahi.
                     </h2>
+                    <p className="max-w-[700px] text-lg leading-[1.65] text-[#cbd5e1]">
+                        Kalau programmu sudah pernah terjual dan audiensnya sudah ada, mari lihat apa yang membuat calon pembeli belum lanjut daftar. Ajukan audit gratis untuk membahasnya bersama saya.
+                    </p>
                     <a
                         href="#audit-form"
-                        className="inline-flex min-h-[76px] cursor-pointer items-center justify-center rounded-full border border-[#fcd34d] bg-[#fbbf24] px-[clamp(28px,5vw,52px)] py-4 text-[length:clamp(17px,2.4vw,22px)] leading-[1.3] font-extrabold tracking-[.03em] text-[#451a03] shadow-[0_0_40px_-10px_rgba(251,191,36,.45)] transition-all duration-300 hover:scale-[1.04] hover:bg-[#f59e0b] hover:text-[#451a03]"
+                        className="inline-flex min-h-[64px] cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#fcd34d] bg-[#fbbf24] px-10 py-4 text-lg font-extrabold text-[#451a03] shadow-[0_0_40px_-10px_rgba(251,191,36,.45)] transition-all duration-300 hover:scale-[1.03] hover:bg-[#f59e0b] hover:text-[#451a03]"
                     >
-                        KLAIM AUDIT GRATIS SEKARANG
+                        Ajukan Audit Gratis
+                        <ArrowRight />
                     </a>
-                    <p className="flex flex-wrap justify-center gap-2.5 text-base font-semibold text-[#94a3b8]">
-                        <span>Hanya 5 slot per minggu</span>
-                        <span className="text-[#475569]">·</span>
-                        <span>Gratis</span>
-                        <span className="text-[#475569]">·</span>
-                        <span>Tanpa kewajiban</span>
+                    <p className="text-sm font-medium text-[#94a3b8]">
+                        Kami meninjau pengajuan terlebih dahulu agar sesi ini sesuai dengan kebutuhan bisnismu.
                     </p>
                 </div>
             </section>
