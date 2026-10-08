@@ -22,6 +22,12 @@ interface Copy {
     m: string;
 }
 
+interface Chapter {
+    title: string;
+    paras: (string | Copy)[];
+    hasFlow?: boolean;
+    hasResult?: boolean;
+}
 
 interface Proof {
     src: string;
@@ -220,6 +226,55 @@ const TESTIMONIALS: Testimonial[] = [
     },
 ];
 
+
+const CHAPTERS: Chapter[] = [
+    {
+        title: 'Masalahnya',
+        paras: [
+            {
+                d: 'Kenalkan, Tsania Latheefa. Content creator dengan puluhan ribu follower yang menjual kelas belajar affiliate & sosmed, Affiliate Jago Jualan. Dengan audiens sebesar itu, harusnya laris manis, bukan?',
+                m: 'Kenalkan, Tsania Latheefa: creator dengan puluhan ribu follower, pemilik kelas affiliate & sosmed Affiliate Jago Jualan.',
+            },
+            {
+                d: 'Realitanya tidak semanis itu. Setiap postingan dan story sudah mengarahkan audiens ke link di bio. Klik yang masuk banyak sekali. Traffic-nya deras.',
+                m: 'Setiap postingan mengarahkan audiens ke link di bio. Klik yang masuk banyak, traffic-nya deras.',
+            },
+            'TAPI, saat membuka dashboard penjualan, angkanya stuck di Rp20 juta per bulan.',
+            'Traffic masuk belasan ribu, tapi sebagian besar pengunjung cuma numpang lewat tanpa mendaftar.',
+        ],
+    },
+    {
+        title: 'Solusinya',
+        hasFlow: true,
+        paras: [
+            {
+                d: 'Kami membangun ulang halaman penjualannya dengan copywriting dan struktur yang dirancang khusus untuk cara audiensnya mengambil keputusan membeli.',
+                m: 'Kami bangun ulang halaman penjualannya dengan copy dan struktur yang sesuai cara audiensnya membeli.',
+            },
+        ],
+    },
+    {
+        title: 'Hasilnya? Angka yang Bicara.',
+        hasResult: true,
+        paras: [
+            {
+                d: 'Tanpa menambah follower, tanpa mengubah produk, dan tanpa menaikkan budget iklan, konversinya naik signifikan.',
+                m: 'Tanpa tambah follower, ubah produk, atau naikkan budget iklan, konversinya naik signifikan.',
+            },
+            {
+                d: 'Dalam hitungan minggu, omzetnya menembus Rp30 juta+ per bulan. Naik 50% hanya dengan membenahi satu hal: halaman penjualannya.',
+                m: 'Dalam hitungan minggu, omzetnya tembus Rp30 juta+ per bulan. Naik 50% hanya dari halaman penjualan.',
+            },
+        ],
+    },
+];
+
+const FLOW: string[] = [
+    'Traffic sudah ada',
+    'Produk sudah terbukti',
+    'Masalah ada di mekanisme konversi',
+    'Landing page dibenahi',
+];
 
 const PROOFS: Proof[] = [
     {
@@ -1739,9 +1794,115 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                 className="bg-white py-[clamp(72px,12vw,128px)]"
             >
                 <div className={`${CONTAINER} max-w-[1024px]`}>
-                    <h3 className="mb-8 text-[length:clamp(22px,3vw,28px)] font-extrabold text-[#0f172a]">
-                        Bukan cuma Tsania, ini bukti hasil klien lainnya:
-                    </h3>
+                    <div className="flex flex-col">
+                        {CHAPTERS.map((c, i) => {
+                            const last = i === CHAPTERS.length - 1;
+
+                            return (
+                                <div
+                                    key={c.title}
+                                    className="flex gap-[clamp(16px,3vw,28px)]"
+                                >
+                                    <div className="flex shrink-0 flex-col items-center">
+                                        <div
+                                            className={`flex size-[52px] items-center justify-center rounded-full border-2 text-[17px] font-extrabold ${
+                                                last
+                                                    ? 'border-[#4f46e5] bg-[#4f46e5] text-white'
+                                                    : 'border-[#c7d2fe] bg-white text-[#4f46e5]'
+                                            }`}
+                                        >
+                                            0{i + 1}
+                                        </div>
+                                        <div
+                                            className={`my-2 w-0.5 flex-1 ${last ? 'bg-transparent' : 'bg-[#e0e7ff]'}`}
+                                        />
+                                    </div>
+                                    <div className="flex min-w-0 flex-1 flex-col gap-[14px] pb-12">
+                                        <span className="pt-[14px] text-[13px] font-bold tracking-[.16em] text-[#4f46e5] uppercase">
+                                            Chapter 0{i + 1}
+                                        </span>
+                                        <h3 className="text-[length:clamp(24px,3.4vw,30px)] leading-[1.25] font-extrabold tracking-[-0.02em] text-[#0f172a]">
+                                            {c.title}
+                                        </h3>
+                                        {c.paras.map((p, j) => (
+                                            <p
+                                                key={j}
+                                                className="text-[17px] leading-[1.75] text-pretty text-[#475569]"
+                                            >
+                                                {typeof p === 'string' ? (
+                                                    p
+                                                ) : (
+                                                    <R c={p} />
+                                                )}
+                                            </p>
+                                        ))}
+                                        {c.hasFlow && (
+                                            <div className="mt-1.5 flex flex-wrap items-center gap-2.5">
+                                                {FLOW.map((label, k) => {
+                                                    const end =
+                                                        k === FLOW.length - 1;
+
+                                                    return (
+                                                        <div
+                                                            key={label}
+                                                            className="flex items-center gap-2.5"
+                                                        >
+                                                            <span
+                                                                className={`rounded-xl border px-4 py-2.5 text-[15px] font-bold ${
+                                                                    end
+                                                                        ? 'border-[#4f46e5] bg-[#4f46e5] text-white'
+                                                                        : 'border-[#e2e8f0] bg-[#f8fafc] text-[#334155]'
+                                                                }`}
+                                                            >
+                                                                {label}
+                                                            </span>
+                                                            {!end && (
+                                                                <ArrowRight className="size-4 text-[#94a3b8]" />
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                        {c.hasResult && (
+                                            <div className="mt-2 grid grid-cols-1 items-center gap-[14px] md:grid-cols-[1fr_auto_1fr]">
+                                                <div className="flex flex-col gap-1.5 rounded-[20px] border border-[#fecdd3] bg-[#fff1f2] p-6">
+                                                    <span className="text-[13px] font-extrabold tracking-[.14em] text-[#be123c] uppercase">
+                                                        Before
+                                                    </span>
+                                                    <span className="text-[length:clamp(26px,4vw,34px)] font-extrabold tracking-[-0.02em] whitespace-nowrap text-[#0f172a]">
+                                                        Rp20 juta
+                                                        <span className="text-[17px] font-semibold text-[#475569]">
+                                                            /bulan
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                                <div className="flex size-11 rotate-90 items-center justify-center justify-self-center rounded-full bg-[#4f46e5] text-white md:rotate-0">
+                                                    <ArrowRight className="size-5" />
+                                                </div>
+                                                <div className="flex flex-col gap-1.5 rounded-[20px] border border-[#a7f3d0] bg-[#ecfdf5] p-6">
+                                                    <span className="text-[13px] font-extrabold tracking-[.14em] text-[#047857] uppercase">
+                                                        After
+                                                    </span>
+                                                    <span className="text-[length:clamp(26px,4vw,34px)] font-extrabold tracking-[-0.02em] whitespace-nowrap text-[#0f172a]">
+                                                        Rp30 juta+
+                                                        <span className="text-[17px] font-semibold text-[#475569]">
+                                                            /bulan
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    <div className="mt-4 border-t border-[#f1f5f9] pt-12">
+                        <h3 className="mb-6 text-[length:clamp(22px,3vw,28px)] font-extrabold text-[#0f172a]">
+                            Bukan cuma Tsania:
+                        </h3>
                         <div className="flex flex-col gap-6">
                             <div className="flex flex-col gap-[clamp(20px,3vw,28px)] rounded-[28px] border border-[#e0e7ff] bg-[#f8f6fc] p-[clamp(20px,4vw,32px)]">
                                 <div className="flex flex-col gap-2.5">
@@ -1877,6 +2038,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                 </div>
                             </div>
                         </div>
+                    </div>
 
                     <div className="relative mt-14 flex flex-col items-center gap-7 overflow-hidden rounded-[28px] bg-[#1E1B2E] p-[clamp(32px,5vw,48px)] text-center">
                         <div className="pointer-events-none absolute top-1/2 left-1/2 h-[300px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[rgba(79,70,229,.25)] blur-[80px]" />
