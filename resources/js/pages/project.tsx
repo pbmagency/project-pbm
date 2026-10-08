@@ -22,12 +22,6 @@ interface Copy {
     m: string;
 }
 
-interface Chapter {
-    title: string;
-    paras: (string | Copy)[];
-    hasFlow?: boolean;
-    hasResult?: boolean;
-}
 
 interface Proof {
     src: string;
@@ -41,11 +35,6 @@ interface Pillar {
     icon: ReactNode;
 }
 
-interface Outcome {
-    tag: string;
-    title: string;
-    desc: string;
-}
 
 interface Faq {
     q: string;
@@ -215,28 +204,6 @@ const PILLARS: Pillar[] = [
     },
 ];
 
-const OUTCOMES: Outcome[] = [
-    {
-        tag: 'Omzet',
-        title: 'Peserta Bertambah, Budget Iklan Tetap',
-        desc: 'Traffic yang sama menghasilkan lebih banyak pendaftar yang transfer, tanpa menaikkan budget iklan.',
-    },
-    {
-        tag: 'Kualitas Leads',
-        title: 'Pembeli Berkualitas yang Siap Checkout',
-        desc: 'Pengunjung yang masuk dari iklan sudah terfilter dan benar-benar memiliki niat beli (high buying intent) yang tinggi, sehingga langsung melakukan transaksi (checkout) tanpa perlu tanya-tanya panjang.',
-    },
-    {
-        tag: 'Cost',
-        title: 'Biaya per Pendaftar (CPA) Makin Efisien',
-        desc: 'Conversion rate naik, biaya per peserta otomatis turun. Setiap rupiah iklan bekerja lebih keras.',
-    },
-    {
-        tag: 'Stabilitas',
-        title: 'Omzet Antar-Batch Lebih Stabil & Terprediksi',
-        desc: 'Anda tahu angka yang harus dijaga di tiap tahap funnel, jadi launching tak lagi bergantung keberuntungan.',
-    },
-];
 
 const TESTIMONIALS: Testimonial[] = [
     {
@@ -253,67 +220,6 @@ const TESTIMONIALS: Testimonial[] = [
     },
 ];
 
-const CHAPTERS: Chapter[] = [
-    {
-        title: 'Masalahnya',
-        paras: [
-            {
-                d: 'Kenalkan, Tsania Latheefa. Content creator dengan puluhan ribu follower yang menjual kelas belajar affiliate & sosmed, Affiliate Jago Jualan. Dengan audiens sebesar itu, harusnya laris manis, bukan?',
-                m: 'Kenalkan, Tsania Latheefa: creator dengan puluhan ribu follower, pemilik kelas affiliate & sosmed Affiliate Jago Jualan.',
-            },
-            {
-                d: 'Realitanya tidak semanis itu. Setiap postingan dan story sudah mengarahkan audiens ke link di bio. Klik yang masuk banyak sekali. Traffic-nya deras.',
-                m: 'Setiap postingan mengarahkan audiens ke link di bio. Klik yang masuk banyak, traffic-nya deras.',
-            },
-            'TAPI, saat membuka dashboard penjualan, angkanya stuck di Rp20 juta per bulan.',
-            'Traffic masuk belasan ribu, tapi sebagian besar pengunjung cuma numpang lewat tanpa mendaftar.',
-        ],
-    },
-    {
-        title: 'Kebocoran Fatal',
-        paras: [
-            {
-                d: 'Tsania datang ke PBM. Setelah kami bedah datanya, ternyata masalahnya BUKAN di produk kelasnya, dan BUKAN karena kurang traffic.',
-                m: 'Setelah kami bedah datanya, masalahnya BUKAN di produk kelas, dan BUKAN karena kurang traffic.',
-            },
-            {
-                d: 'Kebocoran terbesar ada di halaman penjualan: penawaran kurang meyakinkan, alasan daftar sekarang belum jelas, dan pengunjung tidak diarahkan mengambil keputusan.',
-                m: 'Kebocoran ada di halaman penjualan: penawaran kurang meyakinkan dan pengunjung tidak diarahkan memutuskan.',
-            },
-        ],
-    },
-    {
-        title: 'Solusinya',
-        hasFlow: true,
-        paras: [
-            {
-                d: 'Kami membangun ulang halaman penjualannya dengan copywriting dan struktur yang dirancang khusus untuk cara audiensnya mengambil keputusan membeli.',
-                m: 'Kami bangun ulang halaman penjualannya dengan copy dan struktur yang sesuai cara audiensnya membeli.',
-            },
-        ],
-    },
-    {
-        title: 'Hasilnya? Angka yang Bicara.',
-        hasResult: true,
-        paras: [
-            {
-                d: 'Tanpa menambah follower, tanpa mengubah produk, dan tanpa menaikkan budget iklan, konversinya naik signifikan.',
-                m: 'Tanpa tambah follower, ubah produk, atau naikkan budget iklan, konversinya naik signifikan.',
-            },
-            {
-                d: 'Dalam hitungan minggu, omzetnya menembus Rp30 juta+ per bulan. Naik 50% hanya dengan membenahi satu hal: halaman penjualannya.',
-                m: 'Dalam hitungan minggu, omzetnya tembus Rp30 juta+ per bulan. Naik 50% hanya dari halaman penjualan.',
-            },
-        ],
-    },
-];
-
-const FLOW: string[] = [
-    'Traffic sudah ada',
-    'Produk sudah terbukti',
-    'Masalah ada di mekanisme konversi',
-    'Landing page dibenahi',
-];
 
 const PROOFS: Proof[] = [
     {
@@ -1545,58 +1451,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                 </div>
             </section>
 
-            {/* OUTCOME */}
-            <section
-                id="outcome"
-                className="bg-white py-[clamp(72px,12vw,128px)]"
-            >
-                <div className={`${CONTAINER} max-w-[1152px]`}>
-                    <div className="mb-12 max-w-[760px]">
-                        <h2 className="text-[length:clamp(24px,6.2vw,44px)] leading-[1.2] font-extrabold tracking-[-0.025em] text-balance text-[#0f172a]">
-                            Hasil yang Bisa Anda Raih Setelah Kebocoran Ditutup
-                        </h2>
-                    </div>
-                    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] gap-5">
-                        {OUTCOMES.map((o) => (
-                            <div
-                                key={o.tag}
-                                className="flex flex-col gap-3 rounded-3xl border border-[#f1f5f9] bg-[#f8fafc] p-8 transition-all duration-300 hover:border-[#c7d2fe] hover:bg-white hover:shadow-[0_20px_25px_-5px_rgba(0,0,0,.06)]"
-                            >
-                                <div className="flex items-center gap-2.5">
-                                    <div className="flex size-8 items-center justify-center rounded-full bg-[#d1fae5]">
-                                        <CheckIcon className="size-4 text-[#047857]" />
-                                    </div>
-                                    <span className="text-[13px] font-bold tracking-[.12em] text-[#047857] uppercase">
-                                        {o.tag}
-                                    </span>
-                                </div>
-                                <h3 className="text-[21px] leading-[1.35] font-extrabold text-[#0f172a]">
-                                    {o.title}
-                                </h3>
-                                <p className="text-base leading-[1.65] text-[#475569]">
-                                    {o.desc}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="mt-10 flex justify-center">
-                        <a href="#audit-form" className={CTA_PRIMARY}>
-                            Klaim Audit Gratis Sekarang
-                            <ArrowRight />
-                        </a>
-                    </div>
-                    <div className="mt-5 flex flex-wrap items-center justify-center gap-[14px]">
-                        <Avatars size="md" />
-                        <p className="text-base font-medium text-[#475569]">
-                            Dipercaya{' '}
-                            <strong className="text-[#0f172a]">
-                                {clientCount}
-                            </strong>{' '}
-                            pemilik kelas online, coach &amp; trainer
-                        </p>
-                    </div>
-                </div>
-            </section>
+
 
             {/* ABOUT */}
             <section
@@ -1884,115 +1739,9 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                 className="bg-white py-[clamp(72px,12vw,128px)]"
             >
                 <div className={`${CONTAINER} max-w-[1024px]`}>
-                    <div className="flex flex-col">
-                        {CHAPTERS.map((c, i) => {
-                            const last = i === CHAPTERS.length - 1;
-
-                            return (
-                                <div
-                                    key={c.title}
-                                    className="flex gap-[clamp(16px,3vw,28px)]"
-                                >
-                                    <div className="flex shrink-0 flex-col items-center">
-                                        <div
-                                            className={`flex size-[52px] items-center justify-center rounded-full border-2 text-[17px] font-extrabold ${
-                                                last
-                                                    ? 'border-[#4f46e5] bg-[#4f46e5] text-white'
-                                                    : 'border-[#c7d2fe] bg-white text-[#4f46e5]'
-                                            }`}
-                                        >
-                                            0{i + 1}
-                                        </div>
-                                        <div
-                                            className={`my-2 w-0.5 flex-1 ${last ? 'bg-transparent' : 'bg-[#e0e7ff]'}`}
-                                        />
-                                    </div>
-                                    <div className="flex min-w-0 flex-1 flex-col gap-[14px] pb-12">
-                                        <span className="pt-[14px] text-[13px] font-bold tracking-[.16em] text-[#4f46e5] uppercase">
-                                            Chapter 0{i + 1}
-                                        </span>
-                                        <h3 className="text-[length:clamp(24px,3.4vw,30px)] leading-[1.25] font-extrabold tracking-[-0.02em] text-[#0f172a]">
-                                            {c.title}
-                                        </h3>
-                                        {c.paras.map((p, j) => (
-                                            <p
-                                                key={j}
-                                                className="text-[17px] leading-[1.75] text-pretty text-[#475569]"
-                                            >
-                                                {typeof p === 'string' ? (
-                                                    p
-                                                ) : (
-                                                    <R c={p} />
-                                                )}
-                                            </p>
-                                        ))}
-                                        {c.hasFlow && (
-                                            <div className="mt-1.5 flex flex-wrap items-center gap-2.5">
-                                                {FLOW.map((label, k) => {
-                                                    const end =
-                                                        k === FLOW.length - 1;
-
-                                                    return (
-                                                        <div
-                                                            key={label}
-                                                            className="flex items-center gap-2.5"
-                                                        >
-                                                            <span
-                                                                className={`rounded-xl border px-4 py-2.5 text-[15px] font-bold ${
-                                                                    end
-                                                                        ? 'border-[#4f46e5] bg-[#4f46e5] text-white'
-                                                                        : 'border-[#e2e8f0] bg-[#f8fafc] text-[#334155]'
-                                                                }`}
-                                                            >
-                                                                {label}
-                                                            </span>
-                                                            {!end && (
-                                                                <ArrowRight className="size-4 text-[#94a3b8]" />
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        )}
-                                        {c.hasResult && (
-                                            <div className="mt-2 grid grid-cols-1 items-center gap-[14px] md:grid-cols-[1fr_auto_1fr]">
-                                                <div className="flex flex-col gap-1.5 rounded-[20px] border border-[#fecdd3] bg-[#fff1f2] p-6">
-                                                    <span className="text-[13px] font-extrabold tracking-[.14em] text-[#be123c] uppercase">
-                                                        Before
-                                                    </span>
-                                                    <span className="text-[length:clamp(26px,4vw,34px)] font-extrabold tracking-[-0.02em] whitespace-nowrap text-[#0f172a]">
-                                                        Rp20 juta
-                                                        <span className="text-[17px] font-semibold text-[#475569]">
-                                                            /bulan
-                                                        </span>
-                                                    </span>
-                                                </div>
-                                                <div className="flex size-11 rotate-90 items-center justify-center justify-self-center rounded-full bg-[#4f46e5] text-white md:rotate-0">
-                                                    <ArrowRight className="size-5" />
-                                                </div>
-                                                <div className="flex flex-col gap-1.5 rounded-[20px] border border-[#a7f3d0] bg-[#ecfdf5] p-6">
-                                                    <span className="text-[13px] font-extrabold tracking-[.14em] text-[#047857] uppercase">
-                                                        After
-                                                    </span>
-                                                    <span className="text-[length:clamp(26px,4vw,34px)] font-extrabold tracking-[-0.02em] whitespace-nowrap text-[#0f172a]">
-                                                        Rp30 juta+
-                                                        <span className="text-[17px] font-semibold text-[#475569]">
-                                                            /bulan
-                                                        </span>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    <div className="mt-4 border-t border-[#f1f5f9] pt-12">
-                        <h3 className="mb-6 text-[length:clamp(22px,3vw,28px)] font-extrabold text-[#0f172a]">
-                            Bukan cuma Tsania:
-                        </h3>
+                    <h3 className="mb-8 text-[length:clamp(22px,3vw,28px)] font-extrabold text-[#0f172a]">
+                        Bukan cuma Tsania, ini bukti hasil klien lainnya:
+                    </h3>
                         <div className="flex flex-col gap-6">
                             <div className="flex flex-col gap-[clamp(20px,3vw,28px)] rounded-[28px] border border-[#e0e7ff] bg-[#f8f6fc] p-[clamp(20px,4vw,32px)]">
                                 <div className="flex flex-col gap-2.5">
@@ -2128,7 +1877,6 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                 </div>
                             </div>
                         </div>
-                    </div>
 
                     <div className="relative mt-14 flex flex-col items-center gap-7 overflow-hidden rounded-[28px] bg-[#1E1B2E] p-[clamp(32px,5vw,48px)] text-center">
                         <div className="pointer-events-none absolute top-1/2 left-1/2 h-[300px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[rgba(79,70,229,.25)] blur-[80px]" />
