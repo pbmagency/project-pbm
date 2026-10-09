@@ -1744,7 +1744,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                     </svg>
                                     @justinwijaya ·{' '}
                                     <span className="text-[#fbbf24]">
-                                        213K Followers
+                                        19K Followers
                                     </span>
                                 </p>
                             </div>
