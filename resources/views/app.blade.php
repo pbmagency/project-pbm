@@ -16,6 +16,9 @@
         <link rel="preload" as="image" href="/images/poster/Poster.webp" type="image/webp" fetchpriority="high">
     @endif
 
+    <!-- OpenAI Ads Measurement Pixel -->
+    <script>!function(w,d,s,u){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q;var j=d.createElement(s);j.async=1;j.src=u;var f=d.getElementsByTagName(s)[0];f.parentNode.insertBefore(j,f)}(window,document,"script","https://bzrcdn.openai.com/sdk/oaiq.min.js");oaiq("init",{pixelId:"{{ config('services.openai.pixel_id', 'NsMWNPQbe457nNFiQrq6NX') }}",debug:true});</script>
+
     <script>
         let trackingLoaded = false;
         window.__META_PAGE_VIEW_EVENT_ID = window.crypto?.randomUUID?.() ??

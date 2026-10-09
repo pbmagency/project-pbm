@@ -1,0 +1,398 @@
+diff --git a/resources/js/pages/project.tsx b/resources/js/pages/project.tsx
+--- a/resources/js/pages/project.tsx
++++ b/resources/js/pages/project.tsx
+@@ -192,28 +192,28 @@
+ 
+ const PAINS: PainItem[] = [
+     {
+-        title: 'Traffic ramai & link diklik, tapi yang daftar sepi',
+-        desc: 'Konten dilihat, budget iklan jalan, dan link penawaran diklik. Tapi begitu masuk ke pendaftaran, jumlah peserta yang checkout sangat jauh dari harapan.',
++        title: 'Banyak yang tertarik, sedikit yang daftar',
++        desc: 'Konten dilihat, link diklik, WhatsApp masuk. Tapi pendaftarnya masih jauh dari harapan.',
+     },
+     {
+-        title: 'Chat panjang lebar, ujungnya cuma tanya harga lalu ghosting',
+-        desc: 'Kamu sudah menjelaskan program berulang kali. Begitu masuk pembahasan harga atau link transfer, percakapan mendadak berhenti tanpa kabar.',
++        title: 'Chat panjang, ujungnya cuma tanya harga',
++        desc: 'Program sudah dijelaskan berulang kali, tapi begitu bahas harga atau jadwal, chat berhenti.',
+     },
+     {
+-        title: 'Penjualan seperti roller coaster (hasil tiap batch beda)',
+-        desc: 'Bulan lalu ramai, batch berikutnya sepi drastis. Kamu belum tahu variabel apa yang berubah dan apa yang harus dipertahankan agar hasilnya stabil.',
++        title: 'Hasil tiap pendaftaran beda-beda',
++        desc: 'Kadang ramai, kadang sepi. Kamu belum tahu apa yang berubah dan apa yang harus dipertahankan.',
+     },
+     {
+-        title: 'Waktu mengajar habis terkuras untuk trial-error marketing',
+-        desc: 'Ingin fokus mendampingi peserta dan menyusun materi terbaik, tapi energimu habis untuk menebak ide konten, otak-atik iklan, dan ganti halaman tanpa arah.',
++        title: 'Waktu mengajar habis untuk marketing',
++        desc: 'Mau fokus ke peserta, tapi sibuk cari ide konten, cek iklan, dan ganti halaman tanpa arah.',
+     },
+ ];
+ 
+ const PILLAR_ICON = `size-6 ${svgBase}`;
+ const PILLARS: Pillar[] = [
+     {
+-        title: 'Diagnosis presisi titik kebocoran (conversion leak)',
+-        desc: 'Apakah audiens belum paham program ini untuk siapa? Belum percaya buktinya? Atau bingung langkah checkout-nya? Kita lacak di detik mana calon peserta mulai ragu dan pergi.',
++        title: 'Temukan di mana orang mulai ragu',
++        desc: 'Belum paham programnya untuk siapa? Belum yakin hasilnya? Bingung langkah selanjutnya? Kita cari bagian yang menahan mereka.',
+         icon: (
+             <svg viewBox="0 0 24 24" className={PILLAR_ICON} strokeWidth={2}>
+                 <circle cx="11" cy="11" r="8" />
+@@ -222,8 +222,8 @@
+         ),
+     },
+     {
+-        title: 'Rekonstruksi pesan & value proposition',
+-        desc: 'Kita susun ulang cara programmu dijelaskan—mulai dari diferensiasi penawaran, bukti hasil peserta, hingga penanganan keraguan—agar calon pembeli langsung yakin mendaftar.',
++        title: 'Perjelas yang perlu diperjelas',
++        desc: 'Isi program, alasan memilih kamu, bukti hasil peserta, dan cara daftar. Semua yang dibutuhkan calon pembeli sebelum memutuskan.',
+         icon: (
+             <svg viewBox="0 0 24 24" className={PILLAR_ICON} strokeWidth={2}>
+                 <path d="M2 12h20" />
+@@ -233,8 +233,8 @@
+         ),
+     },
+     {
+-        title: 'Checklist prioritas perbaikan pertama',
+-        desc: 'Kamu pulang dengan action plan konkret: mana yang wajib diperbaiki lebih dulu hari ini (misal: headline penawaran atau handling objection WhatsApp) untuk langsung dongkrak konversi.',
++        title: 'Tentukan perbaikan pertama',
++        desc: 'Kamu dapat saran apa yang dikerjakan duluan dan alasannya. Misalnya memperjelas penawaran di awal halaman, atau memperbaiki jawaban untuk pertanyaan yang sering muncul di WhatsApp.',
+         icon: (
+             <svg viewBox="0 0 24 24" className={PILLAR_ICON} strokeWidth={2}>
+                 <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+@@ -311,45 +311,45 @@
+ 
+ const FAQS: Faq[] = [
+     {
+-        q: 'Apa yang akan saya dapatkan dari audit ini?',
++        q: 'Apa yang saya dapat dari audit ini?',
+         a: {
+             d: 'Sesi privat 1-on-1 (30–45 menit) via Zoom langsung bersama Justin Wijaya. Kita lakukan screen-sharing membedah landing page, materi iklan/konten, dan alur chat WhatsApp Anda. Di akhir sesi, Anda mendapatkan rangkuman diagnosis titik kebocoran konversi serta daftar rekomendasi perbaikan konkret (Action Plan) yang bisa langsung diterapkan.',
+             m: 'Sesi privat 1-on-1 via Zoom bersama Justin Wijaya. Kita bedah landing page, iklan, dan alur chat Anda, lalu susun action plan perbaikan konkret.',
+         },
+     },
+     {
+-        q: 'Apakah audit ini memang gratis? Ada jebakan sales pitch?',
++        q: 'Apakah benar-benar gratis?',
+         a: {
+             d: '100% gratis tanpa biaya tersembunyi dan tanpa paksaan membeli apa pun. Misi kami adalah memberikan diagnosa bernilai nyata terlebih dahulu. Jika nanti Anda merasa ingin dibantu tim PBM untuk mengeksekusi perbaikannya, kita bisa diskusikan. Tapi jika ingin Anda jalankan sendiri bersama tim, itu sepenuhnya hak Anda.',
+             m: '100% gratis tanpa biaya tersembunyi dan tanpa sales pitch agresif. Anda bebas memilih untuk mengeksekusi sarannya sendiri atau bersama tim PBM.',
+         },
+     },
+     {
+-        q: 'Iklan saya sudah banyak diklik. Apakah auditnya masih berguna?',
++        q: 'Iklan saya sudah banyak diklik. Masih perlu audit?',
+         a: {
+             d: 'Justru kondisi ini yang paling mendesak untuk diaudit! Klik banyak tapi closing sedikit adalah tanda pasti adanya "kebocoran konversi" di halaman penawaran. Anda membuang budget iklan ke corong yang belum siap mengonversi. Sedikit perbaikan pada conversion rate halaman bisa melipatgandakan omzet tanpa menambah budget iklan.',
+             m: 'Sangat berguna! Klik banyak tapi yang daftar sedikit menandakan corong penawaran bocor. Perbaikan halaman bisa melipatgandakan omzet tanpa menaikkan biaya iklan.',
+         },
+     },
+     {
+-        q: 'Apakah audit ini cocok untuk bisnis saya?',
++        q: 'Apakah cocok untuk bisnis saya?',
+         a: {
+             d: 'Sesi ini ditujukan khusus untuk pemilik kelas online, coach, trainer, dan konsultan yang sudah pernah memiliki peserta/penjualan dan ingin menaikkan atau menstabilkan penjualannya. (Jika Anda baru di tahap ide dan belum punya program/audiens sama sekali, sesi ini belum cocok untuk Anda).',
+             m: 'Cocok untuk pemilik kelas, coach, trainer, dan konsultan yang sudah pernah menjual program dan ingin menstabilkan atau menaikkan penjualannya.',
+         },
+     },
+     {
+-        q: 'Data apa yang perlu saya siapkan?',
++        q: 'Data apa yang perlu disiapkan?',
+         a: {
+             d: 'Cukup siapkan link halaman penawaran aktif, contoh konten/iklan, alur chat pendaftaran, serta estimasi pengunjung dan pendaftar saat ini. Kontak pelanggan bisa disamarkan. Anda tidak perlu membagikan password atau akses akun apa pun.',
+             m: 'Siapkan link penawaran aktif, contoh konten/iklan, alur pendaftaran, dan perkiraan data konversi saat ini. Kontak pelanggan bisa disamarkan.',
+         },
+     },
+     {
+-        q: 'Bagaimana cara mendapat jadwal audit?',
++        q: 'Bagaimana cara dapat jadwal audit?',
+         a: {
+-            d: 'Cukup isi form singkat di halaman ini (30 detik). Tim kami akan meninjau pengajuan dalam 1x24 jam untuk memastikan kecocokan profil bisnis, lalu menghubungi Anda lewat WhatsApp untuk memilih slot jadwal Zoom yang tersedia.',
+-            m: 'Isi form di halaman ini (30 detik). Kami tinjau dalam 1x24 jam dan hubungi lewat WhatsApp untuk memilih jadwal Zoom yang tersedia.',
++            d: 'Isi formulir pengajuan di halaman ini. Jika programmu sudah pernah terjual dan punya audiens, setelah mengirim formulir kamu bisa memilih slot Zoom yang tersedia di Calendly. Setiap pengajuan kami tinjau agar sesi sesuai kebutuhan bisnismu.',
++            m: 'Isi formulir pengajuan. Jika programmu sudah pernah terjual dan punya audiens, setelah mengirimnya kamu bisa memilih jadwal Zoom di Calendly.',
+         },
+     },
+ ];
+@@ -813,14 +813,14 @@
+                                 </span>
+                             </div>
+                             <span className="hidden items-center rounded-full border border-[#e0e7ff] bg-white px-[14px] py-1.5 text-xs leading-4 font-bold tracking-[.08em] whitespace-nowrap text-[#4338ca] uppercase min-[1100px]:inline-flex">
+-                                Untuk pemilik kelas, coaching, training, dan konsultasi
++                                UNTUK PEMILIK KELAS, COACHING, TRAINING &amp; KONSULTASI
+                             </span>
+                         </div>
+                         <a
+                             href="#audit-form"
+                             className="flex cursor-pointer items-center justify-center rounded-lg bg-[#4f46e5] px-5 py-2 text-sm leading-5 font-semibold whitespace-nowrap text-white shadow-[0_4px_6px_-1px_rgba(79,70,229,.2),0_2px_4px_-2px_rgba(79,70,229,.2)] hover:bg-[#4338ca] hover:text-white"
+                         >
+-                            <span className="md:hidden">Ajukan Audit</span>
++                            <span className="md:hidden">Ajukan Audit Gratis</span>
+                             <span className="hidden md:inline">
+                                 Ajukan Audit Gratis
+                             </span>
+@@ -842,7 +842,7 @@
+                         <div className="flex flex-wrap items-center gap-8 md:gap-12">
+                             <div className="relative z-20 flex min-w-0 flex-[7_1_480px] flex-col gap-[18px] md:gap-6">
+                                 <span className="inline-flex max-w-full items-center self-start rounded-full border border-[#e0e7ff] bg-white px-[14px] py-1.5 text-[11px] leading-4 font-bold tracking-[.04em] text-[#4338ca] uppercase min-[1100px]:hidden">
+-                                    Untuk pemilik kelas, coaching, training, dan konsultasi
++                                    UNTUK PEMILIK KELAS, COACHING, TRAINING &amp; KONSULTASI
+                                 </span>
+                                 <span className="inline-flex max-w-full items-center gap-2 self-start rounded-full border border-[#a7f3d0] bg-[#d1fae5] px-4 py-2 text-[length:clamp(12px,3.2vw,14px)] leading-5 font-bold text-[#047857]">
+                                     <svg
+@@ -856,16 +856,13 @@
+                                     Khusus bisnis yang sudah punya pelanggan dan audiens
+                                 </span>
+                                 <h1 className="text-[length:clamp(34px,9vw,62px)] leading-[1.1] font-extrabold tracking-[-0.03em] text-balance text-[#0f172a]">
+-                                    Program sudah pernah laku, tapi{' '}
++                                    Program sudah laku, tapi{' '}
+                                     <span className="text-[#4f46e5]">
+                                         penjualannya masih naik turun?
+                                     </span>
+                                 </h1>
+                                 <p className="max-w-[620px] text-[17px] leading-[1.65] font-medium text-pretty text-[#475569]">
+-                                    Sudah bikin konten, menjalankan iklan, atau melayani banyak chat, tapi belum tahu kenapa yang mendaftar masih sedikit?
+-                                </p>
+-                                <p className="max-w-[620px] text-[17px] leading-[1.65] font-medium text-pretty text-[#475569]">
+-                                    Di audit gratis bersama Justin, kita lihat perjalanan calon pembeli dari pertama tertarik sampai memutuskan daftar. Kamu akan mendapat gambaran hambatannya dan tahu bagian mana yang perlu dibenahi lebih dulu.
++                                    Konten &amp; iklan jalan, tapi yang daftar sedikit? Audit gratis ini bantu temukan hambatannya.
+                                 </p>
+                             </div>
+ 
+@@ -920,7 +917,7 @@
+                                                             Nama Lengkap & Kontak WhatsApp
+                                                         </h3>
+                                                         <p className="text-xs text-[#64748b]">
+-                                                            Untuk konfirmasi dan pembahasan jadwal sesi audit.
++                                                            Untuk konfirmasi jadwal audit.
+                                                         </p>
+                                                     </div>
+                                                     <label className="flex flex-col gap-1.5">
+@@ -987,7 +984,7 @@
+                                                         <ArrowRight />
+                                                     </button>
+                                                     <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
+-                                                        <span className="text-amber-500">⚡</span> Cuma butuh 30 detik untuk mengisi
++                                                        <span className="text-amber-500">⚡</span> Cuma 30 detik
+                                                     </p>
+                                                 </div>
+                                             )}
+@@ -1102,7 +1099,7 @@
+                                                         </button>
+                                                     </div>
+                                                     <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
+-                                                        <span className="text-amber-500">⚡</span> Cuma butuh 30 detik untuk mengisi
++                                                        <span className="text-amber-500">⚡</span> Cuma 30 detik
+                                                     </p>
+                                                 </div>
+                                             )}
+@@ -1163,7 +1160,7 @@
+                                                         </button>
+                                                     </div>
+                                                     <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
+-                                                        <span className="text-amber-500">⚡</span> Cuma butuh 30 detik untuk mengisi
++                                                        <span className="text-amber-500">⚡</span> Cuma 30 detik
+                                                     </p>
+                                                 </div>
+                                             )}
+@@ -1265,7 +1262,7 @@
+                                                         </button>
+                                                     </div>
+                                                     <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
+-                                                        <span className="text-amber-500">⚡</span> Cuma butuh 30 detik untuk mengisi
++                                                        <span className="text-amber-500">⚡</span> Cuma 30 detik
+                                                     </p>
+                                                 </div>
+                                             )}
+@@ -1396,7 +1393,7 @@
+                                                         </button>
+                                                     </div>
+                                                     <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
+-                                                        <span className="text-amber-500">⚡</span> Cuma butuh 30 detik untuk mengisi
++                                                        <span className="text-amber-500">⚡</span> Cuma 30 detik
+                                                     </p>
+                                                 </div>
+                                             )}
+@@ -1444,7 +1441,7 @@
+                                                         </button>
+                                                     </div>
+                                                     <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
+-                                                        <span className="text-amber-500">⚡</span> Cuma butuh 30 detik untuk mengisi
++                                                        <span className="text-amber-500">⚡</span> Cuma 30 detik
+                                                     </p>
+                                                 </div>
+                                             )}
+@@ -1564,8 +1561,8 @@
+                 <div className={`${CONTAINER} max-w-[1152px]`}>
+                     <div className="mb-12">
+                         <span className={KICKER}>// Masalah</span>
+-                        <h2 className="text-[length:clamp(22px,5.6vw,44px)] leading-[1.2] font-extrabold tracking-[-0.025em] whitespace-nowrap text-[#0f172a]">
+-                            Apakah Anda Sedang Mengalami Ini?
++                        <h2 className="text-[length:clamp(22px,5.6vw,44px)] leading-[1.2] font-extrabold tracking-[-0.025em] text-balance text-[#0f172a]">
++                            Kamu sedang mengalami ini?
+                         </h2>
+                     </div>
+                     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] gap-5">
+@@ -1605,17 +1602,17 @@
+                                 Dampak Kalau Dibiarkan
+                             </div>
+                             <h3 className="text-[length:clamp(20px,2.6vw,26px)] leading-[1.3] font-extrabold text-[#0f172a]">
+-                                Yang bikin capek, kamu belum tahu harus memperbaiki apa dulu
++                                Yang bikin capek: kamu belum tahu harus perbaiki apa dulu
+                             </h3>
+                             <p className="text-base md:text-[17px] leading-[1.65] text-[#475569]">
+-                                Akhirnya, setiap penjualan turun kamu mencoba hal baru. Ganti iklan, ubah harga, atau tambah konten. Waktu dan biaya terus keluar, sementara penyebabnya belum jelas.
++                                Setiap penjualan turun, kamu coba hal baru: ganti iklan, ubah harga, tambah konten. Waktu dan biaya keluar, tapi penyebabnya belum ketemu.
+                             </p>
+                         </div>
+                     </div>
+ 
+                     <div className="mx-auto mt-14 flex max-w-[760px] flex-col items-center gap-7 text-center">
+                         <p className="text-[length:clamp(18px,2.4vw,22px)] leading-[1.6] font-semibold text-[#0f172a]">
+-                            Kita mulai dengan melihat apa yang sudah berjalan dan di mana calon pembeli mulai berhenti. Dari situ, kamu bisa menentukan perbaikan yang masuk akal untuk kondisi bisnismu sekarang.
++                            Kita mulai dari apa yang sudah berjalan dan di mana calon pembeli berhenti. Dari situ, kamu bisa pilih perbaikan yang paling masuk akal.
+                         </p>
+                         <a href="#audit-form" className={CTA_PRIMARY}>
+                             Ajukan Audit Gratis
+@@ -1634,11 +1631,11 @@
+                     <div className="mx-auto mb-14 max-w-[800px] text-center">
+                         <span className={KICKER}>// Manfaat</span>
+                         <h2 className="text-[length:clamp(24px,6.2vw,48px)] leading-[1.15] font-extrabold tracking-[-0.025em] text-balance text-[#0f172a]">
+-                            Audit Funnel 1-on-1 Gratis Untuk Bisnis Kelas &amp;
+-                            Coaching Anda
++                            Audit Funnel 1-on-1 Gratis untuk Bisnis Kelas &amp;
++                            Coaching
+                         </h2>
+                         <p className="mt-5 text-lg leading-[1.65] text-pretty text-[#475569]">
+-                            Di sesi Zoom, kita melihat cara kamu menawarkan program, konten atau iklan yang membawa calon pembeli, halaman pendaftaran, dan percakapan penjualan. Pembahasannya mengikuti materi dan data yang kamu punya.
++                            Lewat Zoom, kita bedah cara kamu menawarkan program, konten atau iklan, halaman pendaftaran, dan chat penjualan, berdasarkan data milikmu.
+                         </p>
+                     </div>
+                     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] gap-6">
+@@ -1686,7 +1683,7 @@
+                             // Profil
+                         </span>
+                         <h2 className="text-[length:clamp(20px,4.5vw,40px)] leading-[1.25] font-extrabold tracking-[-0.025em] text-white">
+-                            Kenalan dulu dengan orang yang akan mengaudit bisnismu
++                            Kenalan dulu dengan yang akan mengaudit bisnismu
+                         </h2>
+                     </div>
+                     <div className="flex flex-wrap items-start gap-8 md:gap-12">
+@@ -1740,13 +1737,13 @@
+                         </div>
+                         <div className="flex min-w-0 flex-[6_1_420px] flex-col gap-6">
+                             <p className="text-[19px] leading-[1.7] text-pretty text-[#e2e8f0]">
+-                                Hai, saya Justin. Saya telah membantu puluhan pemilik kelas, coaching, training melihat apa yang membuat orang tertarik, lalu apa yang membantu mereka memutuskan untuk membeli.
++                                Hai, saya Justin. Saya sudah membantu puluhan pemilik kelas, coaching, dan training memahami apa yang membuat orang tertarik dan akhirnya membeli.
+                             </p>
+                             <p className="text-lg leading-[1.7] text-[#cbd5e1]">
+-                                Programmu mungkin sudah bagus dan pernah membantu pelanggan. Saat penjualan belum konsisten, kita perlu melihat bagaimana manfaat itu dijelaskan dan bagaimana calon pembeli diarahkan untuk mendaftar.
++                                Programmu mungkin sudah bagus. Kalau penjualan belum konsisten, yang perlu dicek adalah cara manfaatnya dijelaskan dan cara calon pembeli diarahkan untuk daftar.
+                             </p>
+                             <blockquote className="rounded-[20px] border border-[rgba(251,191,36,.35)] bg-[rgba(251,191,36,.08)] px-7 py-6 text-[length:clamp(18px,2.2vw,21px)] leading-[1.6] font-bold text-pretty text-white">
+-                                "Di sesi audit nanti, saya ingin memahami apa yang sudah kamu coba, apa yang terjadi, dan apa yang ingin kamu capai. Kita gunakan materi serta data yang kamu punya untuk membantu scaleup program anda."
++                                "Di sesi audit, saya ingin tahu apa yang sudah kamu coba, hasilnya, dan targetmu. Dari materi dan datamu, kita cari cara untuk scale up programmu."
+                             </blockquote>
+                             <a
+                                 href="#audit-form"
+@@ -1771,10 +1768,10 @@
+                             Cerita klien PBM
+                         </div>
+                         <h2 className="text-[length:clamp(22px,5.4vw,40px)] leading-[1.25] font-extrabold tracking-[-0.025em] text-balance text-[#0f172a]">
+-                            Ini Cerita Tsania yang omzet kelasnya naik dari Rp20 juta ke Rp30 juta per bulan
++                            Omzet kelas Tsania naik dari Rp20 juta ke Rp30 juta per bulan
+                         </h2>
+                         <p className="mt-4 text-base md:text-lg leading-[1.65] text-[#475569]">
+-                            Tsania Latheefa menjual kelas affiliate dan media sosial. Dalam testimoninya, ia menceritakan omzet bulanan yang sebelumnya sekitar Rp20 juta menjadi sekitar Rp30 juta setelah halaman penjualannya dibenahi bersama PBM.
++                            Tsania Latheefa menjual kelas affiliate dan media sosial. Omzetnya naik dari sekitar Rp20 juta menjadi sekitar Rp30 juta per bulan setelah halaman penjualannya dibenahi bersama PBM.
+                         </p>
+                     </div>
+                     <div className="rounded-[28px] border border-[#e2e8f0] bg-white p-[clamp(20px,4vw,32px)] shadow-[0_20px_25px_-5px_rgba(0,0,0,.06)]">
+@@ -2020,8 +2017,7 @@
+                                         3,2% → 4,1%
+                                     </p>
+                                     <p className="text-base leading-[1.6] text-[#475569]">
+-                                        Conversion rate naik, purchase naik 29%
+-                                        dalam 30 hari.
++                                        Conversion rate naik, purchase +29% dalam 30 hari.
+                                     </p>
+                                 </div>
+                                 <div className="grid grid-cols-1 items-start gap-[14px] md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+@@ -2101,8 +2097,7 @@
+                                         ROAS 5x
+                                     </p>
+                                     <p className="text-base leading-[1.6] text-[#475569]">
+-                                        Dibanding periode yang sama tahun
+-                                        sebelumnya.
++                                        Dibanding periode yang sama tahun lalu.
+                                     </p>
+                                 </div>
+                                 <div className="w-full max-w-[480px] self-center">
+@@ -2143,12 +2138,7 @@
+                         <div className="pointer-events-none absolute top-1/2 left-1/2 h-[300px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[rgba(79,70,229,.25)] blur-[80px]" />
+                         <p className="relative max-w-[720px] text-[length:clamp(20px,3vw,28px)] leading-[1.4] font-extrabold text-balance text-white">
+                             <span className="text-[#fbbf24]">Bukti nyata.</span>{' '}
+-                            <R
+-                                c={{
+-                                    d: 'Traffic yang sama, dialirkan ke halaman yang berbeda, menghasilkan angka yang jauh berbeda.',
+-                                    m: 'Traffic sama, halaman berbeda, hasilnya jauh berbeda.',
+-                                }}
+-                            />
++                            Traffic sama, halaman berbeda, hasilnya jauh berbeda.
+                         </p>
+                         <a
+                             href="#audit-form"
+@@ -2170,7 +2160,7 @@
+                     <div className="mb-12 text-center">
+                         <span className={KICKER}>// FAQ</span>
+                         <h2 className="text-[length:clamp(24px,6vw,40px)] leading-[1.2] font-extrabold tracking-[-0.025em]">
+-                            Mungkin kamu masih ingin tahu ini
++                            Masih ada pertanyaan?
+                         </h2>
+                     </div>
+                     <div className="flex flex-col gap-[14px]">
+@@ -2253,10 +2243,10 @@
+                     className={`${CONTAINER} relative z-10 flex max-w-[896px] flex-col items-center gap-7`}
+                 >
+                     <h2 className="text-[length:clamp(26px,5.5vw,46px)] leading-[1.2] font-extrabold tracking-[-0.025em] text-balance text-white">
+-                        Sebelum tambah budget atau ganti strategi lagi, cari tahu apa yang perlu dibenahi.
++                        Sebelum tambah budget atau ganti strategi, cari tahu dulu apa yang perlu dibenahi.
+                     </h2>
+                     <p className="max-w-[700px] text-lg leading-[1.65] text-[#cbd5e1]">
+-                        Kalau programmu sudah pernah terjual dan audiensnya sudah ada, mari lihat apa yang membuat calon pembeli belum lanjut daftar. Ajukan audit gratis untuk membahasnya bersama saya.
++                        Program sudah pernah terjual dan audiens sudah ada? Mari cari tahu kenapa calon pembeli belum daftar. Ajukan audit gratis bersama saya.
+                     </p>
+                     <a
+                         href="#audit-form"
+@@ -2266,7 +2256,7 @@
+                         <ArrowRight />
+                     </a>
+                     <p className="text-sm font-medium text-[#94a3b8]">
+-                        Kami meninjau pengajuan terlebih dahulu agar sesi ini sesuai dengan kebutuhan bisnismu.
++                        Setiap pengajuan kami tinjau dulu agar sesi ini sesuai kebutuhan bisnismu.
+                     </p>
+                 </div>
+             </section>
+@@ -2293,7 +2283,7 @@
+                             Performance Business Marketing
+                         </p>
+                         <p>
+-                            Spesialis High-Converting Landing Page &amp;
++                            Spesialis Landing Page &amp;
+                             Funnel CRO untuk Pemilik Kelas Online, Coach,
+                             Trainer &amp; Konsultan.
+                         </p>
+@@ -2303,9 +2293,8 @@
+                             <strong className="text-[#334155]">
+                                 Disclaimer:
+                             </strong>{' '}
+-                            Hasil setiap bisnis dapat bervariasi tergantung
+-                            kecocokan produk dengan pasar, penawaran, dan skala
+-                            budget iklan yang digunakan.
++                            Hasil tiap bisnis bisa berbeda, tergantung kecocokan
++                            produk dengan pasar, penawaran, dan skala budget iklan.
+                         </p>
+                         <p className="font-medium text-[#475569]">
+                             © 2026 PBM Agency. All rights reserved.

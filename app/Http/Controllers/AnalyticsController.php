@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\UserAnalytic;
 use App\Services\AnalyticsMetricsService;
 use App\Services\MetaConversionService;
+use App\Services\OpenAiConversionService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -38,7 +39,11 @@ class AnalyticsController extends Controller
         ]);
     }
 
-    public function track(Request $request, MetaConversionService $metaService): JsonResponse
+    public function track(
+        Request $request,
+        MetaConversionService $metaService,
+        OpenAiConversionService $openAiService,
+    ): JsonResponse
     {
         $validated = $request->validate([
             'event_type' => ['required', Rule::in([
@@ -134,6 +139,7 @@ class AnalyticsController extends Controller
 
         if ($validated['event_type'] === 'visit') {
             $metaService->sendPageView($request, $capiEventId);
+            $openAiService->sendEvent('page_viewed', $capiEventId, $request->fullUrl());
         }
 
         if ($validated['event_type'] === 'add_to_cart') {
@@ -148,6 +154,14 @@ class AnalyticsController extends Controller
             ($eventData['type'] ?? '') === 'wa_inquiry'
         ) {
             $metaService->sendContact($request, $capiEventId);
+        }
+
+        // Audit form submission conversion event
+        if (
+            $validated['event_type'] === 'conversion' &&
+            ($eventData['type'] ?? '') === 'audit_request'
+        ) {
+            $openAiService->sendEvent('order_created', $capiEventId, $request->fullUrl(), ['type' => 'contents']);
         }
 
         return response()->json(['success' => true]);

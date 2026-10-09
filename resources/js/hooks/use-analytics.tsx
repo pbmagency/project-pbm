@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react';
+import { trackOpenAiPageVisit } from '@/lib/oaiq';
 
 const LANDING_SOURCE_KEY = 'landing_source';
 const REFERRAL_SOURCE_KEY = 'referral_source';
@@ -156,6 +157,7 @@ export function useAnalytics() {
         }
 
         pendingVisitKeys.add(visitKey);
+        trackOpenAiPageVisit();
 
         const eventId =
             ((window as unknown as Record<string, unknown>)

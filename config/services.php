@@ -48,4 +48,9 @@ return [
         'sandbox' => env('DUITKU_SANDBOX', true),
     ],
 
+    'openai' => [
+        'pixel_id' => env('OPENAI_PIXEL_ID', 'NsMWNPQbe457nNFiQrq6NX'),
+        'api_key' => env('OPENAI_CAPI_KEY', ''),
+    ],
+
 ];
