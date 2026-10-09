@@ -192,28 +192,28 @@ const KICKER =
 
 const PAINS: PainItem[] = [
     {
-        title: 'Orang tertarik, tapi belum banyak yang daftar',
-        desc: 'Kontenmu dilihat, link penawaran diklik, dan ada yang tanya lewat WhatsApp. Tapi ketika cek pendaftaran, jumlahnya masih jauh dari yang kamu harapkan.',
+        title: 'Traffic ramai & link diklik, tapi yang daftar sepi',
+        desc: 'Konten dilihat, budget iklan jalan, dan link penawaran diklik. Tapi begitu masuk ke pendaftaran, jumlah peserta yang checkout sangat jauh dari harapan.',
     },
     {
-        title: 'Chat panjang, ujungnya cuma tanya harga',
-        desc: 'Kamu sudah menjelaskan program berulang kali. Begitu masuk pembahasan harga atau jadwal, percakapannya berhenti. Kamu ingin tahu apa yang sebenarnya membuat mereka ragu.',
+        title: 'Chat panjang lebar, ujungnya cuma tanya harga lalu ghosting',
+        desc: 'Kamu sudah menjelaskan program berulang kali. Begitu masuk pembahasan harga atau link transfer, percakapan mendadak berhenti tanpa kabar.',
     },
     {
-        title: 'Setiap buka pendaftaran, hasilnya beda',
-        desc: 'Pernah ramai pembeli, lalu penjualan berikutnya turun. Kamu belum tahu apa yang berubah dan apa yang perlu dipertahankan supaya hasilnya lebih konsisten.',
+        title: 'Penjualan seperti roller coaster (hasil tiap batch beda)',
+        desc: 'Bulan lalu ramai, batch berikutnya sepi drastis. Kamu belum tahu variabel apa yang berubah dan apa yang harus dipertahankan agar hasilnya stabil.',
     },
     {
-        title: 'Waktu buat mengajar ikut habis untuk marketing',
-        desc: 'Kamu ingin fokus mendampingi peserta, tapi masih sibuk mencari ide konten, mengecek iklan, dan mengganti halaman penawaran tanpa arah yang jelas.',
+        title: 'Waktu mengajar habis terkuras untuk trial-error marketing',
+        desc: 'Ingin fokus mendampingi peserta dan menyusun materi terbaik, tapi energimu habis untuk menebak ide konten, otak-atik iklan, dan ganti halaman tanpa arah.',
     },
 ];
 
 const PILLAR_ICON = `size-6 ${svgBase}`;
 const PILLARS: Pillar[] = [
     {
-        title: 'Cari tahu di mana orang mulai ragu',
-        desc: 'Apakah mereka belum paham siapa yang cocok ikut programmu? Belum yakin dengan hasilnya? Atau bingung harus melakukan apa setelah membaca penawaran? Kita lihat bagian yang mungkin menahan mereka untuk lanjut.',
+        title: 'Diagnosis presisi titik kebocoran (conversion leak)',
+        desc: 'Apakah audiens belum paham program ini untuk siapa? Belum percaya buktinya? Atau bingung langkah checkout-nya? Kita lacak di detik mana calon peserta mulai ragu dan pergi.',
         icon: (
             <svg viewBox="0 0 24 24" className={PILLAR_ICON} strokeWidth={2}>
                 <circle cx="11" cy="11" r="8" />
@@ -222,8 +222,8 @@ const PILLARS: Pillar[] = [
         ),
     },
     {
-        title: 'Pahami apa yang perlu dibuat lebih jelas',
-        desc: 'Kita bahas hal yang perlu dilihat calon pembeli sebelum memutuskan, seperti isi program, alasan memilih kamu, bukti hasil peserta, dan cara mendaftar.',
+        title: 'Rekonstruksi pesan & value proposition',
+        desc: 'Kita susun ulang cara programmu dijelaskan—mulai dari diferensiasi penawaran, bukti hasil peserta, hingga penanganan keraguan—agar calon pembeli langsung yakin mendaftar.',
         icon: (
             <svg viewBox="0 0 24 24" className={PILLAR_ICON} strokeWidth={2}>
                 <path d="M2 12h20" />
@@ -233,8 +233,8 @@ const PILLARS: Pillar[] = [
         ),
     },
     {
-        title: 'Tentukan perbaikan pertama',
-        desc: 'Kamu mendapat saran tentang bagian yang sebaiknya dikerjakan lebih dulu, beserta alasannya. Misalnya memperjelas penawaran di awal halaman atau memperbaiki jawaban untuk pertanyaan yang sering muncul di WhatsApp.',
+        title: 'Checklist prioritas perbaikan pertama',
+        desc: 'Kamu pulang dengan action plan konkret: mana yang wajib diperbaiki lebih dulu hari ini (misal: headline penawaran atau handling objection WhatsApp) untuk langsung dongkrak konversi.',
         icon: (
             <svg viewBox="0 0 24 24" className={PILLAR_ICON} strokeWidth={2}>
                 <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
@@ -313,43 +313,43 @@ const FAQS: Faq[] = [
     {
         q: 'Apa yang akan saya dapatkan dari audit ini?',
         a: {
-            d: 'Kita membahas kondisi marketing dan penjualan programmu, melihat hambatan yang perlu diperiksa, lalu menentukan perbaikan yang sebaiknya didahulukan. Saran mengikuti materi dan data yang tersedia. Kalau datanya belum cukup, kita bahas apa yang perlu dilihat sebelum mengambil keputusan.',
-            m: 'Kita bahas kondisi marketing & penjualan, cari hambatan, lalu tentukan perbaikan prioritas sesuai data yang ada.',
+            d: 'Sesi privat 1-on-1 (30–45 menit) via Zoom langsung bersama Justin Wijaya. Kita lakukan screen-sharing membedah landing page, materi iklan/konten, dan alur chat WhatsApp Anda. Di akhir sesi, Anda mendapatkan rangkuman diagnosis titik kebocoran konversi serta daftar rekomendasi perbaikan konkret (Action Plan) yang bisa langsung diterapkan.',
+            m: 'Sesi privat 1-on-1 via Zoom bersama Justin Wijaya. Kita bedah landing page, iklan, dan alur chat Anda, lalu susun action plan perbaikan konkret.',
         },
     },
     {
-        q: 'Apakah audit ini memang gratis?',
+        q: 'Apakah audit ini memang gratis? Ada jebakan sales pitch?',
         a: {
-            d: 'Ya, sesi audit ini gratis. Kalau kebutuhanmu cocok dan kamu ingin dibantu menjalankan perbaikannya, kita bisa membahas kerja sama berbayar dengan PBM. Kamu bisa menilai penawarannya dulu sebelum memutuskan.',
-            m: 'Ya, sesi audit ini gratis. Jika ingin dibantu menjalankan perbaikannya, kita bisa bahas kerja sama berbayar dengan PBM.',
+            d: '100% gratis tanpa biaya tersembunyi dan tanpa paksaan membeli apa pun. Misi kami adalah memberikan diagnosa bernilai nyata terlebih dahulu. Jika nanti Anda merasa ingin dibantu tim PBM untuk mengeksekusi perbaikannya, kita bisa diskusikan. Tapi jika ingin Anda jalankan sendiri bersama tim, itu sepenuhnya hak Anda.',
+            m: '100% gratis tanpa biaya tersembunyi dan tanpa sales pitch agresif. Anda bebas memilih untuk mengeksekusi sarannya sendiri atau bersama tim PBM.',
         },
     },
     {
         q: 'Iklan saya sudah banyak diklik. Apakah auditnya masih berguna?',
         a: {
-            d: 'Bisa, terutama kalau yang mendaftar belum sesuai harapan. Banyak klik belum menjelaskan apakah orang memahami programmu atau yakin untuk membeli. Kita lihat apa yang terjadi setelah mereka tertarik, termasuk halaman penawaran dan percakapan sebelum daftar.',
-            m: 'Bisa. Banyak klik belum tentu bikin orang yakin membeli. Kita lihat apa yang terjadi di halaman penawaran & chat pendaftaran.',
+            d: 'Justru kondisi ini yang paling mendesak untuk diaudit! Klik banyak tapi closing sedikit adalah tanda pasti adanya "kebocoran konversi" di halaman penawaran. Anda membuang budget iklan ke corong yang belum siap mengonversi. Sedikit perbaikan pada conversion rate halaman bisa melipatgandakan omzet tanpa menambah budget iklan.',
+            m: 'Sangat berguna! Klik banyak tapi yang daftar sedikit menandakan corong penawaran bocor. Perbaikan halaman bisa melipatgandakan omzet tanpa menaikkan biaya iklan.',
         },
     },
     {
         q: 'Apakah audit ini cocok untuk bisnis saya?',
         a: {
-            d: 'Sesi ini ditujukan untuk pemilik kelas, coaching, training, atau konsultasi yang programnya sudah tersedia, pernah terjual, punya bukti hasil pelanggan, dan sudah memiliki audiens atau pengunjung. Kamu juga terbuka untuk bekerja sama dengan tim yang membantu menjalankan marketing. Kalau masih menyiapkan produk pertama atau belum pernah menjual, fokus berikutnya adalah menguji penawaran dan mendapatkan pelanggan awal.',
-            m: 'Cocok jika programmu sudah pernah terjual, punya bukti hasil pelanggan, punya audiens, dan terbuka bekerja sama untuk marketing.',
+            d: 'Sesi ini ditujukan khusus untuk pemilik kelas online, coach, trainer, dan konsultan yang sudah pernah memiliki peserta/penjualan dan ingin menaikkan atau menstabilkan penjualannya. (Jika Anda baru di tahap ide dan belum punya program/audiens sama sekali, sesi ini belum cocok untuk Anda).',
+            m: 'Cocok untuk pemilik kelas, coach, trainer, dan konsultan yang sudah pernah menjual program dan ingin menstabilkan atau menaikkan penjualannya.',
         },
     },
     {
         q: 'Data apa yang perlu saya siapkan?',
         a: {
-            d: 'Siapkan link penawaran, contoh konten atau iklan, gambaran penjualan, dan pertanyaan yang sering muncul dari calon pembeli. Kamu bisa menyamarkan nama serta kontak pelanggan. Tidak perlu mengirim kata sandi atau akses akun lewat form.',
-            m: 'Siapkan link penawaran, contoh konten/iklan, gambaran penjualan, dan pertanyaan calon pembeli. Kontak bisa disamarkan.',
+            d: 'Cukup siapkan link halaman penawaran aktif, contoh konten/iklan, alur chat pendaftaran, serta estimasi pengunjung dan pendaftar saat ini. Kontak pelanggan bisa disamarkan. Anda tidak perlu membagikan password atau akses akun apa pun.',
+            m: 'Siapkan link penawaran aktif, contoh konten/iklan, alur pendaftaran, dan perkiraan data konversi saat ini. Kontak pelanggan bisa disamarkan.',
         },
     },
     {
         q: 'Bagaimana cara mendapat jadwal audit?',
         a: {
-            d: 'Isi form pengajuan terlebih dahulu. Kami meninjau kecocokan bisnis dan kebutuhanmu, lalu menghubungi kamu lewat WhatsApp untuk langkah penjadwalan jika sesuai. Sesi dilakukan secara personal agar pembahasannya fokus pada bisnismu.',
-            m: 'Isi form pengajuan terlebih dahulu. Kami meninjau kecocokan bisnis dan menghubungi lewat WhatsApp untuk jadwal audit.',
+            d: 'Cukup isi form singkat di halaman ini (30 detik). Tim kami akan meninjau pengajuan dalam 1x24 jam untuk memastikan kecocokan profil bisnis, lalu menghubungi Anda lewat WhatsApp untuk memilih slot jadwal Zoom yang tersedia.',
+            m: 'Isi form di halaman ini (30 detik). Kami tinjau dalam 1x24 jam dan hubungi lewat WhatsApp untuk memilih jadwal Zoom yang tersedia.',
         },
     },
 ];
