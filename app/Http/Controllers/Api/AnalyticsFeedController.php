@@ -20,13 +20,6 @@ class AnalyticsFeedController extends Controller
 
     public function feed(Request $request): JsonResponse
     {
-        $secret = config('ops_board.secret');
-        $providedSecret = $request->header('X-Ops-Secret');
-
-        if (! is_string($secret) || $secret === '' || ! is_string($providedSecret) || ! hash_equals($secret, $providedSecret)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
         $days = (int) ($request->validate(['range' => 'nullable|integer|in:7,30,90,365'])['range'] ?? 30);
         $startDate = Carbon::now()->subDays($days)->startOfDay();
         $endDate = Carbon::now()->endOfDay();

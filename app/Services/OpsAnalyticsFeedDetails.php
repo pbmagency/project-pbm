@@ -52,31 +52,10 @@ class OpsAnalyticsFeedDetails
             ->limit(8)
             ->get();
 
-        $recentEvents = UserAnalytic::query()
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->latest('created_at')
-            ->limit(20)
-            ->get(['id', 'session_id', 'event_type', 'referral_source', 'utm_source', 'utm_campaign', 'event_data', 'created_at'])
-            ->map(fn ($event) => [
-                'id' => $event->id,
-                'session_id' => $event->session_id,
-                'event_type' => $event->event_type,
-                'referral_source' => $event->referral_source,
-                'utm_source' => $event->utm_source,
-                'utm_campaign' => $event->utm_campaign,
-                'event_data' => [
-                    'landing_source' => data_get($event->event_data, 'landing_source'),
-                    'page' => data_get($event->event_data, 'page'),
-                ],
-                'occurred_at' => $event->created_at?->toIso8601String(),
-            ])
-            ->values();
-
         return [
             'chart_data' => array_values($days),
             'referral_data' => $referrals,
             'utm_campaign_data' => $utmCampaigns,
-            'recent_events' => $recentEvents,
         ];
     }
 }
