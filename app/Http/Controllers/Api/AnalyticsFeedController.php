@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\AnalyticsController;
+use App\Services\OpsAnalyticsFeedDetails;
 use App\Services\AbTestingService;
 use App\Services\AnalyticsMetricsService;
 use Carbon\Carbon;
@@ -18,19 +20,26 @@ class AnalyticsFeedController extends Controller
 
     public function feed(Request $request): JsonResponse
     {
-        $secret = config('services.ops_board.secret', env('OPS_BOARD_SECRET', 'pbm_ops_secret_2026'));
-        $providedSecret = $request->header('X-Ops-Secret', $request->query('token'));
+        $secret = config('ops_board.secret');
+        $providedSecret = $request->header('X-Ops-Secret');
 
-        if ($secret && $providedSecret !== $secret) {
+        if (! is_string($secret) || $secret === '' || ! is_string($providedSecret) || ! hash_equals($secret, $providedSecret)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $days = (int) $request->get('range', 30);
+        $days = (int) ($request->validate(['range' => 'nullable|integer|in:7,30,90,365'])['range'] ?? 30);
         $startDate = Carbon::now()->subDays($days)->startOfDay();
         $endDate = Carbon::now()->endOfDay();
 
         $stats = $this->metrics->dashboardStats($startDate, $endDate);
         $rawMatrix = $this->abTestingService->getPerformanceMatrix($startDate, $endDate);
+        $analytics = app(AnalyticsController::class);
+        $details = app(OpsAnalyticsFeedDetails::class)->build(
+            $analytics->getChartData($startDate, $endDate),
+            $analytics->getReferralData($startDate, $endDate),
+            $startDate,
+            $endDate
+        );
 
         $matrix = [];
         $maxTotalLeadsCr = -1;
@@ -81,6 +90,7 @@ class AnalyticsFeedController extends Controller
 
         return response()->json([
             'success' => true,
+            'schema_version' => 2,
             'project_key' => env('PBM_OPS_PROJECT_KEY', 'project-pbm'),
             'project_name' => config('app.name', 'Project PBM'),
             'date_range_days' => $days,
@@ -88,6 +98,7 @@ class AnalyticsFeedController extends Controller
             'end_date' => $endDate->toDateString(),
             'stats' => $stats,
             'performance_matrix' => $matrix,
+            ...$details,
             'generated_at' => now()->toIso8601String(),
         ]);
     }

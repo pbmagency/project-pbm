@@ -197,7 +197,7 @@ class AnalyticsController extends Controller
         ]);
     }
 
-    private function getChartData(Carbon $startDate, Carbon $endDate)
+    public function getChartData(Carbon $startDate, Carbon $endDate)
     {
         $eventData = UserAnalytic::select(
             DB::raw('DATE(created_at) as date'),
@@ -266,7 +266,7 @@ class AnalyticsController extends Controller
         return $eventData;
     }
 
-    private function getReferralData(Carbon $startDate, Carbon $endDate)
+    public function getReferralData(Carbon $startDate, Carbon $endDate)
     {
         return UserAnalytic::select('referral_source', DB::raw('COUNT(DISTINCT session_id) as count'))
             ->where('event_type', 'visit')
