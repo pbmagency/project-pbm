@@ -62,3 +62,6 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 });
 
 require __DIR__ . '/settings.php';
+
+// Public API Feed for Centralized Ops Board
+Route::get('/api/analytics/feed', [\App\Http\Controllers\Api\AnalyticsFeedController::class, 'feed'])->name('api.analytics.feed');

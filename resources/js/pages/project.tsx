@@ -428,7 +428,7 @@ function CaseStudyVideo() {
     );
 }
 
-export default function Project({ clientCount = '100+' }: ProjectProps) {
+export default function Project({ clientCount = '10+' }: ProjectProps) {
     const { track, trackVisit, trackCTA, trackConversion } = useAnalytics();
     useScrollTracking();
     useDwellTime();
@@ -855,17 +855,6 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                             <div className="relative z-20 flex min-w-0 flex-[7_1_480px] flex-col gap-[18px] md:gap-6">
                                 <span className="inline-flex max-w-full items-center self-start rounded-full border border-[#e0e7ff] bg-white px-[14px] py-1.5 text-[11px] leading-4 font-bold tracking-[.04em] text-[#4338ca] uppercase min-[1100px]:hidden">
                                     UNTUK PEMILIK KELAS, COACHING, TRAINING &amp; KONSULTASI
-                                </span>
-                                <span className="inline-flex max-w-full items-center gap-2 self-start rounded-full border border-[#a7f3d0] bg-[#d1fae5] px-4 py-2 text-[length:clamp(12px,3.2vw,14px)] leading-5 font-bold text-[#047857]">
-                                    <svg
-                                        viewBox="0 0 24 24"
-                                        className={`size-4 shrink-0 ${svgBase}`}
-                                        strokeWidth={2.5}
-                                    >
-                                        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-                                        <polyline points="16 7 22 7 22 13" />
-                                    </svg>
-                                    Khusus bisnis yang sudah punya pelanggan dan audiens
                                 </span>
                                 <h1 className="text-[length:clamp(34px,9vw,62px)] leading-[1.1] font-extrabold tracking-[-0.03em] text-balance text-[#0f172a]">
                                     Program sudah laku, tapi{' '}
@@ -1556,11 +1545,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                                             <strong className="text-[#0f172a]">
                                                 {clientCount}
                                             </strong>{' '}
-                                            pemilik kelas online, coach &amp;
-                                            trainer, termasuk{' '}
-                                            <strong className="text-[#0f172a]">
-                                                Tsania Latheefa
-                                            </strong>
+                                            bisnis kelas online, coach &amp; trainer
                                         </p>
                                     </div>
                                 </div>
@@ -2240,7 +2225,7 @@ export default function Project({ clientCount = '100+' }: ProjectProps) {
                             <strong className="text-[#0f172a]">
                                 {clientCount}
                             </strong>{' '}
-                            pemilik kelas online, coach &amp; trainer
+                            bisnis kelas online, coach &amp; trainer
                         </p>
                     </div>
                 </div>
