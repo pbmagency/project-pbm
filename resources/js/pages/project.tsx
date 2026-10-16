@@ -587,71 +587,22 @@ export default function Project({ clientCount = '10+' }: ProjectProps) {
         }
 
         if (currentStep === 2) {
-            if (!programType) {
-                setError('Silakan pilih salah satu jenis program Anda.');
-                return false;
-            }
-            if (programType === 'Lainnya' && !otherProgram.trim()) {
-                setError('Mohon sebutkan jenis program Anda.');
-                return false;
-            }
-            if (!programNameTarget.trim()) {
-                setError('Mohon jelaskan nama program dan siapa yang biasanya membeli.');
-                return false;
-            }
             if (!websiteLink.trim()) {
-                setError('Mohon isi link website atau akun Instagram bisnis Anda.');
+                setError('Mohon isi link website bisnis Anda.');
                 return false;
             }
             return true;
         }
 
-        if (currentStep === 3) {
-            if (!totalBuyers) {
-                setError('Silakan pilih total alumni / pembeli program Anda saat ini.');
-                return false;
-            }
-            return true;
-        }
 
-        if (currentStep === 4) {
-            if (audienceSources.length === 0) {
-                setError('Silakan pilih minimal satu sumber calon pembeli.');
-                return false;
-            }
-            if (!primaryProblem) {
-                setError('Silakan pilih apa yang paling ingin Anda benahi sekarang.');
-                return false;
-            }
-            if (primaryProblem === 'Masalah lainnya' && !otherProblem.trim()) {
-                setError('Mohon jelaskan masalah yang ingin Anda benahi.');
-                return false;
-            }
-            return true;
-        }
 
-        if (currentStep === 5) {
-            if (!helpStage) {
-                setError('Silakan pilih tahap bantuan yang Anda inginkan.');
-                return false;
-            }
-            if (!agencyBudgetReady) {
-                setError('Silakan tentukan kesiapan mempertimbangkan biaya kerja sama.');
-                return false;
-            }
-            if (!timeline) {
-                setError('Silakan tentukan kapan Anda ingin mulai membenahi marketing.');
-                return false;
-            }
-            return true;
-        }
 
         return true;
     };
 
     const nextStep = (): void => {
         if (validateStep(step)) {
-            setStep((prev) => Math.min(prev + 1, 6));
+            setStep((prev) => Math.min(prev + 1, 3));
         }
     };
 
@@ -706,17 +657,12 @@ export default function Project({ clientCount = '10+' }: ProjectProps) {
             return;
         }
 
-        if (!validateStep(5)) {
+        if (!validateStep(1) || !validateStep(2)) {
             return;
         }
 
-        // Rule Evaluasi Kualifikasi:
-        // Audit difokuskan pada program yang sudah pernah terjual dan memiliki audiens.
-        const hasNoBuyers = totalBuyers === 'Belum ada';
-        const hasNoAudience =
-            audienceSources.length === 1 &&
-            audienceSources[0] === 'Belum ada sumber calon pembeli';
-        const qualified = !hasNoBuyers && !hasNoAudience;
+        // Semua pengajuan audit yang valid langsung diarahkan ke jadwal Calendly
+        const qualified = true;
 
         const calendlyUrl = `${CALENDLY_URL}?name=${encodeURIComponent(name.trim())}&email=${encodeURIComponent(email.trim())}&a1=${encodeURIComponent(phone.trim())}&a2=${encodeURIComponent(websiteLink.trim())}`;
 
@@ -992,84 +938,20 @@ export default function Project({ clientCount = '10+' }: ProjectProps) {
                                                 </div>
                                             )}
 
-                                            {/* STEP 2: Program dan Bisnis */}
+                                            {/* STEP 2: Website Bisnis */}
                                             {step === 2 && (
                                                 <div className="flex flex-col gap-4">
                                                     <div className="flex flex-col gap-1">
                                                         <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            Ceritakan program yang kamu jual
+                                                            Link Website Bisnis
                                                         </h3>
                                                         <p className="text-xs text-[#64748b]">
-                                                            Informasi program untuk memahami konteks penawaran Anda.
+                                                            Masukkan alamat website landing page atau penjualan program Anda.
                                                         </p>
                                                     </div>
-                                                    <div className="flex flex-col gap-2">
-                                                        <span className="text-xs font-bold text-[#334155]">
-                                                            Apa jenis programmu? <span className="text-[#e11d48]">*</span>
-                                                        </span>
-                                                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                                                            {PROGRAM_OPTIONS.map((opt) => (
-                                                                <label
-                                                                    key={opt.value}
-                                                                    className={`flex cursor-pointer items-center gap-2.5 rounded-xl border p-3 transition-all ${
-                                                                        programType === opt.value
-                                                                            ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
-                                                                            : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
-                                                                    }`}
-                                                                >
-                                                                    <input
-                                                                        type="radio"
-                                                                        name="program_type"
-                                                                        value={opt.value}
-                                                                        checked={programType === opt.value}
-                                                                        onChange={() => {
-                                                                            setProgramType(opt.value);
-                                                                            if (error) setError('');
-                                                                        }}
-                                                                        className="size-4 text-[#4f46e5] accent-[#4f46e5]"
-                                                                    />
-                                                                    <span className="text-xs font-semibold text-[#1e293b]">
-                                                                        {opt.label}
-                                                                    </span>
-                                                                </label>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                    {programType === 'Lainnya' && (
-                                                        <label className="flex flex-col gap-1.5">
-                                                            <span className="text-xs font-bold text-[#334155]">
-                                                                Sebutkan jenis program Anda <span className="text-[#e11d48]">*</span>
-                                                            </span>
-                                                            <input
-                                                                type="text"
-                                                                value={otherProgram}
-                                                                onChange={(e) => {
-                                                                    setOtherProgram(e.target.value);
-                                                                    if (error) setError('');
-                                                                }}
-                                                                placeholder="Contoh: Membership, Agency Jasa, Workshop"
-                                                                className={inputBase}
-                                                            />
-                                                        </label>
-                                                    )}
                                                     <label className="flex flex-col gap-1.5">
                                                         <span className="text-xs font-bold text-[#334155]">
-                                                            Apa nama programmu dan siapa yang biasanya membeli? <span className="text-[#e11d48]">*</span>
-                                                        </span>
-                                                        <textarea
-                                                            rows={2}
-                                                            value={programNameTarget}
-                                                            onChange={(e) => {
-                                                                setProgramNameTarget(e.target.value);
-                                                                if (error) setError('');
-                                                            }}
-                                                            placeholder="Contoh: Kelas public speaking untuk pemilik bisnis yang ingin lebih percaya diri saat presentasi."
-                                                            className="w-full rounded-xl border-[1.5px] bg-[#f8fafc] p-3 text-sm text-[#0f172a] outline-hidden placeholder:text-[#94a3b8] transition-all focus:border-[#4f46e5] focus:bg-white focus:shadow-[0_0_0_4px_#e0e7ff]"
-                                                        />
-                                                    </label>
-                                                    <label className="flex flex-col gap-1.5">
-                                                        <span className="text-xs font-bold text-[#334155]">
-                                                            Link website / akun instagram bisnis <span className="text-[#e11d48]">*</span>
+                                                            Link website bisnis <span className="text-[#e11d48]">*</span>
                                                         </span>
                                                         <input
                                                             id="audit-link"
@@ -1080,304 +962,10 @@ export default function Project({ clientCount = '10+' }: ProjectProps) {
                                                                 setWebsiteLink(e.target.value);
                                                                 if (error) setError('');
                                                             }}
-                                                            placeholder="misal: instagram.com/brandanda atau brandanda.com"
+                                                            placeholder="misal: brandanda.com atau link website program"
                                                             className={inputBase}
                                                         />
                                                     </label>
-                                                    <div className="mt-2 flex items-center gap-3">
-                                                        <button
-                                                            type="button"
-                                                            onClick={prevStep}
-                                                            className="flex h-[52px] flex-1 cursor-pointer items-center justify-center rounded-xl border border-[#cbd5e1] bg-white text-sm font-bold text-[#475569] transition-all hover:bg-[#f8fafc]"
-                                                        >
-                                                            Kembali
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={nextStep}
-                                                            className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
-                                                        >
-                                                            Konfirmasi Data Program
-                                                            <ArrowRight />
-                                                        </button>
-                                                    </div>
-                                                    <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
-                                                        <span className="text-amber-500">⚡</span> Cuma 30 detik
-                                                    </p>
-                                                </div>
-                                            )}
-
-                                            {/* STEP 3: Pengalaman Penjualan */}
-                                            {step === 3 && (
-                                                <div className="flex flex-col gap-4">
-                                                    <div className="flex flex-col gap-1">
-                                                        <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            Programmu sudah sampai tahap mana?
-                                                        </h3>
-                                                        <p className="text-xs text-[#64748b]">
-                                                            Total alumni / pembeli saat ini
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex flex-col gap-2">
-                                                        {ALUMNI_OPTIONS.map((opt) => (
-                                                            <label
-                                                                key={opt.value}
-                                                                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3.5 transition-all ${
-                                                                    totalBuyers === opt.value
-                                                                        ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
-                                                                        : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
-                                                                }`}
-                                                            >
-                                                                <input
-                                                                    type="radio"
-                                                                    name="total_buyers"
-                                                                    value={opt.value}
-                                                                    checked={totalBuyers === opt.value}
-                                                                    onChange={() => {
-                                                                        setTotalBuyers(opt.value);
-                                                                        if (error) setError('');
-                                                                    }}
-                                                                    className="size-4 text-[#4f46e5] accent-[#4f46e5]"
-                                                                />
-                                                                <span className="text-sm font-semibold text-[#1e293b]">
-                                                                    {opt.label}
-                                                                </span>
-                                                            </label>
-                                                        ))}
-                                                    </div>
-                                                    <div className="mt-2 flex items-center gap-3">
-                                                        <button
-                                                            type="button"
-                                                            onClick={prevStep}
-                                                            className="flex h-[52px] flex-1 cursor-pointer items-center justify-center rounded-xl border border-[#cbd5e1] bg-white text-sm font-bold text-[#475569] transition-all hover:bg-[#f8fafc]"
-                                                        >
-                                                            Kembali
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={nextStep}
-                                                            className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
-                                                        >
-                                                            Konfirmasi Tahap Program
-                                                            <ArrowRight />
-                                                        </button>
-                                                    </div>
-                                                    <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
-                                                        <span className="text-amber-500">⚡</span> Cuma 30 detik
-                                                    </p>
-                                                </div>
-                                            )}
-
-                                            {/* STEP 4: Audiens dan Masalah Utama */}
-                                            {step === 4 && (
-                                                <div className="flex flex-col gap-4">
-                                                    <div className="flex flex-col gap-1">
-                                                        <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            Dari mana calon pembelimu datang?
-                                                        </h3>
-                                                        <p className="text-xs text-[#64748b]">
-                                                            Pilih sumber yang sudah kamu gunakan. Boleh lebih dari satu.
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex max-h-[190px] flex-col gap-1.5 overflow-y-auto pr-1">
-                                                        {AUDIENCE_SOURCE_OPTIONS.map((source) => (
-                                                            <label
-                                                                key={source}
-                                                                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-2.5 transition-all ${
-                                                                    audienceSources.includes(source)
-                                                                        ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
-                                                                        : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
-                                                                }`}
-                                                            >
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={audienceSources.includes(source)}
-                                                                    onChange={() => handleAudienceSourceToggle(source)}
-                                                                    className="size-4 rounded text-[#4f46e5] accent-[#4f46e5]"
-                                                                />
-                                                                <span className="text-xs font-semibold text-[#1e293b]">
-                                                                    {source}
-                                                                </span>
-                                                            </label>
-                                                        ))}
-                                                    </div>
-
-                                                    <div className="flex flex-col gap-1 pt-1">
-                                                        <h4 className="text-sm font-extrabold text-[#0f172a]">
-                                                            Apa yang paling ingin kamu benahi sekarang?
-                                                        </h4>
-                                                    </div>
-                                                    <div className="flex max-h-[190px] flex-col gap-1.5 overflow-y-auto pr-1">
-                                                        {PRIMARY_PROBLEM_OPTIONS.map((problem) => (
-                                                            <label
-                                                                key={problem}
-                                                                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-2.5 transition-all ${
-                                                                    primaryProblem === problem
-                                                                        ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
-                                                                        : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
-                                                                }`}
-                                                            >
-                                                                <input
-                                                                    type="radio"
-                                                                    name="primary_problem"
-                                                                    value={problem}
-                                                                    checked={primaryProblem === problem}
-                                                                    onChange={() => {
-                                                                        setPrimaryProblem(problem);
-                                                                        if (error) setError('');
-                                                                    }}
-                                                                    className="size-4 text-[#4f46e5] accent-[#4f46e5]"
-                                                                />
-                                                                <span className="text-xs font-semibold text-[#1e293b]">
-                                                                    {problem}
-                                                                </span>
-                                                            </label>
-                                                        ))}
-                                                    </div>
-                                                    {primaryProblem === 'Masalah lainnya' && (
-                                                        <input
-                                                            type="text"
-                                                            value={otherProblem}
-                                                            onChange={(e) => {
-                                                                setOtherProblem(e.target.value);
-                                                                if (error) setError('');
-                                                            }}
-                                                            placeholder="Jelaskan masalah lainnya..."
-                                                            className={inputBase}
-                                                        />
-                                                    )}
-
-                                                    <div className="mt-2 flex items-center gap-3">
-                                                        <button
-                                                            type="button"
-                                                            onClick={prevStep}
-                                                            className="flex h-[52px] flex-1 cursor-pointer items-center justify-center rounded-xl border border-[#cbd5e1] bg-white text-sm font-bold text-[#475569] transition-all hover:bg-[#f8fafc]"
-                                                        >
-                                                            Kembali
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={nextStep}
-                                                            className="flex h-[52px] flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#4f46e5] text-base font-extrabold text-white shadow-[0_10px_15px_-3px_rgba(79,70,229,.3)] transition-all hover:bg-[#4338ca]"
-                                                        >
-                                                            Konfirmasi Sumber & Kendala
-                                                            <ArrowRight />
-                                                        </button>
-                                                    </div>
-                                                    <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-[#64748b]">
-                                                        <span className="text-amber-500">⚡</span> Cuma 30 detik
-                                                    </p>
-                                                </div>
-                                            )}
-
-                                            {/* STEP 5: Kebutuhan Bantuan */}
-                                            {step === 5 && (
-                                                <div className="flex flex-col gap-4">
-                                                    <div className="flex flex-col gap-1">
-                                                        <h3 className="text-base font-extrabold text-[#0f172a]">
-                                                            Kebutuhan Bantuan & Rencana
-                                                        </h3>
-                                                    </div>
-
-                                                    <div className="flex flex-col gap-1.5">
-                                                        <span className="text-xs font-bold text-[#334155]">
-                                                            Kamu ingin dibantu sampai tahap apa? <span className="text-[#e11d48]">*</span>
-                                                        </span>
-                                                        <div className="flex flex-col gap-1.5">
-                                                            {HELP_STAGE_OPTIONS.map((opt) => (
-                                                                <label
-                                                                    key={opt}
-                                                                    className={`flex cursor-pointer items-center gap-3 rounded-xl border p-2.5 transition-all ${
-                                                                        helpStage === opt
-                                                                            ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
-                                                                            : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
-                                                                    }`}
-                                                                >
-                                                                    <input
-                                                                        type="radio"
-                                                                        name="help_stage"
-                                                                        value={opt}
-                                                                        checked={helpStage === opt}
-                                                                        onChange={() => {
-                                                                            setHelpStage(opt);
-                                                                            if (error) setError('');
-                                                                        }}
-                                                                        className="size-4 text-[#4f46e5] accent-[#4f46e5]"
-                                                                    />
-                                                                    <span className="text-xs font-semibold text-[#1e293b]">
-                                                                        {opt}
-                                                                    </span>
-                                                                </label>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="flex flex-col gap-1.5">
-                                                        <span className="text-xs font-bold text-[#334155]">
-                                                            Kalau ada solusi yang cocok, apakah kamu siap mempertimbangkan biaya kerja sama dengan agency? <span className="text-[#e11d48]">*</span>
-                                                        </span>
-                                                        <div className="flex flex-col gap-1.5">
-                                                            {BUDGET_READY_OPTIONS.map((opt) => (
-                                                                <label
-                                                                    key={opt}
-                                                                    className={`flex cursor-pointer items-center gap-3 rounded-xl border p-2.5 transition-all ${
-                                                                        agencyBudgetReady === opt
-                                                                            ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
-                                                                            : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
-                                                                    }`}
-                                                                >
-                                                                    <input
-                                                                        type="radio"
-                                                                        name="budget_ready"
-                                                                        value={opt}
-                                                                        checked={agencyBudgetReady === opt}
-                                                                        onChange={() => {
-                                                                            setAgencyBudgetReady(opt);
-                                                                            if (error) setError('');
-                                                                        }}
-                                                                        className="size-4 text-[#4f46e5] accent-[#4f46e5]"
-                                                                    />
-                                                                    <span className="text-xs font-semibold text-[#1e293b]">
-                                                                        {opt}
-                                                                    </span>
-                                                                </label>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="flex flex-col gap-1.5">
-                                                        <span className="text-xs font-bold text-[#334155]">
-                                                            Kapan kamu ingin mulai membenahi marketing? <span className="text-[#e11d48]">*</span>
-                                                        </span>
-                                                        <div className="flex flex-col gap-1.5">
-                                                            {TIMELINE_OPTIONS.map((opt) => (
-                                                                <label
-                                                                    key={opt}
-                                                                    className={`flex cursor-pointer items-center gap-3 rounded-xl border p-2.5 transition-all ${
-                                                                        timeline === opt
-                                                                            ? 'border-[#4f46e5] bg-[#eef2ff] shadow-sm'
-                                                                            : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
-                                                                    }`}
-                                                                >
-                                                                    <input
-                                                                        type="radio"
-                                                                        name="timeline"
-                                                                        value={opt}
-                                                                        checked={timeline === opt}
-                                                                        onChange={() => {
-                                                                            setTimeline(opt);
-                                                                            if (error) setError('');
-                                                                        }}
-                                                                        className="size-4 text-[#4f46e5] accent-[#4f46e5]"
-                                                                    />
-                                                                    <span className="text-xs font-semibold text-[#1e293b]">
-                                                                        {opt}
-                                                                    </span>
-                                                                </label>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-
                                                     <div className="mt-2 flex items-center gap-3">
                                                         <button
                                                             type="button"
@@ -1401,8 +989,8 @@ export default function Project({ clientCount = '10+' }: ProjectProps) {
                                                 </div>
                                             )}
 
-                                            {/* STEP 6: Tinjau dan Kirim */}
-                                            {step === 6 && (
+                                            {/* STEP 3: Tinjau dan Kirim */}
+                                            {step === 3 && (
                                                 <div className="flex flex-col gap-4">
                                                     <div className="flex flex-col gap-1">
                                                         <h3 className="text-base font-extrabold text-[#0f172a]">
@@ -1418,7 +1006,6 @@ export default function Project({ clientCount = '10+' }: ProjectProps) {
                                                         <div><span className="font-bold text-[#0f172a]">WhatsApp:</span> {phone}</div>
                                                         <div><span className="font-bold text-[#0f172a]">Email:</span> {email}</div>
                                                         <div><span className="font-bold text-[#0f172a]">Link Bisnis:</span> {websiteLink}</div>
-                                                        <div><span className="font-bold text-[#0f172a]">Program:</span> {programType === 'Lainnya' ? otherProgram : programType} ({totalBuyers})</div>
                                                     </div>
 
                                                     <p className="text-xs leading-[1.5] text-[#64748b]">
@@ -1512,7 +1099,7 @@ export default function Project({ clientCount = '10+' }: ProjectProps) {
                                                     Terima kasih, {name}!
                                                 </h3>
                                                 <p className="max-w-[420px] text-sm leading-[1.6] text-[#475569]">
-                                                    Terima kasih sudah cerita tentang rencanamu. Audit ini difokuskan pada program yang sudah pernah terjual, punya bukti hasil pelanggan, dan sudah memiliki audiens. Untuk tahapmu sekarang, prioritasnya adalah menyiapkan penawaran dan mendapatkan pelanggan awal. Setelah itu, kamu bisa mengajukan audit kembali.
+                                                    Terima kasih sudah cerita tentang rencanamu. Audit ini difokuskan pada program yang sudah memiliki sumber calon pembeli/audiens aktif. Untuk tahapmu sekarang, prioritasnya adalah mulai membangun audiens dan mendapatkan calon pembeli awal. Setelah itu, kamu bisa mengajukan audit kembali.
                                                 </p>
                                             </div>
 
